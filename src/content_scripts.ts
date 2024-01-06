@@ -6,12 +6,12 @@ chrome.runtime.onMessage.addListener(async function (
 	sendResponse
 ) {
 	if (message.request === "click-extension") {
-		await createCapture(message.id);
-		sendResponse(true);
+		await createCapture();
+		sendResponse({ status: "SEND" });
 	}
 });
 
-async function createCapture(id: number) {
+async function createCapture() {
 	const width: number = window.innerWidth;
 	const height: number = window.innerHeight;
 
@@ -20,14 +20,17 @@ async function createCapture(id: number) {
 	// console.log(document.body.clientWidth);
 	// console.log(document.body.scrollHeight);
 
-	html2canvas(document.body, {
-		width: width,
-		height: document.body.scrollHeight,
-		windowWidth: width,
-	}).then(function (canvas) {
-		saveImageOnClipBoard(canvas, id);
-		createDownloadLink(canvas);
-	});
+	try {
+		const canvas = await html2canvas(document.body, {
+			width: width,
+			height: document.body.scrollHeight,
+			windowWidth: width,
+		});
+		await saveImageOnClipBoard(canvas);
+		await createDownloadLink(canvas);
+	} catch (error) {
+		console.error(error);
+	}
 }
 
 async function createDownloadLink(canvas: HTMLCanvasElement) {
@@ -58,10 +61,11 @@ async function getImageNameFromStorage(): Promise<string> {
 	}
 
 	const imageName = name + count.toString().padStart(4, "0") + ex;
+	console.log(imageName);
 	return imageName;
 }
 
-async function saveImageOnClipBoard(canvas: HTMLCanvasElement, id: number) {
+function saveImageOnClipBoard(canvas: HTMLCanvasElement) {
 	const imageData: string = canvas.toDataURL("image/png");
 
 	if (!canvas) {
