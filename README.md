@@ -20,7 +20,7 @@ npm run build
 ## 依存関係
 
 - crxjs/vite-plugin
-- @types/chrome
+- types/chrome
 - typescript
 - vite
 - html2canvas

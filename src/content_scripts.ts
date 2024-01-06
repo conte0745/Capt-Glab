@@ -30,61 +30,63 @@ async function createCapture(id: number) {
 	});
 }
 
-function createDownloadLink(canvas: HTMLCanvasElement) {
+async function createDownloadLink(canvas: HTMLCanvasElement) {
 	const link = document.createElement("a");
 	link.href = canvas.toDataURL();
-	link.download = getImageNameFromStorage();
+	link.download = await getImageNameFromStorage();
 	link.click();
 }
 
-function getImageNameFromStorage(): string {
+async function getImageNameFromStorage(): Promise<string> {
 	const ex = ".png";
 	let name: string = "screen-";
-	let count: number | undefined = undefined;
-	chrome.storage.local.get(["image-name-count"]).then((result) => {
-		count = Number(result.key) ?? 0;
-		count = isNaN(count) ? 0 : count;
+	let count: number = 0;
+
+	try {
+		const result = await new Promise((resolve) => {
+			chrome.storage.local.get(["image-name-count"], (data) => {
+				resolve(data["image-name-count"]);
+			});
+		});
+
+		count = Number(result) || 0;
 		count += 1;
-		console.log(count);
-	});
-	chrome.storage.local.set({ ["image-name-count"]: count });
-	count = count ?? 0;
+
+		chrome.storage.local.set({ "image-name-count": count });
+	} catch (error) {
+		console.error("Error getting image count from storage:", error);
+	}
+
 	const imageName = name + count.toString().padStart(4, "0") + ex;
-	console.log(imageName);
 	return imageName;
 }
 
-function saveImageOnClipBoard(canvas: HTMLCanvasElement, id: number) {
+async function saveImageOnClipBoard(canvas: HTMLCanvasElement, id: number) {
 	const imageData: string = canvas.toDataURL("image/png");
 
-	if (canvas === undefined || canvas === null) {
+	if (!canvas) {
 		return;
 	}
 
-	// 新たに画像を生成する
 	const img = new Image();
 	img.src = imageData;
 
-	// 画像が読み込まれた後、それをクリップボードにコピーする
-	img.onload = async function () {
-		const canvasForCopying: HTMLCanvasElement =
-			document.createElement("canvas");
+	img.onload = () => {
+		const canvasForCopying = document.createElement("canvas");
 		canvasForCopying.width = img.width;
 		canvasForCopying.height = img.height;
 		const context = canvasForCopying.getContext("2d");
 		context!.drawImage(img, 0, 0, img.width, img.height);
 
-		alert("Copy image on clip board");
-
-		canvasForCopying.toBlob((blob) => {
-			navigator.clipboard
-				.write([new ClipboardItem({ "image/png": blob! })])
-				.then(() => {
-					console.log("Image copied to clipboard!");
-				})
-				.catch((error) => {
-					console.error("Failed to copy image to clipboard:", error);
-				});
+		canvasForCopying.toBlob(async (blob) => {
+			try {
+				await navigator.clipboard.write([
+					new ClipboardItem({ "image/png": blob! }),
+				]);
+				console.log("Image copied to clipboard!");
+			} catch (error) {
+				console.error("Failed to copy image to clipboard:", error);
+			}
 		});
 	};
 }

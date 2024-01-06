@@ -27,9 +27,17 @@ const manifest = defineManifest({
 		open_in_tab: false,
 	},
 
-	permissions: ["activeTab", "storage"],
+	permissions: ["tabs", "activeTab", "storage"],
 });
 
 export default defineConfig({
+	build: {
+		rollupOptions: {
+			input: {
+				popupts: "./src/popup/popup.ts",
+				popuphtml: "./src/popup/index.html",
+			},
+		},
+	},
 	plugins: [crx({ manifest })],
 });
