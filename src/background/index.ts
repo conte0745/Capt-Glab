@@ -1,5 +1,5 @@
 chrome.action.onClicked.addListener(async function (tab) {
-	if (!tab || !tab.id) {
+	if (!tab || !tab.id || tab.url?.startsWith("chrome://extensions/")) {
 		return;
 	}
 	const tabId = tab.id;

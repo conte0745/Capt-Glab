@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 	<head>
 		<meta charset="utf-8" />
+		<style>
+			.btn {
+				font-size: 0.9rem;
+				border-radius: 100vh;
+			}
+		</style>
 	</head>
 	<body>
 		<div>
-			<h1>example settings</h1>
-			<div class="js-description"></div>
+			<h1>設定</h1>
+			<div class="js-description">
+				<span>現在のカウント：</span>
+				<span id="storageValues"></span>&emsp;
+				<button class="btn" id="reset-count">カウントをリセット</button>
+			</div>
 		</div>
 		<script type="module" src="/src/options/index.ts"></script>
 	</body>

@@ -82,6 +82,8 @@ function saveImageOnClipBoard(canvas: HTMLCanvasElement) {
 		const context = canvasForCopying.getContext("2d");
 		context!.drawImage(img, 0, 0, img.width, img.height);
 
+		alert("画像を保存しました");
+
 		canvasForCopying.toBlob(async (blob) => {
 			try {
 				await navigator.clipboard.write([
