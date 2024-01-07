@@ -26,8 +26,7 @@ const manifest = defineManifest({
 		page: "src/options/index.html",
 		open_in_tab: false,
 	},
-
-	permissions: ["tabs", "activeTab", "storage"],
+	permissions: ["activeTab", "storage"],
 });
 
 export default defineConfig({
