@@ -1,3 +1,5 @@
+export {};
+
 document.addEventListener("DOMContentLoaded", function () {
 	// ローカルストレージから'image-count'の値を取得して表示する関数
 	function displayImageCount() {

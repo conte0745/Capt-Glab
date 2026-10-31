@@ -1,3 +1,5 @@
+export {};
+
 chrome.action.onClicked.addListener(function (tab) {
 	if (!tab || !tab.id) {
 		return;

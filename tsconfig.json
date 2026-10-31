@@ -2,12 +2,22 @@
 	"compilerOptions": {
 		"target": "ESNext",
 		"module": "ESNext",
-		"lib": ["ESNext", "DOM", "DOM.Iterable"],
+		"lib": [
+			"ESNext",
+			"DOM",
+			"DOM.Iterable"
+		],
 		"strict": true,
 		"moduleResolution": "bundler",
 		"esModuleInterop": true,
-		"types": ["chrome"],
+		"types": [
+			"chrome",
+			"node"
+		],
 		"noEmit": true
 	},
-	"include": ["src"]
+	"include": [
+		"src",
+		"tests"
+	]
 }
