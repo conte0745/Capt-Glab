@@ -54,7 +54,7 @@ pnpm build
 | `pnpm dev`     | 開発サーバーを起動します                        |
 | `pnpm build`   | 型チェックのあと、`dist/` にビルドします        |
 | `pnpm preview` | ビルド結果をプレビューします                    |
-| `pnpm zip`     | `dist/` を圧縮し、`release/` に zip を出力します |
+| `pnpm zip`     | ビルドして `dist/` を圧縮し、`release/` に zip を出力します |
 
 ### ディレクトリ構成
 
@@ -81,12 +81,7 @@ vite.config.ts manifest の定義
 バージョンは `package.json` の `version` だけで管理します。manifest の `version` と zip のファイル名には、この値が使われます。
 
 1. `package.json` の `version` を更新します。
-2. ビルドして圧縮します。`pnpm zip` はビルドを行わないため、先に `pnpm build` が必要です。
-
-   ```sh
-   pnpm build
-   pnpm zip
-   ```
+2. `pnpm zip` を実行します。ビルドも合わせて行われます。
 
 3. `release/captgrab-<version>.zip` が生成されます。zip のルートに `manifest.json` が入ります。
 

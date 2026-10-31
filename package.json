@@ -7,7 +7,7 @@
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview",
-		"zip": "mkdir -p release && cd dist && zip -FS -r ../release/captgrab-$npm_package_version.zip . -x '*.DS_Store'"
+		"zip": "pnpm build && mkdir -p release && cd dist && zip -FS -r ../release/captgrab-$npm_package_version.zip . -x '*.DS_Store'"
 	},
 	"devDependencies": {
 		"@crxjs/vite-plugin": "^3.0.0",
