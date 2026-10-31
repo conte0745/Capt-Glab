@@ -1,144 +1,242 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>CaptGrab - 使い方ガイド</title>
-		<meta
-			name="description"
-			content="Chrome拡張機能 CaptGrab の導入手順、基本操作、制限事項、よくある質問をまとめたガイドです。"
-		/>
-		<link rel="icon" href="images/icon.png" />
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body>
-		<header class="site-header">
-			<div class="wrap">
-				<a class="brand" href="./">
-					<img src="images/icon.png" alt="" width="256" height="256" />
-					CaptGrab
-				</a>
-				<nav class="site-nav" aria-label="メイン">
-					<a href="./">トップ</a>
-					<a href="privacy-policy.html">プライバシーポリシー</a>
-				</nav>
-			</div>
-		</header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CaptGrab - 使い方ガイド</title>
+    <meta
+      name="description"
+      content="Chrome拡張機能 CaptGrab の導入手順、基本操作、制限事項、よくある質問をまとめたガイドです。"
+    />
+    <link rel="icon" href="images/icon.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./">
+          <img src="images/icon.png" alt="" width="256" height="256" />
+          CaptGrab
+        </a>
+        <nav class="site-nav" aria-label="メイン">
+          <a href="./">トップ</a>
+          <a href="privacy-policy.html">プライバシーポリシー</a>
+        </nav>
+      </div>
+    </header>
 
-		<main class="wrap doc">
-			<nav class="toc" aria-label="目次">
-				<p>目次</p>
-				<ul>
-					<li><a href="#install">導入手順</a></li>
-					<li><a href="#usage">基本操作</a></li>
-					<li><a href="#settings">設定</a></li>
-					<li><a href="#limits">制限事項</a></li>
-					<li><a href="#faq">よくある質問</a></li>
-					<li><a href="#support">サポート</a></li>
-				</ul>
-			</nav>
-			<article>
-				<h1>使い方ガイド</h1>
-				<p class="doc-meta">導入から、うまく撮れないときの対処までをまとめています。</p>
+    <main class="wrap doc">
+      <nav class="toc" aria-label="目次">
+        <p>目次</p>
+        <ul>
+          <li><a href="#install">導入手順</a></li>
+          <li><a href="#usage">基本操作</a></li>
+          <li><a href="#settings">設定</a></li>
+          <li><a href="#limits">制限事項</a></li>
+          <li><a href="#faq">よくある質問</a></li>
+          <li><a href="#support">サポート</a></li>
+        </ul>
+      </nav>
+      <article>
+        <h1>使い方ガイド</h1>
+        <p class="doc-meta">
+          導入から、うまく撮れないときの対処までをまとめています。
+        </p>
 
-				<h2 id="install">導入手順</h2>
-				<p>ソースコードからビルドして読み込みます。Node.js、pnpm、Git が必要です。</p>
-				<ol>
-					<li>
-						リポジトリを取得してビルドします。
-						<pre><code>git clone https://github.com/conte0745/Capt-Glab.git
+        <h2 id="install">導入手順</h2>
+        <p>
+          ソースコードからビルドして読み込みます。Node.js（20.19以上または22.12以上）、pnpm、Git が必要です。
+        </p>
+        <ol>
+          <li>
+            リポジトリを取得してビルドします。
+            <pre><code>git clone https://github.com/conte0745/Capt-Glab.git
 cd Capt-Glab
 pnpm install
 pnpm build</code></pre>
-					</li>
-					<li>Chromeで <code>chrome://extensions</code> を開きます。</li>
-					<li>右上の「デベロッパー モード」をオンにします。</li>
-					<li>「パッケージ化されていない拡張機能を読み込む」から、生成された <code>dist</code> フォルダを選びます。</li>
-				</ol>
+          </li>
+          <li>Chromeで <code>chrome://extensions</code> を開きます。</li>
+          <li>右上の「デベロッパー モード」をオンにします。</li>
+          <li>
+            「パッケージ化されていない拡張機能を読み込む」から、生成された
+            <code>dist</code> フォルダを選びます。
+          </li>
+        </ol>
 
-				<h2 id="usage">基本操作</h2>
-				<ol>
-					<li>撮りたいページをタブに表示します。</li>
-					<li>ツールバーの CaptGrab のアイコンを押します。</li>
-					<li>アイコンの下に「撮影中…」と表示され、撮影が始まります。</li>
-					<li>「保存してコピーしました」と表示されると完了です。表示は約2秒で閉じます。</li>
-				</ol>
-				<p>
-					画像はブラウザのダウンロード先に <code>screen-0001.png</code>
-					の形式で保存され、クリップボードにもコピーされます。動作は<a href="#settings">設定</a>で変更できます。ショートカットキーは
-					<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> です。
-				</p>
+        <h2 id="usage">基本操作</h2>
+        <ol>
+          <li>撮りたいページをタブに表示します。</li>
+          <li>ツールバーの CaptGrab のアイコンを押します。</li>
+          <li>アイコンの下に「撮影中…」と表示され、撮影が始まります。</li>
+          <li>
+            「保存してコピーしました」と表示されると完了です。表示は約2秒で閉じます。
+          </li>
+        </ol>
+        <p>
+          画像はブラウザのダウンロード先に
+          <code>screen-0001.png</code>
+          の形式で保存され、クリップボードにもコピーされます。動作は<a
+            href="#settings"
+            >設定</a
+          >で変更できます。ショートカットキーの初期設定は <kbd>Alt</kbd> +
+          <kbd>Shift</kbd> + <kbd>S</kbd>（Macは <kbd>Option</kbd> +
+          <kbd>Shift</kbd> + <kbd>S</kbd>）です。
+        </p>
 
-				<h2 id="settings">設定</h2>
-				<p>アイコンを右クリックして「オプション」を選ぶと、設定画面が開きます。変更はすぐに保存されます。</p>
-				<ul>
-					<li><strong>撮影後の動作：</strong>ファイルに保存、クリップボードにコピー、別のタブで開く、から1つ以上選びます。</li>
-					<li><strong>保存先：</strong>ダウンロードフォルダ内のフォルダ名を指定します。毎回保存先を選ぶこともできます。Chromeの制限で、ダウンロードフォルダの外を固定の保存先にはできません。</li>
-					<li><strong>ビューポートのサイズ：</strong>現在の表示サイズか、指定したサイズで撮影します。サイズを指定すると、撮影中にページのレイアウトが一時的に変わります。幅だけを変えるので、スマートフォン専用の表示になるとは限りません。</li>
-					<li><strong>ファイル名の連番：</strong>次のファイル名を確認し、番号をリセットできます。</li>
-					<li><strong>ショートカットキー：</strong>Chromeの設定画面で変更できます。</li>
-				</ul>
+        <h2 id="settings">設定</h2>
+        <p>
+          撮影時にアイコンの下に出る表示の歯車ボタンから、設定画面を開けます。アイコンを右クリックして「オプション」を選んでも開けます。変更はすぐに保存されます。
+        </p>
+        <ul>
+          <li>
+            <strong>撮影後の動作：</strong
+            >ファイルに保存、クリップボードにコピー、別のタブで開く、から1つ以上選びます。
+          </li>
+          <li>
+            <strong>保存先：</strong
+            >ダウンロードフォルダ内のフォルダ名を指定します。毎回保存先を選ぶこともできます。Chromeの制限で、ダウンロードフォルダの外を固定の保存先にはできません。
+          </li>
+          <li>
+             <strong>撮影するときの画面サイズ（ビューポート）：</strong>現在の表示サイズか、指定したサイズで撮影します。サイズを指定すると、撮影中にページのレイアウトが一時的に変わります。幅だけを変えるので、スマートフォン専用の表示になるとは限りません。
+          </li>
+          <li>
+            <strong>スクロールする領域：</strong
+            >本文やサイドメニューだけがスクロールする画面で、最後まで撮るかを選べます。撮影中だけ領域を広げ、撮影後に元に戻します。
+          </li>
+          <li>
+            <strong>ファイル名の連番：</strong
+            >次のファイル名を確認し、番号をリセットできます。
+          </li>
+          <li>
+            <strong>ショートカットキー：</strong
+            >現在のキーを確認でき、Chromeの設定画面で変更できます。他の拡張機能と重なっていると割り当てられないことがあります。
+          </li>
+        </ul>
 
-				<h2 id="limits">制限事項</h2>
-				<ul>
-					<li><code>chrome://</code> などのブラウザ内部ページは撮影できません。</li>
-					<li>長いページは、画像の長辺が16,000pxに収まるよう縮小して保存します。縮小したときはその旨を表示します。</li>
-					<li>撮影範囲の横幅は表示中の幅までです。横にはみ出した部分は写りません。</li>
-					<li>スクロールして初めて読み込まれる画像は、読み込み前だと写らないことがあります。先にページを一度スクロールしてください。</li>
-				</ul>
+        <h3>別タブで開いた画像のショートカットキー</h3>
+        <ul>
+          <li><kbd>Ctrl</kbd> + <kbd>S</kbd>（Macは <kbd>Command</kbd> + <kbd>S</kbd>）：設定の保存先に保存</li>
+          <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>（Macは <kbd>Command</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>）：別名で保存</li>
+          <li><kbd>Ctrl</kbd> + <kbd>C</kbd>（Macは <kbd>Command</kbd> + <kbd>C</kbd>）：クリップボードにコピー</li>
+        </ul>
 
-				<h2 id="faq">よくある質問</h2>
-				<dl>
-					<dt>「デバッグを開始しました」というバーが出ます。問題ありませんか？</dt>
-					<dd>
-						デバッガ権限を使う拡張機能でChromeが表示する正常な動作です。バーは撮影後、数秒で消えます。バーが出ている間はページの表示が少し縮みますが、撮影結果には影響しません。
-					</dd>
-					<dt>続けて撮影すると、時間がかかります。</dt>
-					<dd>
-						同じタブでは、前回の撮影から約6秒経つまで次の撮影を待ちます。バーの表示中はタブの高さが縮んでいるため、消えてから正しい高さで撮るようにしています。サイズを指定している場合は待ちません。
-					</dd>
-					<dt>「クリップボードにコピーできませんでした」と出ます。</dt>
-					<dd>
-						撮影中に他の場所をクリックすると失敗することがあります。ファイルに保存する設定なら、画像はダウンロード先に保存されています。
-					</dd>
-					<dt>「このページは撮影できません」と出ます。</dt>
-					<dd>
-						<code>chrome://</code> やChromeウェブストアなど、ブラウザが保護しているページは撮影できません。
-					</dd>
-					<dt>「撮影できませんでした」と出ます。</dt>
-					<dd>
-						他の拡張機能がタブを操作している場合は、その処理が終わってからお試しください。それ以外の場合は、ページを読み込み直してからお試しください。
-					</dd>
-					<dt>別のタブに表示した画像が消えました。</dt>
-					<dd>
-						表示用の画像は保存していないため、再読み込みすると消えます。残したいときは、画面の「ダウンロード」を押してください。
-					</dd>
-					<dt>撮影した画像はどこかに送信されますか？</dt>
-					<dd>
-						送信しません。詳しくは<a href="privacy-policy.html">プライバシーポリシー</a>をご覧ください。
-					</dd>
-				</dl>
+        <h2 id="limits">制限事項</h2>
+        <ul>
+          <li>
+            <code>chrome://</code> などのブラウザ内部ページは撮影できません。
+          </li>
+          <li>
+            長いページは、画像の長辺が16,000pxに収まるよう縮小して保存します。縮小したときはその旨を表示します。
+          </li>
+          <li>
+            本文やサイドメニューだけがスクロールする画面は、設定に応じて領域を広げて撮影します。初期設定では本文だけを広げ、メニューは見えている部分を写します。iframeの中のスクロールは広げられません。サイトの作りによってはレイアウトが崩れたり、表示中の分しか読み込まない一覧が途中までになったりすることがあります。その場合は設定でオフにしてください。
+          </li>
+          <li>
+            撮影範囲の横幅は表示中の幅までです。横にはみ出した部分は写りません。
+          </li>
+          <li>
+            スクロールして初めて読み込まれる画像は、読み込み前だと写らないことがあります。先にページを一度スクロールしてください。
+          </li>
+        </ul>
 
-				<h2 id="support">サポート</h2>
-				<p>
-					ご質問は <a href="mailto:captgrab@shiftonton.net">captgrab@shiftonton.net</a> までお問い合わせください。不具合の報告やご要望は
-					<a href="https://github.com/conte0745/Capt-Glab/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a>
-					でも受け付けています。発生したページの種類とChromeのバージョンを添えていただくと、確認がスムーズです。
-				</p>
-			</article>
-		</main>
+        <h2 id="faq">よくある質問</h2>
+        <dl>
+          <dt>
+            「デバッグを開始しました」というバーが出ます。問題ありませんか？
+          </dt>
+          <dd>
+            デバッガ権限を使う拡張機能でChromeが表示する正常な動作です。バーは撮影後、数秒で消えます。バーが出ている間はページの表示が少し縮みますが、撮影結果には影響しません。
+          </dd>
+          <dt>続けて撮影すると、時間がかかります。</dt>
+          <dd>
+            同じタブでは、前回の撮影から約6秒経つまで次の撮影を待ちます。バーの表示中はタブの高さが縮んでいるため、消えてから正しい高さで撮るようにしています。サイズを指定している場合は待ちません。
+          </dd>
+          <dt>「クリップボードにコピーできませんでした」と出ます。</dt>
+          <dd>
+            撮影中に他の場所をクリックすると失敗することがあります。ファイルに保存する設定なら、画像はダウンロード先に保存されています。
+          </dd>
+          <dt>「このページは撮影できません」と出ます。</dt>
+          <dd>
+            <code>chrome://</code>
+            やChromeウェブストアなど、ブラウザが保護しているページは撮影できません。
+          </dd>
+          <dt>「撮影できませんでした」と出ます。</dt>
+          <dd>
+            他の拡張機能がタブを操作している場合は、その処理が終わってからお試しください。それ以外の場合は、ページを読み込み直してからお試しください。
+          </dd>
+          <dt>「本文の見えていない部分は写っていません」と出ます。</dt>
+          <dd>
+            設定の「本文を最後まで撮る」がオフのときや、広げられない作りのページで表示されます。設定をオンにしてお試しください。
+          </dd>
+          <dt>「撮影中です」と出ます。</dt>
+          <dd>
+            同じタブの撮影がまだ終わっていません。少し待ってからもう一度お試しください。
+          </dd>
+          <dt>撮影中にデバッグのバーで「キャンセル」を押すと、ページの表示が崩れました。</dt>
+          <dd>
+            撮影のために広げた領域は、30秒以内に自動で元に戻ります。すぐに戻すには、ページを読み込み直してください。
+          </dd>
+          <dt>別のタブに表示した画像が消えました。</dt>
+          <dd>
+            表示用の画像は保存していないため、再読み込みすると消えます。残したいときは、画面の「保存」を押すか、ショートカットキーを使ってください。
+          </dd>
+          <dt>撮影した画像はどこかに送信されますか？</dt>
+          <dd>
+            送信しません。詳しくは<a href="privacy-policy.html"
+              >プライバシーポリシー</a
+            >をご覧ください。
+          </dd>
+        </dl>
 
-		<footer class="site-footer">
-			<div class="wrap">
-				<ul>
-					<li><a href="./">トップ</a></li>
-					<li><a href="privacy-policy.html">プライバシーポリシー</a></li>
-					<li><a href="https://github.com/conte0745/Capt-Glab" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-					<li><a href="mailto:captgrab@shiftonton.net">お問い合わせ</a></li>
-					<li><a href="https://ofuse.me/o?uid=213935" target="_blank" rel="noopener noreferrer">OFUSEで応援を送る</a></li>
-				</ul>
-				<p>© 2024 Conte0745. Released under the <a href="https://github.com/conte0745/Capt-Glab/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>.</p>
-			</div>
-		</footer>
-	</body>
+        <h2 id="support">サポート</h2>
+        <p>
+          ご質問は
+          <a href="mailto:captgrab@shiftonton.net">captgrab@shiftonton.net</a>
+          までお問い合わせください。不具合の報告やご要望は
+          <a
+            href="https://github.com/conte0745/Capt-Glab/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub Issues</a
+          >
+          でも受け付けています。発生したページの種類とChromeのバージョンを添えていただくと、確認がスムーズです。
+        </p>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <ul>
+          <li><a href="./">トップ</a></li>
+          <li><a href="privacy-policy.html">プライバシーポリシー</a></li>
+          <li>
+            <a
+              href="https://github.com/conte0745/Capt-Glab"
+              target="_blank"
+              rel="noopener noreferrer"
+              >GitHub</a
+            >
+          </li>
+          <li><a href="mailto:captgrab@shiftonton.net">お問い合わせ</a></li>
+          <li>
+            <a
+              href="https://ofuse.me/o?uid=213935"
+              target="_blank"
+              rel="noopener noreferrer"
+              >OFUSEで応援を送る</a
+            >
+          </li>
+        </ul>
+        <p>
+          © 2024 Conte0745. Released under the
+          <a
+            href="https://github.com/conte0745/Capt-Glab/blob/main/LICENSE"
+            target="_blank"
+            rel="noopener noreferrer"
+            >MIT License</a
+          >.
+        </p>
+      </div>
+    </footer>
+  </body>
 </html>

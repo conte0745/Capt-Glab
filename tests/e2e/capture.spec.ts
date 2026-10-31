@@ -208,6 +208,204 @@ test.describe("長いページ", () => {
 	});
 });
 
+test.describe("スクロールする領域", () => {
+	const options = (expandContent: boolean, expandMenu: boolean) => ({
+		download: true,
+		clipboard: false,
+		expandContent,
+		expandMenu,
+	});
+
+	for (const layout of ["app-shell", "app-header"]) {
+		test(`${layout}: 初期設定で本文を最後まで撮る`, async ({
+			extension,
+			page,
+			url,
+		}) => {
+			await page.goto(url + layout);
+
+			await clickAction(extension, page);
+			const shot = await waitForShot(extension, page);
+
+			expect(shot.hasContentEnd).toBe(true);
+			// 本文と同じ高さに伸びたメニューも、広げなくても全部見える
+			expect(shot.hasMenuEnd).toBe(true);
+		});
+
+		test(`${layout}: 両方オンならどちらも最後まで撮る`, async ({
+			extension,
+			page,
+			url,
+		}) => {
+			await setSettings(extension, options(true, true));
+			await page.goto(url + layout);
+
+			await clickAction(extension, page);
+			const shot = await waitForShot(extension, page);
+
+			expect(shot.hasContentEnd).toBe(true);
+			expect(shot.hasMenuEnd).toBe(true);
+		});
+
+		test(`${layout}: 両方オフなら見えている部分だけ撮る`, async ({
+			extension,
+			page,
+			url,
+		}) => {
+			await setSettings(extension, options(false, false));
+			await page.goto(url + layout);
+			const height = await page.evaluate(() => innerHeight);
+
+			await clickAction(extension, page);
+			const shot = await waitForShot(extension, page);
+
+			expect(shot.height).toBe(height);
+			expect(shot.hasContentEnd).toBe(false);
+			expect(shot.hasMenuEnd).toBe(false);
+		});
+	}
+
+	for (const layout of ["menu-fixed", "menu-sticky"]) {
+		test(`${layout}: メニューをオンにすると最後まで写る`, async ({
+			extension,
+			page,
+			url,
+		}) => {
+			await setSettings(extension, options(true, true));
+			await page.goto(url + layout);
+
+			await clickAction(extension, page);
+			const shot = await waitForShot(extension, page);
+
+			expect(shot.hasContentEnd).toBe(true);
+			expect(shot.hasMenuEnd).toBe(true);
+		});
+
+		test(`${layout}: メニューをオフにすると本文だけ最後まで写る`, async ({
+			extension,
+			page,
+			url,
+		}) => {
+			await page.goto(url + layout);
+
+			await clickAction(extension, page);
+			const shot = await waitForShot(extension, page);
+
+			expect(shot.hasContentEnd).toBe(true);
+			expect(shot.hasMenuEnd).toBe(false);
+		});
+	}
+
+	test("撮影後にスタイルとスクロール位置を元に戻す", async ({ extension, page, url }) => {
+		await setSettings(extension, options(true, true));
+		await page.goto(`${url}app-shell`);
+		const before = await page.evaluate(() => {
+			const main = document.getElementById("main")!;
+			main.scrollTop = 300;
+			return {
+				style: main.getAttribute("style"),
+				body: document.body.getAttribute("style"),
+			};
+		});
+
+		await clickAction(extension, page);
+		await waitForShot(extension, page);
+
+		await expect
+			.poll(() =>
+				page.evaluate(() => {
+					const main = document.getElementById("main")!;
+					return {
+						style: main.getAttribute("style"),
+						body: document.body.getAttribute("style"),
+						scrollTop: main.scrollTop,
+						leftover: "__captgrabRestore" in window,
+					};
+				})
+			)
+			.toEqual({ ...before, scrollTop: 300, leftover: false });
+	});
+
+	for (const layout of ["spoof-rect", "spoof-dpr", "spoof-style"]) {
+		test(`${layout}: ページのスクリプトでは撮影結果を壊せない`, async ({
+			extension,
+			page,
+			url,
+		}) => {
+			await page.goto(url + layout);
+			const width = await page.evaluate(() => innerWidth);
+
+			await clickAction(extension, page);
+			const shot = await waitForShot(extension, page);
+
+			expect(shot.width).toBe(width);
+			expect(shot.hasContentEnd).toBe(true);
+		});
+	}
+
+	test("ページのスクリプトから復元用の関数が見えない", async ({ extension, page, url }) => {
+		await page.goto(`${url}app-shell`);
+		await clickAction(extension, page);
+
+		await expect
+			.poll(() =>
+				page.evaluate(
+					() => getComputedStyle(document.getElementById("main")!).overflowY
+				)
+			)
+			.toBe("visible");
+		expect(await page.evaluate(() => "__captgrabRestore" in window)).toBe(false);
+	});
+
+	test("撮影中に接続が切れても、ページは自動で元に戻る", async ({
+		extension,
+		page,
+		url,
+	}) => {
+		test.setTimeout(60_000);
+		await page.goto(`${url}app-shell`);
+		const before = await page.evaluate(() =>
+			document.getElementById("main")!.getAttribute("style")
+		);
+		const tabId = await activeTabId(extension, page);
+
+		await clickAction(extension, page);
+		await expect
+			.poll(
+				() =>
+					page.evaluate(
+						() => getComputedStyle(document.getElementById("main")!).overflowY
+					),
+				{ intervals: [20] }
+			)
+			.toBe("visible");
+		await extension.worker.evaluate(
+			(tabId) => chrome.debugger.detach({ tabId }),
+			tabId
+		);
+
+		await expect
+			.poll(
+				() =>
+					page.evaluate(() =>
+						document.getElementById("main")!.getAttribute("style")
+					),
+				{ timeout: 35_000 }
+			)
+			.toBe(before);
+	});
+
+	test("小さなスクロール領域は広げない", async ({ extension, page, url }) => {
+		await page.goto(`${url}small-box`);
+		const height = await page.evaluate(() => document.documentElement.scrollHeight);
+
+		await clickAction(extension, page);
+		const shot = await waitForShot(extension, page);
+
+		expect(shot.height).toBe(height);
+	});
+});
+
 test.describe("設定", () => {
 	const settings = {
 		download: true,
@@ -296,8 +494,54 @@ test.describe("設定", () => {
 					.evaluate((image: HTMLImageElement) => image.naturalWidth)
 			)
 			.toBeGreaterThan(0);
-		await expect(viewer.locator("#save")).toBeVisible();
+		await expect(viewer.locator("#actions")).toBeVisible();
 		expect(fs.readdirSync(extension.downloads)).toEqual([]);
+	});
+
+	test.describe("別タブのショートカット", () => {
+		async function openViewer(
+			extension: Parameters<typeof clickAction>[0],
+			page: Parameters<typeof clickAction>[1],
+			url: string
+		) {
+			await setSettings(extension, {
+				...settings,
+				download: false,
+				openTab: true,
+				folder: "from-viewer",
+			});
+			await page.goto(url);
+			const opened = extension.context.waitForEvent("page");
+			await clickAction(extension, page);
+			const viewer = await opened;
+			await expect(viewer.locator("#actions")).toBeVisible();
+			return viewer;
+		}
+
+		test("Ctrl+S で設定の保存先に連番で保存する", async ({ extension, page, url }) => {
+			const viewer = await openViewer(extension, page, url);
+
+			await viewer.keyboard.press("Control+s");
+
+			await expect(viewer.locator("#toast")).toHaveText("保存しました");
+			await waitForShot(extension, page, "from-viewer/screen-0001.png");
+			await expect(viewer.locator("#name")).toHaveText("screen-0001.png");
+		});
+
+		test("Ctrl+C でクリップボードにコピーする", async ({ extension, page, url }) => {
+			await extension.context.grantPermissions(["clipboard-read"], { origin: url });
+			const viewer = await openViewer(extension, page, url);
+
+			await viewer.keyboard.press("Control+c");
+
+			await expect(viewer.locator("#toast")).toHaveText("コピーしました");
+			await page.bringToFront();
+			const types = await page.evaluate(async () => {
+				const items = await navigator.clipboard.read();
+				return items.flatMap((item) => item.types);
+			});
+			expect(types).toContain("image/png");
+		});
 	});
 
 	test("別タブとコピーを両方選ぶと、どちらも行う", async ({ extension, page, url }) => {
@@ -367,6 +611,7 @@ test.describe("設定", () => {
 		await options.locator("#folder").fill("from-options");
 		await options.locator("#folder").blur();
 		await expect(options.locator("#saved")).toHaveText("保存しました");
+		await options.locator("#viewport-custom").check();
 		await options.selectOption("#preset", "375x667");
 		await options.close();
 
@@ -375,6 +620,14 @@ test.describe("設定", () => {
 
 		expect(shot.width).toBe(375);
 		expect(shot.firstScreenEnd).toBe(667);
+	});
+
+	test("設定画面に割り当て済みのショートカットを表示する", async ({ extension, page }) => {
+		const extensionId = new URL(extension.worker.url()).host;
+		await page.goto(`chrome-extension://${extensionId}/src/options/index.html`);
+
+		await expect(page.locator("#shortcut-text")).toContainText("現在のキー");
+		console.log(await page.locator("#shortcut-text").textContent());
 	});
 
 	test("連番をリセットすると次のファイル名が戻る", async ({ extension, page, url }) => {

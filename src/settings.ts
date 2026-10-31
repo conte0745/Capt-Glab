@@ -4,6 +4,8 @@ export type Settings = {
 	openTab: boolean;
 	folder: string;
 	askEveryTime: boolean;
+	expandContent: boolean;
+	expandMenu: boolean;
 	viewport: {
 		mode: "current" | "custom";
 		width: number;
@@ -17,6 +19,8 @@ export const DEFAULT_SETTINGS: Settings = {
 	openTab: false,
 	folder: "",
 	askEveryTime: false,
+	expandContent: true,
+	expandMenu: false,
 	viewport: { mode: "current", width: 1280, height: 800 },
 };
 
@@ -54,4 +58,20 @@ export function normalizeFolder(input: string): string | null {
 
 export function isValidViewportSize(size: number): boolean {
 	return Number.isInteger(size) && size >= MIN_VIEWPORT && size <= MAX_VIEWPORT;
+}
+
+/** 次のファイル名を返す。保存に成功するまで連番は進めない */
+export async function peekImageName(): Promise<string> {
+	const count = await currentImageCount();
+	return `screen-${(count + 1).toString().padStart(4, "0")}.png`;
+}
+
+export async function advanceImageCount(): Promise<void> {
+	const count = await currentImageCount();
+	await chrome.storage.local.set({ "image-name-count": count + 1 });
+}
+
+async function currentImageCount(): Promise<number> {
+	const stored = await chrome.storage.local.get("image-name-count");
+	return Number(stored["image-name-count"]) || 0;
 }

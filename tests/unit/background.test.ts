@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { RESTORE_SCROLL_AREAS } from "../../src/background/scroll-areas";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/settings";
 
 const TAB = { width: 1000, height: 613 };
@@ -10,6 +11,7 @@ const METRICS = {
 function setup(settings: Partial<Settings> = {}) {
 	type Listener = (message: any) => void;
 	let onConnect: (port: unknown) => void = () => {};
+	let onInstalled: (details: { reason: string }) => void = () => {};
 	let onMessage: (
 		message: unknown,
 		sender: unknown,
@@ -19,15 +21,36 @@ function setup(settings: Partial<Settings> = {}) {
 	const store: Record<string, unknown> = {
 		settings: { ...DEFAULT_SETTINGS, ...settings },
 	};
-	const metrics = { current: METRICS, dpr: 1 };
-	const sendCommand = vi.fn(async (_target: unknown, method: string) => {
+	const metrics = {
+		current: METRICS,
+		dpr: 1,
+		areas: { bottom: 0, contentCut: false },
+	};
+	const sendCommand = vi.fn(async (
+		_target: unknown,
+		method: string,
+		params?: { expression?: string }
+	): Promise<any> => {
 		if (method === "Page.getLayoutMetrics") return metrics.current;
-		if (method === "Runtime.evaluate") return { result: { value: metrics.dpr } };
+		if (method === "Page.getFrameTree") return { frameTree: { frame: { id: "F" } } };
+		if (method === "Page.createIsolatedWorld") return { executionContextId: 5 };
+		if (method === "Runtime.evaluate") {
+			const expression = String(params?.expression);
+			if (expression.includes("devicePixelRatio")) {
+				return { result: { value: metrics.dpr } };
+			}
+			if (expression === RESTORE_SCROLL_AREAS) {
+				return { result: {} };
+			}
+			return { result: { value: metrics.areas } };
+		}
 		if (method === "Page.captureScreenshot") return { data: "BASE64" };
 		return {};
 	});
 	const chromeStub = {
 		runtime: {
+			onInstalled: { addListener: (fn: typeof onInstalled) => (onInstalled = fn) },
+			openOptionsPage: vi.fn(),
 			onConnect: { addListener: (fn: typeof onConnect) => (onConnect = fn) },
 			onMessage: { addListener: (fn: typeof onMessage) => (onMessage = fn) },
 			getURL: (path: string) => `chrome-extension://id/${path}`,
@@ -78,6 +101,7 @@ function setup(settings: Partial<Settings> = {}) {
 		store,
 		metrics,
 		connect,
+		installed: (reason: string) => onInstalled({ reason }),
 		capture(tabId = 7) {
 			const port = connect();
 			port.send({ request: "capture", tabId });
@@ -111,6 +135,16 @@ describe("background", () => {
 
 	afterEach(() => {
 		vi.useRealTimers();
+	});
+
+	it("初回インストール時だけ設定画面を開く", async () => {
+		const ctx = await load();
+
+		ctx.installed("update");
+		expect(ctx.chromeStub.runtime.openOptionsPage).not.toHaveBeenCalled();
+
+		ctx.installed("install");
+		expect(ctx.chromeStub.runtime.openOptionsPage).toHaveBeenCalledTimes(1);
 	});
 
 	it("capture 以外のポートは無視する", async () => {
@@ -276,6 +310,127 @@ describe("background", () => {
 		});
 	});
 
+	describe("スクロール領域", () => {
+		const evaluated = (ctx: Awaited<ReturnType<typeof load>>) =>
+			ctx.sendCommand.mock.calls
+				.filter(([, method]) => method === "Runtime.evaluate")
+				.map(([, , params]) => String(params?.expression));
+
+		it("設定を渡して領域を広げる", async () => {
+			const ctx = await load({ expandContent: true, expandMenu: true });
+
+			ctx.capture();
+			await flush();
+
+			expect(evaluated(ctx)[0]).toContain(
+				'{"expandContent":true,"expandMenu":true,"restoreAfterMs":30000}'
+			);
+		});
+
+		it("広げたら再レイアウトを待ってから撮影する", async () => {
+			const ctx = await load();
+			ctx.metrics.areas = { bottom: 5000, contentCut: false };
+
+			ctx.capture();
+			await flush(500);
+			expect(commands(ctx)).not.toContain("Page.getLayoutMetrics");
+
+			await flush(300);
+			expect(commands(ctx)).toContain("Page.captureScreenshot");
+		});
+
+		it("広げた領域がページより長ければ、その下端まで撮る", async () => {
+			const ctx = await load();
+			ctx.metrics.areas = { bottom: 5000, contentCut: false };
+
+			ctx.capture();
+			await flush();
+
+			expect(ctx.sendCommand).toHaveBeenCalledWith(
+				{ tabId: 7 },
+				"Page.captureScreenshot",
+				expect.objectContaining({
+					clip: { x: 0, y: 0, width: 985, height: 5000, scale: 1 },
+				})
+			);
+		});
+
+		it("隔離された環境で実行する", async () => {
+			const ctx = await load();
+
+			ctx.capture();
+			await flush();
+
+			expect(ctx.sendCommand).toHaveBeenCalledWith(
+				{ tabId: 7 },
+				"Page.createIsolatedWorld",
+				{ frameId: "F", worldName: "CaptGrab" }
+			);
+			const evaluations = ctx.sendCommand.mock.calls.filter(
+				([, method]) => method === "Runtime.evaluate"
+			);
+			expect(evaluations.length).toBeGreaterThan(0);
+			for (const [, , params] of evaluations) {
+				expect(params).toMatchObject({ contextId: 5 });
+			}
+		});
+
+		it("広げられなくても見えている範囲を撮影する", async () => {
+			const ctx = await load();
+			const original = ctx.sendCommand.getMockImplementation()!;
+			ctx.sendCommand.mockImplementation(async (target, method, params) =>
+				method === "Runtime.evaluate" &&
+				String(params?.expression).includes("expandContent")
+					? { result: {}, exceptionDetails: { text: "boom" } }
+					: original(target, method, params)
+			);
+
+			const port = ctx.capture();
+			await flush();
+
+			expect(port.posted.at(-1)).toMatchObject({ type: "done", cut: false });
+		});
+
+		it("本文が切れたままなら伝える", async () => {
+			const ctx = await load();
+			ctx.metrics.areas = { bottom: 0, contentCut: true };
+
+			const port = ctx.capture();
+			await flush();
+
+			expect(port.posted.at(-1).cut).toBe(true);
+		});
+
+		it("撮影後に元へ戻してから切断する", async () => {
+			const ctx = await load();
+
+			ctx.capture();
+			await flush();
+
+			const restore = ctx.sendCommand.mock.calls.findIndex(
+				([, , params]) => params?.expression === RESTORE_SCROLL_AREAS
+			);
+			expect(restore).toBeGreaterThan(-1);
+			expect(ctx.sendCommand.mock.invocationCallOrder[restore]).toBeLessThan(
+				ctx.chromeStub.debugger.detach.mock.invocationCallOrder[0]
+			);
+		});
+
+		it("撮影に失敗しても元へ戻す", async () => {
+			const ctx = await load();
+			const original = ctx.sendCommand.getMockImplementation()!;
+			ctx.sendCommand.mockImplementation(async (target, method, params) => {
+				if (method === "Page.captureScreenshot") throw new Error("boom");
+				return original(target, method, params);
+			});
+
+			ctx.capture();
+			await flush();
+
+			expect(evaluated(ctx).at(-1)).toBe(RESTORE_SCROLL_AREAS);
+		});
+	});
+
 	describe("エラー", () => {
 		it.each([
 			["Cannot access a chrome:// URL", "restricted"],
@@ -295,11 +450,10 @@ describe("background", () => {
 
 		it("撮影に失敗しても切断する", async () => {
 			const ctx = await load();
-			ctx.sendCommand.mockImplementation(async (_target, method) => {
+			const original = ctx.sendCommand.getMockImplementation()!;
+			ctx.sendCommand.mockImplementation(async (target, method, params) => {
 				if (method === "Page.captureScreenshot") throw new Error("boom");
-				return method === "Runtime.evaluate"
-					? { result: { value: 1 } }
-					: METRICS;
+				return original(target, method, params);
 			});
 
 			const port = ctx.capture();
@@ -318,6 +472,23 @@ describe("background", () => {
 
 			expect(port.posted.at(-1).type).toBe("done");
 		});
+	});
+
+	it("同じタブを撮影中なら重ねて撮らず、撮影中と伝える", async () => {
+		const ctx = await load();
+
+		ctx.capture();
+		const second = ctx.capture();
+		await flush(0);
+
+		expect(second.posted).toEqual([{ type: "error", reason: "busy" }]);
+		expect(ctx.chromeStub.debugger.attach).toHaveBeenCalledTimes(1);
+
+		await flush();
+		ctx.chromeStub.debugger.attach.mockClear();
+		ctx.capture();
+		await flush(6000);
+		expect(ctx.chromeStub.debugger.attach).toHaveBeenCalledTimes(1);
 	});
 
 	describe("連続撮影", () => {
@@ -443,6 +614,19 @@ describe("background", () => {
 			expect(port.posted.at(-1).saved).toBe("failed");
 		});
 
+		it("保存できなかったときは連番を進めない", async () => {
+			const ctx = await load();
+			ctx.store["image-name-count"] = 3;
+			ctx.chromeStub.downloads.download.mockRejectedValue(
+				new Error("Download canceled by the user")
+			);
+
+			ctx.capture();
+			await flush();
+
+			expect(ctx.store["image-name-count"]).toBe(3);
+		});
+
 		it("キャンセルされたら canceled を伝える", async () => {
 			const ctx = await load({ askEveryTime: true });
 			ctx.chromeStub.downloads.download.mockRejectedValue(
@@ -510,6 +694,18 @@ describe("background", () => {
 			await flush(0);
 
 			expect(ctx.chromeStub.tabs.create).toHaveBeenCalledTimes(1);
+		});
+
+		it("保存していなければファイル名を渡さず、連番も進めない", async () => {
+			const ctx = await load({ download: false, clipboard: false, openTab: true });
+			ctx.capture();
+			await flush();
+
+			await expect(ctx.viewerImage("uuid")).resolves.toEqual({
+				data: "BASE64",
+				filename: null,
+			});
+			expect(ctx.store["image-name-count"]).toBeUndefined();
 		});
 
 		it("画像は1回だけ渡して手放す", async () => {

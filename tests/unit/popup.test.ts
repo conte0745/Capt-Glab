@@ -4,15 +4,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const BLOB = new Blob(["png"], { type: "image/png" });
 
 function setup() {
-	document.body.innerHTML = `<img id="loading" /><p id="status">撮影中…</p><p id="note"></p>`;
+	// 前のテストのイベント登録を残さない
+	document.body.replaceWith(document.createElement("body"));
+	document.body.innerHTML = `<img id="loading" /><p id="status">撮影中…</p><p id="note"></p><button id="settings"></button>`;
 
+	const openOptionsPage = vi.fn();
 	let listener: (message: unknown) => Promise<void> | void = () => {};
 	const port = {
 		postMessage: vi.fn(),
 		onMessage: { addListener: (fn: typeof listener) => (listener = fn) },
 	};
 	vi.stubGlobal("chrome", {
-		runtime: { connect: vi.fn(() => port) },
+		runtime: { connect: vi.fn(() => port), openOptionsPage },
 		tabs: { query: vi.fn(async () => [{ id: 42 }]) },
 	});
 	vi.stubGlobal(
@@ -34,6 +37,7 @@ function setup() {
 		port,
 		write,
 		close,
+		openOptionsPage,
 		receive: async (message: object) => {
 			listener(message);
 			await vi.advanceTimersByTimeAsync(0);
@@ -54,6 +58,7 @@ const done = (overrides: object = {}) => ({
 	data: "BASE64",
 	saved: "saved",
 	scaled: false,
+	cut: false,
 	openTab: false,
 	...overrides,
 });
@@ -117,6 +122,38 @@ describe("popup", () => {
 		expect(statusText()).toBe(expected);
 	});
 
+	it("設定ボタンで設定画面を開く", async () => {
+		const { openOptionsPage } = await load();
+
+		document.getElementById("settings")!.click();
+
+		expect(openOptionsPage).toHaveBeenCalledTimes(1);
+	});
+
+	it("マウスを乗せている間は閉じず、離すと閉じる", async () => {
+		const { receive, close } = await load();
+		document.body.dispatchEvent(new Event("mouseenter"));
+
+		await receive(done());
+		await vi.advanceTimersByTimeAsync(10000);
+		expect(close).not.toHaveBeenCalled();
+
+		document.body.dispatchEvent(new Event("mouseleave"));
+		expect(close).toHaveBeenCalledTimes(1);
+	});
+
+	it("閉じる前にマウスを離しても、待ち時間までは閉じない", async () => {
+		const { receive, close } = await load();
+		document.body.dispatchEvent(new Event("mouseenter"));
+		document.body.dispatchEvent(new Event("mouseleave"));
+
+		await receive(done());
+		expect(close).not.toHaveBeenCalled();
+
+		await vi.advanceTimersByTimeAsync(2000);
+		expect(close).toHaveBeenCalledTimes(1);
+	});
+
 	it("画像がなければコピーしない", async () => {
 		const { receive, write } = await load();
 
@@ -135,6 +172,15 @@ describe("popup", () => {
 		expect(close).not.toHaveBeenCalled();
 		await vi.advanceTimersByTimeAsync(1);
 		expect(close).toHaveBeenCalledTimes(1);
+	});
+
+	it("写っていない領域があれば設定を案内する", async () => {
+		const { receive } = await load();
+
+		await receive(done({ cut: true }));
+
+		expect(noteText()).toContain("本文の見えていない部分");
+		expect(noteText()).toContain("設定");
 	});
 
 	it("コピーに失敗したら保存の結果と失敗を伝える", async () => {
@@ -176,6 +222,7 @@ describe("popup", () => {
 
 	it.each([
 		["restricted", "このページは撮影できません", "保護"],
+		["busy", "撮影中です", "少しお待ちください"],
 		["other-debugger", "撮影できませんでした", "他の拡張機能"],
 		["unknown", "撮影できませんでした", "読み込み直して"],
 		["???", "撮影できませんでした", "読み込み直して"],

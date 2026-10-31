@@ -1,197 +1,262 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>CaptGrab - レイアウトを崩さずページ全体を撮るChrome拡張機能</title>
-		<meta
-			name="description"
-			content="CaptGrabは、ビューポートを固定したままWebページ全体を撮影し、PNGの保存とクリップボードへのコピーを1クリックで行うChrome拡張機能です。"
-		/>
-		<link rel="icon" href="images/icon.png" />
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body>
-		<header class="site-header">
-			<div class="wrap">
-				<a class="brand" href="./">
-					<img src="images/icon.png" alt="" width="256" height="256" />
-					CaptGrab
-				</a>
-				<nav class="site-nav" aria-label="メイン">
-					<a href="#flow">できること</a>
-					<a href="#privacy">データの扱い</a>
-					<a href="guide.html">使い方ガイド</a>
-				</nav>
-			</div>
-		</header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CaptGrab - 画面サイズを固定してページ全体を撮るChrome拡張機能</title>
+    <meta
+      name="description"
+      content="CaptGrabは、ビューポートを固定したままWebページ全体を撮影し、PNGの保存とクリップボードへのコピーを1クリックで行うChrome拡張機能です。"
+    />
+    <link rel="icon" href="images/icon.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./">
+          <img src="images/icon.png" alt="" width="256" height="256" />
+          CaptGrab
+        </a>
+        <nav class="site-nav" aria-label="メイン">
+          <a href="#flow">できること</a>
+          <a href="#privacy">データの扱い</a>
+          <a href="guide.html">使い方ガイド</a>
+        </nav>
+      </div>
+    </header>
 
-		<main>
-			<section class="hero">
-				<div class="wrap">
-					<div>
-						<p class="eyebrow">Chrome拡張機能</p>
-						<h1>
-							<span class="nowrap">見えているレイアウトのまま、</span>
-							<span class="nowrap">ページ全体を1枚に。</span>
-						</h1>
-						<p class="lead">
-							CaptGrabは、ビューポートを固定したままWebページ全体を撮影する拡張機能です。アイコンを押すだけで、PNGの保存とクリップボードへのコピーまで終わります。
-						</p>
-						<div class="actions">
-							<a class="btn btn-primary" href="guide.html#install">導入手順を見る</a>
-							<a class="btn" href="https://github.com/conte0745/Capt-Glab" target="_blank" rel="noopener noreferrer">GitHub</a>
-						</div>
-						<ul class="check-list">
-							<li>アカウント登録不要</li>
-							<li>画像を外部へ送信しない</li>
-							<li>高DPIディスプレイの解像度で保存</li>
-						</ul>
-					</div>
-					<figure class="compare">
-						<div>
-							<h3>固定しない場合</h3>
-							<div class="shot shot-stretched" aria-hidden="true">
-								<div class="shot-first">100vh</div>
-								<div class="shot-rest"></div>
-							</div>
-						</div>
-						<div>
-							<h3>CaptGrab</h3>
-							<div class="shot" aria-hidden="true">
-								<div class="shot-first">100vh</div>
-								<div class="shot-rest"></div>
-							</div>
-						</div>
-						<figcaption>
-							画面の高さに合わせた要素が、撮影の瞬間に伸びて後続の内容を押し出すことがあります。CaptGrabは高さを固定して撮影します（図は説明用のイメージです）。
-						</figcaption>
-					</figure>
-				</div>
-			</section>
+    <main>
+      <section class="hero">
+        <div class="wrap">
+          <div>
+            <p class="eyebrow">Chrome拡張機能</p>
+            <h1>
+              <span class="nowrap">画面サイズを固定して、</span>
+              <span class="nowrap">ページ全体を1枚に。</span>
+            </h1>
+            <p class="lead">
+              CaptGrabは、ビューポートを固定したままWebページ全体を撮影する拡張機能です。アイコンを押すだけで、PNGの保存とクリップボードへのコピーまで終わります。
+            </p>
+            <div class="actions">
+              <a class="btn btn-primary" href="guide.html#install"
+                >導入手順を見る</a
+              >
+              <a
+                class="btn"
+                href="https://github.com/conte0745/Capt-Glab"
+                target="_blank"
+                rel="noopener noreferrer"
+                >GitHub</a
+              >
+            </div>
+            <ul class="check-list">
+              <li>アカウント登録不要</li>
+              <li>画像を外部へ送信しない</li>
+              <li>高DPIディスプレイの解像度で保存</li>
+            </ul>
+          </div>
+          <figure class="compare">
+            <div>
+              <h3>固定しない場合</h3>
+              <div class="shot shot-stretched" aria-hidden="true">
+                <div class="shot-first">100vh</div>
+                <div class="shot-rest"></div>
+              </div>
+            </div>
+            <div>
+              <h3>CaptGrab</h3>
+              <div class="shot" aria-hidden="true">
+                <div class="shot-first">100vh</div>
+                <div class="shot-rest"></div>
+              </div>
+            </div>
+            <figcaption>
+              画面の高さに合わせた要素が、撮影の瞬間に伸びて後続の内容を押し出すことがあります。CaptGrabは高さを固定して撮影します（図は説明用のイメージです）。
+            </figcaption>
+          </figure>
+        </div>
+      </section>
 
-			<section id="flow">
-				<div class="wrap">
-					<h2>押してから保存まで、操作は1回</h2>
-					<p class="lead">撮影範囲の指定やスクロールは必要ありません。</p>
-					<ol class="steps">
-						<li>
-							<span class="step-label">STEP 1 ・ 押す</span>
-							<h3>撮りたいタブでアイコンを押す</h3>
-							<p>アイコンの下に、撮影の進み具合を表示します。</p>
-						</li>
-						<li>
-							<span class="step-label">STEP 2 ・ 固定する</span>
-							<h3>今の表示サイズで固定して撮る</h3>
-							<p>
-								幅と高さを押した時点のサイズに固定します。デバッグ中のバーが出ても、レイアウトは変わりません。
-							</p>
-						</li>
-						<li>
-							<span class="step-label">STEP 3 ・ 残す</span>
-							<h3>PNG保存とコピーを同時に</h3>
-							<p>
-								<code>screen-0001.png</code>
-								のような連番でダウンロードし、クリップボードにもコピーします。
-							</p>
-						</li>
-					</ol>
-				</div>
-			</section>
+      <section id="flow">
+        <div class="wrap">
+          <h2>押してから保存まで、操作は1回</h2>
+          <p class="lead">撮影範囲の指定やスクロールは必要ありません。</p>
+          <ol class="steps">
+            <li>
+              <span class="step-label">STEP 1 ・ 押す</span>
+              <h3>撮りたいタブでアイコンを押す（ショートカットキーでも撮影できます）</h3>
+              <p>アイコンの下に、撮影の進み具合を表示します。</p>
+            </li>
+            <li>
+              <span class="step-label">STEP 2 ・ 固定する</span>
+              <h3>今の表示サイズで固定して撮る</h3>
+              <p>
+                幅と高さを押した時点のサイズに固定します。デバッグ中のバーが出ても、撮影するときの高さは変わりません。
+              </p>
+            </li>
+            <li>
+              <span class="step-label">STEP 3 ・ 残す</span>
+              <h3>PNG保存とコピーを同時に</h3>
+              <p>
+                <code>screen-0001.png</code>
+                のような連番でダウンロードし、クリップボードにもコピーします。
+              </p>
+            </li>
+          </ol>
+        </div>
+      </section>
 
-			<section>
-				<div class="wrap">
-					<h2>「きれいに全体を撮る」ための作り</h2>
-					<p class="lead">ブラウザのデバッガ機能を使い、Chrome自身の描画結果を画像にします。</p>
-					<div class="features">
-						<div>
-							<h3><code>100vh</code> のレイアウトを保つ</h3>
-							<p>画面いっぱいのヒーローなど、表示領域を基準にした要素も表示中の高さのまま写ります。</p>
-						</div>
-						<div>
-							<h3>つなぎ合わせない1枚撮り</h3>
-							<p>スクロールしながら画像を重ねる方式ではないので、継ぎ目がありません。</p>
-						</div>
-						<div>
-							<h3>高解像度のまま保存</h3>
-							<p>Retinaなどの高DPIディスプレイでは、その倍率の解像度でPNGを出力します。</p>
-						</div>
-						<div>
-							<h3>撮影後の動作を選べる</h3>
-							<p>ファイル保存、クリップボードへのコピー、別タブでの表示を、組み合わせて設定できます。</p>
-						</div>
-						<div>
-							<h3>ビューポートのサイズを指定できる</h3>
-							<p>現在の表示サイズのほか、1920×1080 などのサイズを指定して撮影できます。</p>
-						</div>
-						<div>
-							<h3>保存先と連番</h3>
-							<p>ダウンロードフォルダ内のフォルダを指定できます。ファイル名の番号は自動で増えます。</p>
-						</div>
-					</div>
-				</div>
-			</section>
+      <section>
+        <div class="wrap">
+          <h2>「きれいに全体を撮る」ための作り</h2>
+          <p class="lead">
+            ブラウザのデバッガ機能を使い、Chrome自身の描画結果を画像にします。
+          </p>
+          <div class="features">
+            <div>
+              <h3><code>100vh</code> のレイアウトを保つ</h3>
+              <p>
+                画面いっぱいのヒーローなど、表示領域を基準にした要素も表示中の高さのまま写ります。
+              </p>
+            </div>
+            <div>
+              <h3>つなぎ合わせない1枚撮り</h3>
+              <p>
+                スクロールしながら画像を重ねる方式ではないので、継ぎ目がありません。
+              </p>
+            </div>
+            <div>
+              <h3>高解像度のまま保存</h3>
+              <p>
+                Retinaなどの高DPIディスプレイでは、その倍率の解像度でPNGを出力します。とても長いページは、画像の長辺が16,000pxに収まるよう縮小します。
+              </p>
+            </div>
+            <div>
+              <h3>撮影後の動作を選べる</h3>
+              <p>
+                ファイル保存、クリップボードへのコピー、別タブでの表示を、組み合わせて設定できます。
+              </p>
+            </div>
+            <div>
+              <h3>撮影するときの画面サイズを指定できる</h3>
+              <p>
+                現在の表示サイズのほか、1920×1080
+                などのサイズを指定して撮影できます。
+              </p>
+            </div>
+            <div>
+              <h3>本文だけがスクロールする画面も撮れる</h3>
+              <p>
+                管理画面やWebアプリでも、撮影中だけ領域を広げて本文を最後まで撮ります。サイドメニューを含めるかも選べます。
+              </p>
+            </div>
+            <div>
+              <h3>別タブですぐ確認</h3>
+              <p>
+                撮影結果を別タブで開けます。保存、別名で保存、コピーはショートカットキーでも操作できます。
+              </p>
+            </div>
+            <div>
+              <h3>保存先と連番</h3>
+              <p>
+                ダウンロードフォルダ内のフォルダを指定できます。ファイル名の番号は自動で増えます。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-			<section class="band" id="privacy">
-				<div class="wrap">
-					<h2>画像は、あなたのPCから出ません</h2>
-					<ul class="check-list">
-						<li>撮影した画像は、設定に応じてダウンロード、クリップボード、別タブにだけ渡します</li>
-						<li>外部サーバーへの送信、アカウント登録、クラウド同期はありません</li>
-						<li>アナリティクスや広告はありません</li>
-						<li>デバッガ権限は、アイコンを押したタブの撮影にだけ使います</li>
-					</ul>
-					<a href="privacy-policy.html">プライバシーポリシーを読む</a>
-				</div>
-			</section>
+      <section class="band" id="privacy">
+        <div class="wrap">
+          <h2>画像は、あなたのPCから出ません</h2>
+          <ul class="check-list">
+            <li>
+              撮影した画像は、設定に応じてダウンロード、クリップボード、別タブにだけ渡します
+            </li>
+            <li>
+              外部サーバーへの送信、アカウント登録、クラウド同期はありません
+            </li>
+            <li>アナリティクスや広告はありません</li>
+            <li>デバッガ権限は、撮影を始めたタブの撮影にだけ使います</li>
+          </ul>
+          <a href="privacy-policy.html">プライバシーポリシーを読む</a>
+        </div>
+      </section>
 
-			<section>
-				<div class="wrap">
-					<h2>導入前に知っておいてほしいこと</h2>
-					<p class="lead">CaptGrabは、1クリックのページ全体キャプチャに絞ったツールです。</p>
-					<div class="fit">
-						<div>
-							<h3>向いている使い方</h3>
-							<ul>
-								<li>Webページのデザイン確認やレビュー資料の作成</li>
-								<li>画面の高さを基準にしたレイアウトの記録</li>
-								<li>撮った画像をすぐチャットや資料に貼り付けたいとき</li>
-							</ul>
-						</div>
-						<div>
-							<h3>対応していないこと</h3>
-							<ul>
-								<li><code>chrome://</code> など、デバッガを接続できないページ</li>
-								<li>横にはみ出した部分の撮影、範囲指定、画像への書き込み</li>
-								<li>Chrome以外のブラウザでの動作確認</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</section>
+      <section>
+        <div class="wrap">
+          <h2>導入前に知っておいてほしいこと</h2>
+          <p class="lead">
+            CaptGrabは、1クリックのページ全体キャプチャに絞ったツールです。
+          </p>
+          <div class="fit">
+            <div>
+              <h3>向いている使い方</h3>
+              <ul>
+                <li>Webページのデザイン確認やレビュー資料の作成</li>
+                <li>画面の高さを基準にしたレイアウトの記録</li>
+                <li>撮った画像をすぐチャットや資料に貼り付けたいとき</li>
+              </ul>
+            </div>
+            <div>
+              <h3>対応していないこと</h3>
+              <ul>
+                <li>
+                  <code>chrome://</code> など、デバッガを接続できないページ
+                </li>
+                <li>横にはみ出した部分の撮影、範囲指定、画像への書き込み</li>
+                <li>Chrome以外のブラウザでの動作確認、iframeの中のスクロール、表示中の分しか読み込まない一覧の全件撮影</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
 
-			<section class="cta">
-				<div class="wrap">
-					<h2>次のスクリーンショットから、崩れない1枚を</h2>
-					<p>導入手順と、うまく撮れないときの対処はガイドにまとめています。</p>
-					<div class="actions">
-						<a class="btn btn-primary" href="guide.html">使い方ガイドを見る</a>
-					</div>
-				</div>
-			</section>
-		</main>
+      <section class="cta">
+        <div class="wrap">
+          <h2>次のスクリーンショットは、ページ全体を1枚で</h2>
+          <p>導入手順と、うまく撮れないときの対処はガイドにまとめています。</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="guide.html">使い方ガイドを見る</a>
+          </div>
+        </div>
+      </section>
+    </main>
 
-		<footer class="site-footer">
-			<div class="wrap">
-				<ul>
-					<li><a href="guide.html">使い方ガイド</a></li>
-					<li><a href="privacy-policy.html">プライバシーポリシー</a></li>
-					<li><a href="https://github.com/conte0745/Capt-Glab" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-					<li><a href="mailto:captgrab@shiftonton.net">お問い合わせ</a></li>
-					<li><a href="https://ofuse.me/o?uid=213935" target="_blank" rel="noopener noreferrer">OFUSEで応援を送る</a></li>
-				</ul>
-				<p>© 2024 Conte0745. Released under the <a href="https://github.com/conte0745/Capt-Glab/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>.</p>
-			</div>
-		</footer>
-	</body>
+    <footer class="site-footer">
+      <div class="wrap">
+        <ul>
+          <li><a href="guide.html">使い方ガイド</a></li>
+          <li><a href="privacy-policy.html">プライバシーポリシー</a></li>
+          <li>
+            <a
+              href="https://github.com/conte0745/Capt-Glab"
+              target="_blank"
+              rel="noopener noreferrer"
+              >GitHub</a
+            >
+          </li>
+          <li><a href="mailto:captgrab@shiftonton.net">お問い合わせ</a></li>
+          <li>
+            <a
+              href="https://ofuse.me/o?uid=213935"
+              target="_blank"
+              rel="noopener noreferrer"
+              >OFUSEで応援を送る</a
+            >
+          </li>
+        </ul>
+        <p>
+          © 2024 Conte0745. Released under the
+          <a
+            href="https://github.com/conte0745/Capt-Glab/blob/main/LICENSE"
+            target="_blank"
+            rel="noopener noreferrer"
+            >MIT License</a
+          >.
+        </p>
+      </div>
+    </footer>
+  </body>
 </html>

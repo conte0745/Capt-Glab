@@ -6,6 +6,9 @@
 		<meta name="color-scheme" content="light dark" />
 		<title>CaptGrab - 撮影した画像</title>
 		<style>
+			:root {
+				color-scheme: light dark;
+			}
 			body {
 				margin: 0;
 				font-family: system-ui, sans-serif;
@@ -23,13 +26,46 @@
 				background: light-dark(#fff, #2b2b2b);
 				border-bottom: 1px solid light-dark(#ddd, #444);
 			}
-			a {
-				padding: 6px 14px;
-				border-radius: 4px;
+			.actions {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.actions[hidden] {
+				display: none;
+			}
+			.actions {
+				flex-wrap: wrap;
+			}
+			kbd {
+				margin-left: 4px;
+				font-family: ui-monospace, Menlo, Consolas, monospace;
+				font-size: 11px;
+				opacity: 0.7;
+			}
+			#toast {
+				position: fixed;
+				left: 50%;
+				bottom: 20px;
+				margin: 0;
+				padding: 7px 16px;
+				border-radius: 999px;
 				background: light-dark(#111a3a, #fffdf5);
 				color: light-dark(#fffdf5, #111a3a);
-				font-weight: 600;
-				text-decoration: none;
+				font-size: 13px;
+				transform: translateX(-50%);
+			}
+			#toast:empty {
+				display: none;
+			}
+			button {
+				padding: 6px 14px;
+				border: 1px solid light-dark(#ccc, #555);
+				border-radius: 4px;
+				background: transparent;
+				color: inherit;
+				font: inherit;
+				cursor: pointer;
 			}
 			main {
 				padding: 16px;
@@ -45,7 +81,14 @@
 	<body>
 		<header>
 			<span id="name">撮影した画像</span>
-			<a id="save" hidden>ダウンロード</a>
+			<span class="actions">
+				<span class="actions" id="actions" hidden>
+					<button type="button" id="save">保存 <kbd>Ctrl+S</kbd></button>
+					<button type="button" id="save-as">別名で保存 <kbd>Ctrl+Shift+S</kbd></button>
+					<button type="button" id="copy">コピー <kbd>Ctrl+C</kbd></button>
+				</span>
+				<button type="button" id="settings">設定</button>
+			</span>
 		</header>
 		<main>
 			<p id="message" hidden>
@@ -53,6 +96,7 @@
 			</p>
 			<img id="image" alt="撮影したページ全体の画像" hidden />
 		</main>
+		<p id="toast" role="status"></p>
 		<script type="module" src="./index.ts"></script>
 	</body>
 </html>

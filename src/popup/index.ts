@@ -9,6 +9,7 @@ const ERROR_MESSAGES: Record<string, [string, string]> = {
 		"このページは撮影できません",
 		"chrome:// やウェブストアなど、ブラウザが保護しているページです。",
 	],
+	busy: ["撮影中です", "前の撮影が終わるまで、少しお待ちください。"],
 	"other-debugger": [
 		"撮影できませんでした",
 		"他の拡張機能がこのタブを操作しています。終わってからお試しください。",
@@ -22,6 +23,21 @@ const ERROR_MESSAGES: Record<string, [string, string]> = {
 const statusText = document.getElementById("status")!;
 const noteText = document.getElementById("note")!;
 const loading = document.getElementById("loading")!;
+
+document.getElementById("settings")!.addEventListener("click", () => {
+	chrome.runtime.openOptionsPage();
+});
+
+// 設定ボタンを押そうとしている間は閉じない
+let hovering = false;
+document.body.addEventListener("mouseenter", () => (hovering = true));
+document.body.addEventListener("mouseleave", () => {
+	hovering = false;
+	if (closeRequested) {
+		window.close();
+	}
+});
+let closeRequested = false;
 
 start();
 
@@ -47,6 +63,7 @@ type DoneMessage = {
 	data?: string;
 	saved: "saved" | "canceled" | "failed" | "off";
 	scaled: boolean;
+	cut: boolean;
 	openTab: boolean;
 };
 
@@ -61,6 +78,9 @@ async function finish(port: chrome.runtime.Port, message: DoneMessage) {
 	if (message.scaled) {
 		notes.push("長いページのため、縮小して保存しました。");
 	}
+	if (message.cut) {
+		notes.push("本文の見えていない部分は写っていません。設定で変更できます。");
+	}
 	if (message.saved === "failed") {
 		notes.push("ファイルを保存できませんでした。設定の保存先をご確認ください。");
 	}
@@ -70,7 +90,10 @@ async function finish(port: chrome.runtime.Port, message: DoneMessage) {
 	show(completedText(message.saved, copied), notes.join(""));
 
 	await sleep(notes.length ? AUTO_CLOSE_WITH_NOTE_MS : AUTO_CLOSE_MS);
-	window.close();
+	closeRequested = true;
+	if (!hovering) {
+		window.close();
+	}
 }
 
 function completedText(saved: DoneMessage["saved"], copied: boolean | null) {

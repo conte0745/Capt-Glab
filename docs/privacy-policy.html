@@ -1,140 +1,172 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>CaptGrab - プライバシーポリシー</title>
-		<meta name="description" content="Chrome拡張機能 CaptGrab のプライバシーポリシーです。" />
-		<link rel="icon" href="images/icon.png" />
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body>
-		<header class="site-header">
-			<div class="wrap">
-				<a class="brand" href="./">
-					<img src="images/icon.png" alt="" width="256" height="256" />
-					CaptGrab
-				</a>
-				<nav class="site-nav" aria-label="メイン">
-					<a href="./">トップ</a>
-					<a href="guide.html">使い方ガイド</a>
-				</nav>
-			</div>
-		</header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CaptGrab - プライバシーポリシー</title>
+    <meta
+      name="description"
+      content="Chrome拡張機能 CaptGrab のプライバシーポリシーです。"
+    />
+    <link rel="icon" href="images/icon.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./">
+          <img src="images/icon.png" alt="" width="256" height="256" />
+          CaptGrab
+        </a>
+        <nav class="site-nav" aria-label="メイン">
+          <a href="./">トップ</a>
+          <a href="guide.html">使い方ガイド</a>
+        </nav>
+      </div>
+    </header>
 
-		<main class="wrap doc">
-			<nav class="toc" aria-label="目次">
-				<p>目次</p>
-				<ul>
-					<li><a href="#purpose">1. 利用目的</a></li>
-					<li><a href="#capture">2. 撮影時に扱う情報</a></li>
-					<li><a href="#storage">3. 保存するデータ</a></li>
-					<li><a href="#network">4. 通信</a></li>
-					<li><a href="#permissions">5. 権限</a></li>
-					<li><a href="#delete">6. 保持と削除</a></li>
-					<li><a href="#third-party">7. 第三者への提供</a></li>
-					<li><a href="#changes">8. 変更と問い合わせ</a></li>
-				</ul>
-			</nav>
-			<article>
-				<h1>プライバシーポリシー</h1>
-				<p class="doc-meta">最終更新日：2026年10月31日</p>
+    <main class="wrap doc">
+      <nav class="toc" aria-label="目次">
+        <p>目次</p>
+        <ul>
+          <li><a href="#purpose">1. 利用目的</a></li>
+          <li><a href="#capture">2. 撮影時に扱う情報</a></li>
+          <li><a href="#storage">3. 保存するデータ</a></li>
+          <li><a href="#network">4. 通信</a></li>
+          <li><a href="#permissions">5. 権限</a></li>
+          <li><a href="#delete">6. 保持と削除</a></li>
+          <li><a href="#third-party">7. 第三者への提供</a></li>
+          <li><a href="#changes">8. 変更と問い合わせ</a></li>
+        </ul>
+      </nav>
+      <article>
+        <h1>プライバシーポリシー</h1>
+        <p class="doc-meta">最終更新日：2026年10月31日</p>
 
-				<h2 id="purpose">1. 利用目的</h2>
-				<p>
-					CaptGrab（以下「本拡張機能」）は、扱う情報をWebページの撮影、画像の保存、クリップボードへのコピーのためだけに使用します。広告、トラッキング、データの販売には使用しません。
-				</p>
+        <h2 id="purpose">1. 利用目的</h2>
+        <p>
+          CaptGrab（以下「本拡張機能」）は、扱う情報をWebページの撮影、画像の保存、クリップボードへのコピーのためだけに使用します。広告、トラッキング、データの販売には使用しません。
+        </p>
 
-				<h2 id="capture">2. 撮影時に扱う情報</h2>
-				<p>
-					ユーザーが拡張機能のアイコンを押すと、そのとき表示しているタブのページ全体を画像として取得します。画像には、ページに表示されている内容（氏名、メールアドレス、社内情報など）がそのまま含まれます。
-				</p>
-				<p>
-					撮影のために取得するのは、タブのサイズ、ページのレイアウト情報、撮影画像です。ページのURL、閲覧履歴、Cookie、フォームの入力値を個別に読み取ったり記録したりすることはありません。
-				</p>
+        <h2 id="capture">2. 撮影時に扱う情報</h2>
+        <p>
+          ユーザーが拡張機能のアイコンを押すかショートカットキーを使うと、そのとき表示しているタブのページ全体を画像として取得します。画像には、ページに表示されている内容（氏名、メールアドレス、社内情報など）がそのまま含まれます。
+        </p>
+        <p>
+          撮影のために取得するのは、タブのサイズ、ページのレイアウト情報、撮影画像です。ページのURL、閲覧履歴、Cookie、フォームの入力値を個別に読み取ったり記録したりすることはありません。
+        </p>
 
-				<h2 id="storage">3. 保存するデータ</h2>
-				<ul>
-					<li>
-						<strong>連番カウントと設定：</strong>ファイル名の番号を決めるための数値と、設定画面の内容（撮影後の動作、保存先のフォルダ名、ビューポートのサイズ）を
-						Chrome Storage（お使いのブラウザ内）に保存します。
-					</li>
-					<li>
-						<strong>撮影画像：</strong>設定に応じて、ブラウザのダウンロード機能でPNGファイルとして保存し、クリップボードへのコピーや別タブでの表示を行います。本拡張機能の保存領域には残しません。
-					</li>
-				</ul>
+        <h2 id="storage">3. 保存するデータ</h2>
+        <ul>
+          <li>
+            <strong>連番カウントと設定：</strong
+            >ファイル名の番号を決めるための数値と、設定画面の内容（撮影後の動作、保存先のフォルダ名、スクロール領域の撮り方、撮影するときの画面サイズ）を
+            Chrome Storage（お使いのブラウザ内）に保存します。
+          </li>
+          <li>
+            <strong>撮影画像：</strong
+            >設定に応じて、ブラウザのダウンロード機能でPNGファイルとして保存し、クリップボードへのコピーや別タブでの表示を行います。本拡張機能の保存領域には残しません。
+          </li>
+        </ul>
 
-				<h2 id="network">4. 通信</h2>
-				<p>
-					本拡張機能は、開発者や第三者のサーバーへ情報を送信しません。アナリティクス、利用状況やエラーの報告、クラウド同期も行いません。
-				</p>
+        <h2 id="network">4. 通信</h2>
+        <p>
+          本拡張機能は、開発者や第三者のサーバーへ情報を送信しません。アナリティクス、利用状況やエラーの報告、クラウド同期も行いません。
+        </p>
 
-				<h2 id="permissions">5. 権限</h2>
-				<div class="table-wrap">
-					<table>
-						<thead>
-							<tr>
-								<th scope="col">権限</th>
-								<th scope="col">使用目的</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<th scope="row"><code>debugger</code></th>
-								<td>
-									ビューポートの固定、ページサイズの取得、撮影に使用します。アイコンを押したタブにだけ接続し、撮影が終わると切断します。
-								</td>
-							</tr>
-							<tr>
-								<th scope="row"><code>clipboardWrite</code></th>
-								<td>撮影画像をクリップボードへコピーします。クリップボードの内容は読み取りません。</td>
-							</tr>
-							<tr>
-								<th scope="row"><code>storage</code></th>
-								<td>連番カウントと設定を保存します。</td>
-							</tr>
-							<tr>
-								<th scope="row"><code>downloads</code></th>
-								<td>撮影画像を指定のフォルダに保存します。ダウンロード履歴の内容は読み取りません。</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+        <h2 id="permissions">5. 権限</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">権限</th>
+                <th scope="col">使用目的</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row"><code>debugger</code></th>
+                <td>
+                  ビューポートの固定、ページサイズの取得、撮影に使用します。スクロールする領域を撮るために、撮影中だけページの表示を一時的に変更し、撮影後に元に戻します。撮影が途中で中断された場合も、30秒以内に自動で元に戻します。撮影を始めたタブにだけ接続し、撮影が終わると切断します。
+                </td>
+              </tr>
+              <tr>
+                <th scope="row"><code>clipboardWrite</code></th>
+                <td>
+                  撮影画像をクリップボードへコピーします。クリップボードの内容は読み取りません。
+                </td>
+              </tr>
+              <tr>
+                <th scope="row"><code>storage</code></th>
+                <td>連番カウントと設定を保存します。</td>
+              </tr>
+              <tr>
+                <th scope="row"><code>downloads</code></th>
+                <td>
+                  撮影画像を指定のフォルダに保存します。ダウンロード履歴の内容は読み取りません。
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-				<h2 id="delete">6. 保持と削除</h2>
-				<p>
-					連番カウントは設定画面でリセットすると削除されます。連番カウントと設定は、本拡張機能をアンインストールすると削除されます。別タブに表示した画像は、そのタブを閉じると消えます。ダウンロードした画像とクリップボードの内容は本拡張機能の管理外です。ユーザー自身で削除してください。
-				</p>
+        <h2 id="delete">6. 保持と削除</h2>
+        <p>
+          連番カウントは設定画面でリセットすると削除されます。連番カウントと設定は、本拡張機能をアンインストールすると削除されます。別タブに表示した画像は、そのタブを閉じると消えます。ダウンロードした画像とクリップボードの内容は本拡張機能の管理外です。ユーザー自身で削除してください。
+        </p>
 
-				<h2 id="third-party">7. 第三者への提供</h2>
-				<p>
-					ユーザーの情報を第三者に販売または提供しません。ユーザーデータの取り扱いは、Chrome
-					ウェブストアのユーザーデータに関するポリシー（Limited Use の要件を含む）に従います。
-				</p>
-				<p>
-					撮影画像を他のサービスに貼り付けたりアップロードしたりした場合は、そのサービスのポリシーが適用されます。機密情報が写っていないか確認のうえ共有してください。
-				</p>
+        <h2 id="third-party">7. 第三者への提供</h2>
+        <p>
+          ユーザーの情報を第三者に販売または提供しません。ユーザーデータの取り扱いは、Chrome
+          ウェブストアのユーザーデータに関するポリシー（Limited Use
+          の要件を含む）に従います。
+        </p>
+        <p>
+          撮影画像を他のサービスに貼り付けたりアップロードしたりした場合は、そのサービスのポリシーが適用されます。機密情報が写っていないか確認のうえ共有してください。
+        </p>
 
-				<h2 id="changes">8. 変更と問い合わせ</h2>
-				<p>
-					機能やデータの取り扱いを変更する場合は、このページを更新します。ご質問は
-					<a href="mailto:captgrab@shiftonton.net">captgrab@shiftonton.net</a>
-					までお問い合わせください。
-				</p>
-			</article>
-		</main>
+        <h2 id="changes">8. 変更と問い合わせ</h2>
+        <p>
+          機能やデータの取り扱いを変更する場合は、このページを更新します。ご質問は
+          <a href="mailto:captgrab@shiftonton.net">captgrab@shiftonton.net</a>
+          までお問い合わせください。
+        </p>
+      </article>
+    </main>
 
-		<footer class="site-footer">
-			<div class="wrap">
-				<ul>
-					<li><a href="./">トップ</a></li>
-					<li><a href="guide.html">使い方ガイド</a></li>
-					<li><a href="https://github.com/conte0745/Capt-Glab" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-					<li><a href="mailto:captgrab@shiftonton.net">お問い合わせ</a></li>
-					<li><a href="https://ofuse.me/o?uid=213935" target="_blank" rel="noopener noreferrer">OFUSEで応援を送る</a></li>
-				</ul>
-				<p>© 2024 Conte0745. Released under the <a href="https://github.com/conte0745/Capt-Glab/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>.</p>
-			</div>
-		</footer>
-	</body>
+    <footer class="site-footer">
+      <div class="wrap">
+        <ul>
+          <li><a href="./">トップ</a></li>
+          <li><a href="guide.html">使い方ガイド</a></li>
+          <li>
+            <a
+              href="https://github.com/conte0745/Capt-Glab"
+              target="_blank"
+              rel="noopener noreferrer"
+              >GitHub</a
+            >
+          </li>
+          <li><a href="mailto:captgrab@shiftonton.net">お問い合わせ</a></li>
+          <li>
+            <a
+              href="https://ofuse.me/o?uid=213935"
+              target="_blank"
+              rel="noopener noreferrer"
+              >OFUSEで応援を送る</a
+            >
+          </li>
+        </ul>
+        <p>
+          © 2024 Conte0745. Released under the
+          <a
+            href="https://github.com/conte0745/Capt-Glab/blob/main/LICENSE"
+            target="_blank"
+            rel="noopener noreferrer"
+            >MIT License</a
+          >.
+        </p>
+      </div>
+    </footer>
+  </body>
 </html>

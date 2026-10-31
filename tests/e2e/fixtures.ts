@@ -22,6 +22,20 @@ const testPage = (blue: string) => `<!doctype html>
 <div style="height:50px;background:#00ff00"></div>
 </body>`;
 
+// 本文は 2000px で最後が緑、メニューは 1000px で最後がオレンジのレイアウト
+const CONTENT = `<div style="height:2000px;background:#0000ff"></div><div style="height:50px;background:#00ff00"></div>`;
+const MENU = `<div style="height:1000px;background:#cc3333"></div><div style="height:50px;background:#ff8800"></div>`;
+const LAYOUTS: Record<string, string> = {
+	"menu-fixed": `<!doctype html><body style="margin:0"><nav style="position:fixed;top:0;left:0;bottom:0;width:200px;overflow-y:auto">${MENU}</nav><main style="margin-left:200px">${CONTENT}</main>`,
+	"menu-sticky": `<!doctype html><body style="margin:0;display:flex;align-items:flex-start"><nav style="position:sticky;top:0;height:100vh;width:200px;flex:none;overflow-y:auto">${MENU}</nav><main style="flex:1">${CONTENT}</main>`,
+	"app-shell": `<!doctype html><body style="margin:0;height:100vh;display:flex;overflow:hidden"><nav style="width:200px;flex:none;overflow-y:auto">${MENU}</nav><main id="main" style="flex:1;overflow:auto">${CONTENT}</main>`,
+	"app-header": `<!doctype html><html style="height:100%"><body style="margin:0;height:100%;display:flex;flex-direction:column"><header style="height:60px;flex:none;background:#888"></header><div style="flex:1;min-height:0;display:flex"><nav style="width:200px;flex:none;overflow-y:auto">${MENU}</nav><main style="flex:1;overflow:auto">${CONTENT}</main></div>`,
+	"spoof-rect": `<!doctype html><script>Element.prototype.getBoundingClientRect=()=>({width:900,height:900,top:0,bottom:1e9})</script><body style="margin:0;height:100vh;overflow:hidden"><main style="height:100vh;overflow:auto">${CONTENT}</main>`,
+	"spoof-dpr": `<!doctype html><script>Object.defineProperty(window,"devicePixelRatio",{value:-1})</script><body style="margin:0">${CONTENT}`,
+	"spoof-style": `<!doctype html><script>window.getComputedStyle=()=>{throw new Error("x")}</script><body style="margin:0">${CONTENT}`,
+	"small-box": `<!doctype html><body style="margin:0"><div id="box" style="height:100px;overflow:auto"><div style="height:500px"></div></div>${CONTENT}`,
+};
+
 type Fixtures = {
 	scale: number;
 	url: string;
@@ -34,9 +48,11 @@ export const test = base.extend<Fixtures>({
 
 	url: async ({}, use) => {
 		const server = http.createServer((req, res) => {
-			const { searchParams } = new URL(req.url!, "http://localhost");
+			const { searchParams, pathname } = new URL(req.url!, "http://localhost");
 			res.setHeader("content-type", "text/html");
-			res.end(testPage(searchParams.get("blue") ?? "2400"));
+			res.end(
+				LAYOUTS[pathname.slice(1)] ?? testPage(searchParams.get("blue") ?? "2400")
+			);
 		});
 		await new Promise<void>((resolve) => server.listen(0, resolve));
 		await use(`http://localhost:${(server.address() as AddressInfo).port}/`);
@@ -66,6 +82,12 @@ export const test = base.extend<Fixtures>({
 		});
 		const worker =
 			context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
+		// 初回インストールで開く設定画面が、テスト中のタブから前面を奪わないよう閉じる
+		const findOptions = () =>
+			context.pages().find((page) => page.url().includes("src/options/index.html"));
+		await expect.poll(() => findOptions()?.url()).toBeTruthy();
+		await findOptions()!.close();
+
 		await use({ context, worker, downloads });
 		await context.close();
 		fs.rmSync(profile, { recursive: true, force: true });
@@ -128,6 +150,9 @@ export type Shot = {
 	/** 100vh の要素が終わる、画像上の y 座標。見つからなければ -1 */
 	firstScreenEnd: number;
 	bottomColor: string;
+	/** 本文の最後（緑）とメニューの最後（オレンジ）が写っているか */
+	hasContentEnd: boolean;
+	hasMenuEnd: boolean;
 };
 
 /** ダウンロードされた画像を読み取って返す */
@@ -157,7 +182,16 @@ export async function waitForShot(
 				break;
 			}
 		}
+		const hasColor = (x: number, color: string) => {
+			const column = context.getImageData(x, 0, 1, image.height).data;
+			for (let y = 0; y < image.height; y++) {
+				if (column.slice(y * 4, y * 4 + 3).join(",") === color) return true;
+			}
+			return false;
+		};
 		return {
+			hasContentEnd: hasColor(image.width - 50, "0,255,0"),
+			hasMenuEnd: hasColor(10, "255,136,0"),
 			width: image.width,
 			height: image.height,
 			firstScreenEnd,

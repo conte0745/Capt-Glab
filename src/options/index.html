@@ -5,144 +5,333 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="color-scheme" content="light dark" />
 		<title>CaptGrab - 設定</title>
+		<link rel="icon" href="../icons/icon-48.png" />
 		<style>
+			:root {
+				color-scheme: light dark;
+				--paper: light-dark(#fffdf5, #14161f);
+				--card: light-dark(#ffffff, #1e212d);
+				--field: light-dark(#ffffff, #14161f);
+				--ink: light-dark(#111a3a, #f2f0e6);
+				--ink-soft: light-dark(#4a5170, #a9adbf);
+				--line: light-dark(#d9d4c0, #363a4a);
+				--accent: light-dark(#b5452c, #f3b6a6);
+				--selected: light-dark(#f5f1e3, #2a2e3d);
+				--button: light-dark(#111a3a, #f2f0e6);
+				--button-ink: light-dark(#fffdf5, #14161f);
+			}
+			* {
+				box-sizing: border-box;
+			}
 			body {
-				max-width: 560px;
-				margin: 0 auto;
-				padding: 24px 16px 48px;
-				font-family: system-ui, sans-serif;
+				margin: 0;
+				padding: 0 16px 72px;
+				background: var(--paper);
+				color: var(--ink);
+				font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", Meiryo, system-ui, sans-serif;
 				font-size: 14px;
-				line-height: 1.6;
+				line-height: 1.7;
+			}
+			.page {
+				max-width: 640px;
+				margin: 0 auto;
+			}
+			header {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				padding: 28px 0 8px;
+			}
+			header img {
+				width: 44px;
+				height: 44px;
+				border-radius: 8px;
 			}
 			h1 {
-				margin: 0 0 24px;
+				margin: 0;
 				font-size: 22px;
+				line-height: 1.3;
 			}
-			section {
-				margin: 0 0 28px;
+			.lead {
+				margin: 0 0 20px;
+				color: var(--ink-soft);
+			}
+			.card {
+				margin: 0 0 16px;
+				padding: 18px 20px;
+				border: 1px solid var(--line);
+				border-radius: 10px;
+				background: var(--card);
+			}
+			.card[hidden] {
+				display: none;
 			}
 			h2 {
-				margin: 0 0 8px;
-				padding-bottom: 4px;
-				border-bottom: 1px solid light-dark(#ddd, #444);
+				margin: 0 0 2px;
 				font-size: 15px;
 			}
-			label {
+			.description {
+				margin: 0 0 12px;
+				color: var(--ink-soft);
+				font-size: 13px;
+			}
+			.choice {
+				display: flex;
+				align-items: flex-start;
+				gap: 10px;
+				margin-top: 8px;
+				padding: 10px 12px;
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				cursor: pointer;
+			}
+			.choice:hover {
+				border-color: var(--ink-soft);
+			}
+			.choice:has(input:checked) {
+				border-color: var(--ink);
+				background: var(--selected);
+			}
+			.choice input {
+				flex: none;
+				margin: 4px 0 0;
+				accent-color: var(--ink);
+			}
+			.choice strong {
 				display: block;
-				margin: 6px 0;
+				font-weight: 600;
+			}
+			.choice small {
+				display: block;
+				color: var(--ink-soft);
+				font-size: 12px;
+				line-height: 1.5;
+			}
+			.field-label {
+				display: block;
+				margin-bottom: 4px;
+				font-weight: 600;
 			}
 			input[type="text"],
 			input[type="number"],
 			select {
-				padding: 4px 6px;
+				padding: 7px 10px;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background: var(--field);
+				color: var(--ink);
 				font: inherit;
 			}
-			input[type="number"] {
-				width: 6em;
+			input:focus-visible,
+			select:focus-visible,
+			button:focus-visible,
+			a:focus-visible {
+				outline: 2px solid var(--accent);
+				outline-offset: 1px;
 			}
-			#folder {
-				box-sizing: border-box;
+			#folder,
+			#preset {
 				width: 100%;
 			}
-			.indent {
-				margin-left: 24px;
+			input[type="number"] {
+				width: 100px;
+			}
+			.preview {
+				margin: 8px 0 12px;
+				padding: 8px 10px;
+				border-radius: 6px;
+				background: var(--selected);
+				font-size: 12px;
+				overflow-wrap: anywhere;
+			}
+			.preview[hidden] {
+				display: none;
+			}
+			code,
+			kbd {
+				font-family: ui-monospace, Menlo, Consolas, monospace;
+			}
+			.nested {
+				margin-top: 12px;
+				padding-left: 12px;
+				border-left: 2px solid var(--line);
+			}
+			.nested[hidden] {
+				display: none;
+			}
+			.size {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 8px 12px;
+				margin-top: 10px;
+			}
+			.hint {
+				margin: 8px 0 0;
+				color: var(--ink-soft);
+				font-size: 12px;
+			}
+			.error {
+				margin: 8px 0 0;
+				color: var(--accent);
+				font-size: 13px;
+				font-weight: 600;
+			}
+			.error[hidden] {
+				display: none;
 			}
 			.row {
 				display: flex;
 				flex-wrap: wrap;
 				align-items: center;
-				gap: 6px 10px;
-			}
-			.row label {
-				margin: 0;
-			}
-			.hint {
-				margin: 4px 0;
-				opacity: 0.75;
-				font-size: 12px;
-			}
-			.error {
-				margin: 4px 0;
-				color: light-dark(#b3261e, #f2b8b5);
-				font-size: 13px;
-			}
-			code {
-				font-family: ui-monospace, Menlo, Consolas, monospace;
+				justify-content: space-between;
+				gap: 8px 16px;
 			}
 			button {
-				padding: 4px 12px;
+				padding: 7px 14px;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background: transparent;
+				color: var(--ink);
 				font: inherit;
+				cursor: pointer;
+			}
+			button:hover {
+				border-color: var(--ink);
+			}
+			footer {
+				margin-top: 20px;
+				color: var(--ink-soft);
+				font-size: 13px;
+			}
+			a {
+				color: inherit;
+			}
+			#saved {
+				position: fixed;
+				left: 50%;
+				bottom: 20px;
+				margin: 0;
+				padding: 7px 16px;
+				border-radius: 999px;
+				background: var(--button);
+				color: var(--button-ink);
+				font-size: 13px;
+				transform: translateX(-50%);
+			}
+			#saved:empty {
+				display: none;
 			}
 		</style>
 	</head>
 	<body>
-		<h1>CaptGrab の設定</h1>
+		<div class="page">
+			<header>
+				<img src="../icons/icon-128.png" alt="" />
+				<h1>CaptGrab の設定</h1>
+			</header>
+			<p class="lead">変更はすぐに保存され、次の撮影から反映されます。</p>
 
-		<section>
-			<h2>撮影後の動作</h2>
-			<label><input type="checkbox" id="download" /> ファイルに保存する</label>
-			<label><input type="checkbox" id="clipboard" /> クリップボードにコピーする</label>
-			<label><input type="checkbox" id="openTab" /> 別のタブで開く</label>
-			<p class="error" id="actions-error" role="alert" hidden>
-				少なくとも1つ選んでください。
-			</p>
-		</section>
+			<section class="card">
+				<h2>撮影後の動作</h2>
+				<p class="description">複数選べます。</p>
+				<label class="choice">
+					<input type="checkbox" id="download" />
+					<span><strong>ファイルに保存</strong><small>PNG 画像としてパソコンに保存します</small></span>
+				</label>
+				<label class="choice">
+					<input type="checkbox" id="clipboard" />
+					<span><strong>クリップボードにコピー</strong><small>チャットや資料にすぐ貼り付けられます</small></span>
+				</label>
+				<label class="choice">
+					<input type="checkbox" id="openTab" />
+					<span><strong>別のタブで開く</strong><small>撮影結果をその場で確認できます</small></span>
+				</label>
+				<p class="error" id="actions-error" role="alert" hidden>少なくとも1つ選んでください。</p>
+			</section>
 
-		<section id="save-section">
-			<h2>保存先</h2>
-			<label for="folder">ダウンロードフォルダ内のフォルダ名</label>
-			<input type="text" id="folder" placeholder="例: CaptGrab/スクリーンショット" />
-			<p class="hint">空欄ならダウンロードフォルダの直下に保存します。Chrome の制限で、ダウンロードフォルダの外は指定できません。</p>
-			<p class="error" id="folder-error" role="alert" hidden>
-				このフォルダ名は使えません。<code>..</code> や <code>&lt; &gt; : " | ? *</code> は使えません。
-			</p>
-			<label><input type="checkbox" id="askEveryTime" /> 毎回保存先を選ぶ</label>
-		</section>
+			<section class="card" id="save-section">
+				<h2>保存先</h2>
+				<p class="description">Chrome の制限で、ダウンロードフォルダの外は固定できません。</p>
+				<label class="field-label" for="folder">ダウンロードフォルダ内のフォルダ（任意）</label>
+				<input type="text" id="folder" placeholder="例: CaptGrab" />
+				<p class="preview" id="save-preview"></p>
+				<p class="error" id="folder-error" role="alert" hidden>
+					このフォルダ名は使えません。<code>..</code> や <code>&lt; &gt; : " | ? *</code> は使えません。
+				</p>
+				<label class="choice">
+					<input type="checkbox" id="askEveryTime" />
+					<span><strong>保存のたびに場所を選ぶ</strong><small>ダウンロードフォルダの外にも保存できます</small></span>
+				</label>
+			</section>
 
-		<section>
-			<h2>ビューポートのサイズ</h2>
-			<label><input type="radio" name="viewport" id="viewport-current" /> 現在の表示サイズ</label>
-			<label><input type="radio" name="viewport" id="viewport-custom" /> サイズを指定する</label>
-			<div class="indent" id="viewport-fields">
-				<div class="row">
-					<select id="preset" aria-label="プリセット">
-						<option value="">プリセットを選ぶ</option>
+			<section class="card">
+				<h2>撮影するときの画面サイズ</h2>
+				<p class="description">ページのレイアウトを決める、ビューポートのサイズです。</p>
+				<label class="choice">
+					<input type="radio" name="viewport" id="viewport-current" />
+					<span><strong>今の画面のまま</strong><small>見えているレイアウトで撮影します</small></span>
+				</label>
+				<label class="choice">
+					<input type="radio" name="viewport" id="viewport-custom" />
+					<span><strong>サイズを指定</strong><small>画面の大きさに関係なく、同じサイズで撮影します</small></span>
+				</label>
+				<div class="nested" id="viewport-fields">
+					<label class="field-label" for="preset">よく使うサイズ</label>
+					<select id="preset">
+						<option value="">選んでください</option>
 						<option value="1920x1080">1920 × 1080（フルHD）</option>
 						<option value="1440x900">1440 × 900</option>
 						<option value="1280x800">1280 × 800</option>
 						<option value="768x1024">768 × 1024（タブレット）</option>
 						<option value="375x667">375 × 667（スマートフォン）</option>
 					</select>
+					<div class="size">
+						<label>幅 <input type="number" id="width" min="200" max="7680" /></label>
+						<label>高さ <input type="number" id="height" min="200" max="7680" /></label>
+						<span>px</span>
+					</div>
+					<p class="error" id="viewport-error" role="alert" hidden>幅と高さは 200〜7680 の整数で指定してください。</p>
+					<p class="hint">幅と高さだけを変えます。スマートフォン専用の表示になるとは限りません。</p>
 				</div>
+			</section>
+
+			<section class="card">
+				<h2>スクロールする領域</h2>
+				<p class="description">ページ全体ではなく、一部の領域だけがスクロールする画面の撮り方です。撮影中だけ領域を広げ、撮影後に元に戻します。</p>
+				<label class="choice">
+					<input type="checkbox" id="expandContent" />
+					<span><strong>本文を最後まで撮る</strong><small>管理画面や Web アプリで、本文が途中で切れなくなります</small></span>
+				</label>
+				<label class="choice">
+					<input type="checkbox" id="expandMenu" />
+					<span><strong>サイドメニューを最後まで撮る</strong><small>長いメニューも全部写します。メニューの見た目が変わることがあります</small></span>
+				</label>
+				<p class="hint">オフの領域は広げません。ただし、本文を広げるとメニューが一緒に伸びて、全部写る画面もあります。</p>
+			</section>
+
+			<section class="card" id="name-section">
+				<h2>ファイル名の連番</h2>
 				<div class="row">
-					<label>幅 <input type="number" id="width" min="200" max="7680" /></label>
-					<label>高さ <input type="number" id="height" min="200" max="7680" /></label>
-					<span>px</span>
+					<span>次のファイル名: <code id="next-name"></code></span>
+					<button type="button" id="reset-count">1 に戻す</button>
 				</div>
-				<p class="error" id="viewport-error" role="alert" hidden>
-					幅と高さは 200〜7680 の整数で指定してください。
-				</p>
-				<p class="hint">画面の幅だけを変えて撮影します。スマートフォン専用の表示になるとは限りません。</p>
-			</div>
-		</section>
+			</section>
 
-		<section>
-			<h2>ファイル名の連番</h2>
-			<div class="row">
-				<span>次のファイル名: <code id="next-name"></code></span>
-				<button type="button" id="reset-count">連番をリセット</button>
-			</div>
-		</section>
+			<section class="card">
+				<h2>ショートカットキー</h2>
+				<div class="row">
+					<span id="shortcut-text"></span>
+					<button type="button" id="shortcuts">変更する</button>
+				</div>
+			</section>
 
-		<section>
-			<h2>ショートカットキー</h2>
-			<div class="row">
-				<span>初期設定は <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> です。</span>
-				<button type="button" id="shortcuts">変更する</button>
-			</div>
-		</section>
+			<footer>
+				<a href="https://captgrab.shiftonton.net/guide.html" target="_blank" rel="noopener noreferrer">使い方ガイド</a>
+			</footer>
+		</div>
 
-		<p id="saved" role="status" class="hint"></p>
+		<p id="saved" role="status"></p>
 		<script type="module" src="/src/options/index.ts"></script>
 	</body>
 </html>

@@ -5,14 +5,22 @@ import pkg from "./package.json";
 const manifest = defineManifest({
 	manifest_version: 3,
 	description:
-		"見えているレイアウトのまま、Webページ全体を1枚のPNGに。ビューポートを固定して撮影し、保存とクリップボードへのコピーまで1クリックで行います。",
+		"画面サイズを固定して、Webページ全体を1枚のPNGに。保存とクリップボードへのコピーまで1クリックで行います。",
 	name: "CaptGrab",
 	version: pkg.version,
 	icons: {
-		256: "src/icons/icon.png",
+		16: "src/icons/icon-16.png",
+		32: "src/icons/icon-32.png",
+		48: "src/icons/icon-48.png",
+		128: "src/icons/icon-128.png",
 	},
 	action: {
-		default_icon: "src/icons/icon.png",
+		default_icon: {
+			16: "src/icons/icon-16.png",
+			32: "src/icons/icon-32.png",
+			48: "src/icons/icon-48.png",
+			128: "src/icons/icon-128.png",
+		},
 		default_title: "CaptGrab",
 		default_popup: "src/popup/index.html",
 	},

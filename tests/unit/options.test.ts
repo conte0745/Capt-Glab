@@ -6,7 +6,7 @@ const BODY = /<body>([\s\S]*)<\/body>/.exec(
 	fs.readFileSync("src/options/index.html", "utf-8")
 )![1];
 
-async function load(store: Record<string, unknown> = {}) {
+async function load(store: Record<string, unknown> = {}, shortcut = "Alt+Shift+S") {
 	document.body.innerHTML = BODY;
 	const create = vi.fn();
 	vi.stubGlobal("chrome", {
@@ -22,6 +22,9 @@ async function load(store: Record<string, unknown> = {}) {
 			},
 		},
 		tabs: { create },
+		commands: {
+			getAll: vi.fn(async () => [{ name: "_execute_action", shortcut }]),
+		},
 	});
 	vi.resetModules();
 	await import("../../src/options/index");
@@ -49,7 +52,8 @@ describe("options", () => {
 		expect(input("clipboard").checked).toBe(true);
 		expect(input("openTab").checked).toBe(false);
 		expect(input("viewport-current").checked).toBe(true);
-		expect(input("width").disabled).toBe(true);
+		expect(hidden("viewport-fields")).toBe(true);
+		expect(hidden("save-section")).toBe(false);
 	});
 
 	it("保存された設定を表示する", async () => {
@@ -63,10 +67,11 @@ describe("options", () => {
 
 		expect(input("download").checked).toBe(false);
 		expect(input("folder").value).toBe("a/b");
-		expect(input("folder").disabled).toBe(true);
+		expect(hidden("save-section")).toBe(true);
+		expect(hidden("name-section")).toBe(true);
 		expect(input("viewport-custom").checked).toBe(true);
 		expect(input("width").value).toBe("375");
-		expect(input("width").disabled).toBe(false);
+		expect(hidden("viewport-fields")).toBe(false);
 	});
 
 	it("変更すると保存する", async () => {
@@ -148,6 +153,42 @@ describe("options", () => {
 		});
 	});
 
+	it("保存先のプレビューが入力に追従する", async () => {
+		await load({ "image-name-count": 1 });
+		const preview = () => document.getElementById("save-preview")!;
+		expect(preview().textContent).toBe("保存先: ダウンロード / screen-0002.png");
+
+		input("folder").value = " a//b ";
+		input("folder").dispatchEvent(new Event("input"));
+		expect(preview().textContent).toBe("保存先: ダウンロード / a/b / screen-0002.png");
+
+		input("folder").value = "../x";
+		input("folder").dispatchEvent(new Event("input"));
+		expect(preview().hidden).toBe(true);
+	});
+
+	it("毎回選ぶ設定ではプレビューを隠す", async () => {
+		await load();
+
+		await change("askEveryTime", true);
+
+		expect(document.getElementById("save-preview")!.hidden).toBe(true);
+	});
+
+	it("スクロール領域の設定を表示して保存する", async () => {
+		const { store } = await load();
+		expect(input("expandContent").checked).toBe(true);
+		expect(input("expandMenu").checked).toBe(false);
+
+		await change("expandContent", false);
+		await change("expandMenu", true);
+
+		expect(store.settings).toMatchObject({
+			expandContent: false,
+			expandMenu: true,
+		});
+	});
+
 	it("次のファイル名を表示する", async () => {
 		await load({ "image-name-count": 1 });
 		expect(document.getElementById("next-name")!.textContent).toBe(
@@ -169,6 +210,20 @@ describe("options", () => {
 		expect(store["image-name-count"]).toBeUndefined();
 		expect(document.getElementById("next-name")!.textContent).toBe(
 			"screen-0001.png"
+		);
+	});
+
+	it("実際に割り当てられているショートカットを表示する", async () => {
+		await load({}, "⌥⇧S");
+
+		expect(document.getElementById("shortcut-text")!.textContent).toContain("⌥⇧S");
+	});
+
+	it("ショートカットが未割り当てならその旨を表示する", async () => {
+		await load({}, "");
+
+		expect(document.getElementById("shortcut-text")!.textContent).toContain(
+			"割り当てられていません"
 		);
 	});
 
