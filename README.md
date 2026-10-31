@@ -1,8 +1,8 @@
-# Capt Glab
+# CaptGrab
 
 ## 　 Google chrome の拡張機能
 
-- [紹介ページ](https://conte0745.github.io/Capt-Glab/) / [使い方ガイド](https://conte0745.github.io/Capt-Glab/guide.html) / [プライバシーポリシー](https://conte0745.github.io/Capt-Glab/privacy-policy.html)
+- [紹介ページ](https://captgrab.shiftonton.net/) / [使い方ガイド](https://captgrab.shiftonton.net/guide.html) / [プライバシーポリシー](https://captgrab.shiftonton.net/privacy-policy.html)
 - アイコン押下時にスクリーンショットを取得します。
 - `chrome.debugger` を使用し、ビューポートを固定したままページ全体を撮影します。
 - 撮影中はブラウザにデバッグ中である旨のバーが表示されます。

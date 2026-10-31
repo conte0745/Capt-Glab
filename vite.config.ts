@@ -4,14 +4,14 @@ import { defineConfig } from "vite";
 const manifest = defineManifest({
 	manifest_version: 3,
 	description: "You can get screen shot",
-	name: "Capt Grab",
+	name: "CaptGrab",
 	version: "0.1.0",
 	icons: {
 		256: "src/icons/logo.png",
 	},
 	action: {
 		default_icon: "src/icons/logo.png",
-		default_title: "Capt Grab",
+		default_title: "CaptGrab",
 	},
 	background: {
 		service_worker: "src/background/index.ts",
