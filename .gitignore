@@ -25,3 +25,5 @@ release
 *.sw?
 test-results
 playwright-report
+store-submission.md
+store-assets/
