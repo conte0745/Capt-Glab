@@ -1,13 +1,13 @@
 {
 	"name": "captgrab",
 	"private": true,
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview",
-		"zip": "zip -r dist.zip dist -x '*.DS_Store'"
+		"zip": "mkdir -p release && cd dist && zip -FS -r ../release/captgrab-$npm_package_version.zip . -x '*.DS_Store'"
 	},
 	"devDependencies": {
 		"@crxjs/vite-plugin": "^3.0.0",
