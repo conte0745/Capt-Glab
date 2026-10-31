@@ -73,3 +73,12 @@ test("robots.txt がサイトマップを示している", () => {
 		"Sitemap: https://captgrab.shiftonton.net/sitemap.xml"
 	);
 });
+
+test("全ページのフッターに OFUSE のリンクがある", async ({ page }) => {
+	for (const name of PAGES) {
+		await page.goto(fileUrl(name));
+		await expect(
+			page.locator('.site-footer a[href="https://ofuse.me/o?uid=213935"]')
+		).toHaveText("OFUSEで応援を送る");
+	}
+});
