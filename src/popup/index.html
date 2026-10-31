@@ -1,21 +1,40 @@
+<!DOCTYPE html>
 <html lang="ja">
 	<head>
 		<meta charset="UTF-8" />
+		<meta name="color-scheme" content="light dark" />
 		<style>
 			body {
 				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-				height: 100vh;
+				align-items: flex-start;
+				gap: 10px;
+				width: 240px;
 				margin: 0;
+				padding: 12px 14px;
+				font-family: system-ui, sans-serif;
+				font-size: 14px;
+				line-height: 1.5;
+			}
+			img {
+				width: 20px;
+				height: 20px;
+			}
+			p {
+				margin: 0;
+			}
+			#note {
+				font-size: 12px;
+				opacity: 0.75;
 			}
 		</style>
 		<title>CaptGrab</title>
 	</head>
 	<body>
-		<h1 id="status">作成中・・・</h1>
-		<img id="loading" src="../icons/loading.gif" alt="creating..." />
+		<img id="loading" src="../icons/loading.gif" alt="" />
+		<div>
+			<p id="status" role="status">撮影中…</p>
+			<p id="note"></p>
+		</div>
 		<script type="module" src="./index.ts"></script>
 	</body>
 </html>

@@ -8,14 +8,14 @@
 			name="description"
 			content="CaptGrabは、ビューポートを固定したままWebページ全体を撮影し、PNGの保存とクリップボードへのコピーを1クリックで行うChrome拡張機能です。"
 		/>
-		<link rel="icon" href="images/logo.png" />
+		<link rel="icon" href="images/icon.png" />
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
 		<header class="site-header">
 			<div class="wrap">
 				<a class="brand" href="./">
-					<img src="images/logo.png" alt="" width="317" height="345" />
+					<img src="images/icon.png" alt="" width="256" height="256" />
 					CaptGrab
 				</a>
 				<nav class="site-nav" aria-label="メイン">
@@ -78,7 +78,7 @@
 						<li>
 							<span class="step-label">STEP 1 ・ 押す</span>
 							<h3>撮りたいタブでアイコンを押す</h3>
-							<p>小さなウィンドウが開き、撮影の進み具合を表示します。</p>
+							<p>アイコンの下に、撮影の進み具合を表示します。</p>
 						</li>
 						<li>
 							<span class="step-label">STEP 2 ・ 固定する</span>
@@ -117,8 +117,16 @@
 							<p>Retinaなどの高DPIディスプレイでは、その倍率の解像度でPNGを出力します。</p>
 						</div>
 						<div>
-							<h3>連番ファイル名</h3>
-							<p>番号は自動で増えます。リセットは設定画面からいつでもできます。</p>
+							<h3>撮影後の動作を選べる</h3>
+							<p>ファイル保存、クリップボードへのコピー、別タブでの表示を、組み合わせて設定できます。</p>
+						</div>
+						<div>
+							<h3>ビューポートのサイズを指定できる</h3>
+							<p>現在の表示サイズのほか、1920×1080 などのサイズを指定して撮影できます。</p>
+						</div>
+						<div>
+							<h3>保存先と連番</h3>
+							<p>ダウンロードフォルダ内のフォルダを指定できます。ファイル名の番号は自動で増えます。</p>
 						</div>
 					</div>
 				</div>
@@ -128,7 +136,7 @@
 				<div class="wrap">
 					<h2>画像は、あなたのPCから出ません</h2>
 					<ul class="check-list">
-						<li>撮影した画像はダウンロードとクリップボードにだけ渡します</li>
+						<li>撮影した画像は、設定に応じてダウンロード、クリップボード、別タブにだけ渡します</li>
 						<li>外部サーバーへの送信、アカウント登録、クラウド同期はありません</li>
 						<li>アナリティクスや広告はありません</li>
 						<li>デバッガ権限は、アイコンを押したタブの撮影にだけ使います</li>
@@ -153,7 +161,6 @@
 						<div>
 							<h3>対応していないこと</h3>
 							<ul>
-								<li>ブラウザのズームが100%以外のページの正確な撮影</li>
 								<li><code>chrome://</code> など、デバッガを接続できないページ</li>
 								<li>横にはみ出した部分の撮影、範囲指定、画像への書き込み</li>
 								<li>Chrome以外のブラウザでの動作確認</li>

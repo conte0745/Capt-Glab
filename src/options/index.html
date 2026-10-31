@@ -2,22 +2,147 @@
 <html lang="ja">
 	<head>
 		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+		<title>CaptGrab - 設定</title>
 		<style>
-			.btn {
-				font-size: 0.9rem;
-				border-radius: 100vh;
+			body {
+				max-width: 560px;
+				margin: 0 auto;
+				padding: 24px 16px 48px;
+				font-family: system-ui, sans-serif;
+				font-size: 14px;
+				line-height: 1.6;
+			}
+			h1 {
+				margin: 0 0 24px;
+				font-size: 22px;
+			}
+			section {
+				margin: 0 0 28px;
+			}
+			h2 {
+				margin: 0 0 8px;
+				padding-bottom: 4px;
+				border-bottom: 1px solid light-dark(#ddd, #444);
+				font-size: 15px;
+			}
+			label {
+				display: block;
+				margin: 6px 0;
+			}
+			input[type="text"],
+			input[type="number"],
+			select {
+				padding: 4px 6px;
+				font: inherit;
+			}
+			input[type="number"] {
+				width: 6em;
+			}
+			#folder {
+				box-sizing: border-box;
+				width: 100%;
+			}
+			.indent {
+				margin-left: 24px;
+			}
+			.row {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 6px 10px;
+			}
+			.row label {
+				margin: 0;
+			}
+			.hint {
+				margin: 4px 0;
+				opacity: 0.75;
+				font-size: 12px;
+			}
+			.error {
+				margin: 4px 0;
+				color: light-dark(#b3261e, #f2b8b5);
+				font-size: 13px;
+			}
+			code {
+				font-family: ui-monospace, Menlo, Consolas, monospace;
+			}
+			button {
+				padding: 4px 12px;
+				font: inherit;
 			}
 		</style>
 	</head>
 	<body>
-		<div>
-			<h1>設定</h1>
-			<div class="js-description">
-				<span>現在のカウント：</span>
-				<span id="storageValues"></span>&emsp;
-				<button class="btn" id="reset-count">カウントをリセット</button>
+		<h1>CaptGrab の設定</h1>
+
+		<section>
+			<h2>撮影後の動作</h2>
+			<label><input type="checkbox" id="download" /> ファイルに保存する</label>
+			<label><input type="checkbox" id="clipboard" /> クリップボードにコピーする</label>
+			<label><input type="checkbox" id="openTab" /> 別のタブで開く</label>
+			<p class="error" id="actions-error" role="alert" hidden>
+				少なくとも1つ選んでください。
+			</p>
+		</section>
+
+		<section id="save-section">
+			<h2>保存先</h2>
+			<label for="folder">ダウンロードフォルダ内のフォルダ名</label>
+			<input type="text" id="folder" placeholder="例: CaptGrab/スクリーンショット" />
+			<p class="hint">空欄ならダウンロードフォルダの直下に保存します。Chrome の制限で、ダウンロードフォルダの外は指定できません。</p>
+			<p class="error" id="folder-error" role="alert" hidden>
+				このフォルダ名は使えません。<code>..</code> や <code>&lt; &gt; : " | ? *</code> は使えません。
+			</p>
+			<label><input type="checkbox" id="askEveryTime" /> 毎回保存先を選ぶ</label>
+		</section>
+
+		<section>
+			<h2>ビューポートのサイズ</h2>
+			<label><input type="radio" name="viewport" id="viewport-current" /> 現在の表示サイズ</label>
+			<label><input type="radio" name="viewport" id="viewport-custom" /> サイズを指定する</label>
+			<div class="indent" id="viewport-fields">
+				<div class="row">
+					<select id="preset" aria-label="プリセット">
+						<option value="">プリセットを選ぶ</option>
+						<option value="1920x1080">1920 × 1080（フルHD）</option>
+						<option value="1440x900">1440 × 900</option>
+						<option value="1280x800">1280 × 800</option>
+						<option value="768x1024">768 × 1024（タブレット）</option>
+						<option value="375x667">375 × 667（スマートフォン）</option>
+					</select>
+				</div>
+				<div class="row">
+					<label>幅 <input type="number" id="width" min="200" max="7680" /></label>
+					<label>高さ <input type="number" id="height" min="200" max="7680" /></label>
+					<span>px</span>
+				</div>
+				<p class="error" id="viewport-error" role="alert" hidden>
+					幅と高さは 200〜7680 の整数で指定してください。
+				</p>
+				<p class="hint">画面の幅だけを変えて撮影します。スマートフォン専用の表示になるとは限りません。</p>
 			</div>
-		</div>
+		</section>
+
+		<section>
+			<h2>ファイル名の連番</h2>
+			<div class="row">
+				<span>次のファイル名: <code id="next-name"></code></span>
+				<button type="button" id="reset-count">連番をリセット</button>
+			</div>
+		</section>
+
+		<section>
+			<h2>ショートカットキー</h2>
+			<div class="row">
+				<span>初期設定は <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> です。</span>
+				<button type="button" id="shortcuts">変更する</button>
+			</div>
+		</section>
+
+		<p id="saved" role="status" class="hint"></p>
 		<script type="module" src="/src/options/index.ts"></script>
 	</body>
 </html>

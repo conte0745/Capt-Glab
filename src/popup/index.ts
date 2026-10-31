@@ -1,81 +1,102 @@
 export {};
 
+const AUTO_CLOSE_MS = 2000;
+// 読み切れるよう、補足があるときは長めに表示する
+const AUTO_CLOSE_WITH_NOTE_MS = 5000;
+
+const ERROR_MESSAGES: Record<string, [string, string]> = {
+	restricted: [
+		"このページは撮影できません",
+		"chrome:// やウェブストアなど、ブラウザが保護しているページです。",
+	],
+	"other-debugger": [
+		"撮影できませんでした",
+		"他の拡張機能がこのタブを操作しています。終わってからお試しください。",
+	],
+	unknown: [
+		"撮影できませんでした",
+		"ページを読み込み直してから、もう一度お試しください。",
+	],
+};
+
 const statusText = document.getElementById("status")!;
+const noteText = document.getElementById("note")!;
 const loading = document.getElementById("loading")!;
 
-createCapture();
+start();
 
-async function createCapture() {
-	const tabId = Number(new URLSearchParams(location.search).get("tabId"));
+async function start() {
+	const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+	const port = chrome.runtime.connect({ name: "capture" });
 
-	try {
-		const response = await chrome.runtime.sendMessage({
-			request: "capture",
-			tabId,
-		});
-		if (response.error) {
-			throw new Error(response.error);
+	port.onMessage.addListener(async (message) => {
+		if (message.type === "waiting") {
+			statusText.textContent = "前回の撮影の後処理を待っています…";
+		} else if (message.type === "error") {
+			const [status, note] =
+				ERROR_MESSAGES[message.reason] ?? ERROR_MESSAGES.unknown;
+			show(status, note);
+		} else if (message.type === "done") {
+			await finish(port, message);
 		}
+	});
+	port.postMessage({ request: "capture", tabId: tab.id });
+}
 
-		const image = await fetch(`data:image/png;base64,${response.data}`);
+type DoneMessage = {
+	data?: string;
+	saved: "saved" | "canceled" | "failed" | "off";
+	scaled: boolean;
+	openTab: boolean;
+};
+
+async function finish(port: chrome.runtime.Port, message: DoneMessage) {
+	const copied = message.data ? await copyImage(message.data) : null;
+
+	if (message.openTab) {
+		port.postMessage({ request: "copied" });
+	}
+
+	const notes = [];
+	if (message.scaled) {
+		notes.push("長いページのため、縮小して保存しました。");
+	}
+	if (message.saved === "failed") {
+		notes.push("ファイルを保存できませんでした。設定の保存先をご確認ください。");
+	}
+	if (copied === false) {
+		notes.push("クリップボードにコピーできませんでした。");
+	}
+	show(completedText(message.saved, copied), notes.join(""));
+
+	await sleep(notes.length ? AUTO_CLOSE_WITH_NOTE_MS : AUTO_CLOSE_MS);
+	window.close();
+}
+
+function completedText(saved: DoneMessage["saved"], copied: boolean | null) {
+	if (saved === "saved" && copied) return "保存してコピーしました";
+	if (saved === "saved") return "保存しました";
+	if (copied) return "コピーしました";
+	if (saved === "canceled") return "保存をキャンセルしました";
+	return "撮影しました";
+}
+
+async function copyImage(data: string): Promise<boolean> {
+	try {
+		const image = await fetch(`data:image/png;base64,${data}`);
 		const blob = await image.blob();
-
-		await createDownloadLink(blob);
-		const copied = await saveImageOnClipBoard(blob);
-
-		loading.remove();
-		statusText.textContent = copied
-			? "画像を保存しました"
-			: "画像を保存しました（クリップボードへのコピーは失敗しました）";
-
-		await sleep(2000);
-		window.close();
-	} catch (error) {
-		// 原因を確認できるようにウィンドウは閉じない
-		console.error(error);
-		loading.remove();
-		statusText.textContent = "キャプチャに失敗しました";
-	}
-}
-
-async function createDownloadLink(blob: Blob) {
-	const link = document.createElement("a");
-	link.href = URL.createObjectURL(blob);
-	link.download = await getImageNameFromStorage();
-	link.click();
-}
-
-async function getImageNameFromStorage(): Promise<string> {
-	const ex = ".png";
-	let name: string = "screen-";
-	let count: number = 0;
-
-	try {
-		const result = await new Promise((resolve) => {
-			chrome.storage.local.get(["image-name-count"], (data) => {
-				resolve(data["image-name-count"]);
-			});
-		});
-
-		count = Number(result) || 0;
-		count += 1;
-
-		chrome.storage.local.set({ "image-name-count": count });
-	} catch (error) {
-		console.error("Error getting image count from storage:", error);
-	}
-
-	return name + count.toString().padStart(4, "0") + ex;
-}
-
-async function saveImageOnClipBoard(blob: Blob): Promise<boolean> {
-	try {
 		await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
 		return true;
 	} catch (error) {
 		console.error("Failed to copy image to clipboard:", error);
 		return false;
 	}
+}
+
+function show(status: string, note: string) {
+	loading.remove();
+	statusText.textContent = status;
+	noteText.textContent = note;
 }
 
 function sleep(ms: number) {

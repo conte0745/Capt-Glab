@@ -5,14 +5,14 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>CaptGrab - プライバシーポリシー</title>
 		<meta name="description" content="Chrome拡張機能 CaptGrab のプライバシーポリシーです。" />
-		<link rel="icon" href="images/logo.png" />
+		<link rel="icon" href="images/icon.png" />
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
 		<header class="site-header">
 			<div class="wrap">
 				<a class="brand" href="./">
-					<img src="images/logo.png" alt="" width="317" height="345" />
+					<img src="images/icon.png" alt="" width="256" height="256" />
 					CaptGrab
 				</a>
 				<nav class="site-nav" aria-label="メイン">
@@ -56,11 +56,11 @@
 				<h2 id="storage">3. 保存するデータ</h2>
 				<ul>
 					<li>
-						<strong>連番カウント：</strong>ファイル名の番号を決めるための数値を
+						<strong>連番カウントと設定：</strong>ファイル名の番号を決めるための数値と、設定画面の内容（撮影後の動作、保存先のフォルダ名、ビューポートのサイズ）を
 						Chrome Storage（お使いのブラウザ内）に保存します。
 					</li>
 					<li>
-						<strong>撮影画像：</strong>ブラウザのダウンロード機能でPNGファイルとして保存し、クリップボードにコピーします。本拡張機能の保存領域には残しません。
+						<strong>撮影画像：</strong>設定に応じて、ブラウザのダウンロード機能でPNGファイルとして保存し、クリップボードへのコピーや別タブでの表示を行います。本拡張機能の保存領域には残しません。
 					</li>
 				</ul>
 
@@ -91,7 +91,11 @@
 							</tr>
 							<tr>
 								<th scope="row"><code>storage</code></th>
-								<td>連番カウントを保存します。</td>
+								<td>連番カウントと設定を保存します。</td>
+							</tr>
+							<tr>
+								<th scope="row"><code>downloads</code></th>
+								<td>撮影画像を指定のフォルダに保存します。ダウンロード履歴の内容は読み取りません。</td>
 							</tr>
 						</tbody>
 					</table>
@@ -99,7 +103,7 @@
 
 				<h2 id="delete">6. 保持と削除</h2>
 				<p>
-					連番カウントは、設定画面でリセットするか、本拡張機能をアンインストールすると削除されます。ダウンロードした画像とクリップボードの内容は本拡張機能の管理外です。ユーザー自身で削除してください。
+					連番カウントは設定画面でリセットすると削除されます。連番カウントと設定は、本拡張機能をアンインストールすると削除されます。別タブに表示した画像は、そのタブを閉じると消えます。ダウンロードした画像とクリップボードの内容は本拡張機能の管理外です。ユーザー自身で削除してください。
 				</p>
 
 				<h2 id="third-party">7. 第三者への提供</h2>

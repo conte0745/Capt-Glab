@@ -1,5 +1,6 @@
 import {
 	chromium,
+	expect,
 	test as base,
 	type BrowserContext,
 	type Page,
@@ -13,17 +14,18 @@ import path from "node:path";
 
 const EXTENSION = path.resolve("dist");
 
-// 100vh の要素の後ろに高さ 2400px の青い要素を置いたページ
-const TEST_PAGE = `<!doctype html>
+// 100vh の要素の後ろに青い要素を置き、最後を緑にしたページ。青の高さは ?blue= で変えられる
+const testPage = (blue: string) => `<!doctype html>
 <body style="margin:0">
 <div style="height:100vh;background:#cc3333"></div>
-<div style="height:2400px;background:#0000ff"></div>
+<div style="height:${blue}px;background:#0000ff"></div>
+<div style="height:50px;background:#00ff00"></div>
 </body>`;
 
 type Fixtures = {
 	scale: number;
 	url: string;
-	extension: { context: BrowserContext; worker: Worker };
+	extension: { context: BrowserContext; worker: Worker; downloads: string };
 	page: Page;
 };
 
@@ -31,9 +33,10 @@ export const test = base.extend<Fixtures>({
 	scale: [1, { option: true }],
 
 	url: async ({}, use) => {
-		const server = http.createServer((_req, res) => {
+		const server = http.createServer((req, res) => {
+			const { searchParams } = new URL(req.url!, "http://localhost");
 			res.setHeader("content-type", "text/html");
-			res.end(TEST_PAGE);
+			res.end(testPage(searchParams.get("blue") ?? "2400"));
 		});
 		await new Promise<void>((resolve) => server.listen(0, resolve));
 		await use(`http://localhost:${(server.address() as AddressInfo).port}/`);
@@ -42,11 +45,18 @@ export const test = base.extend<Fixtures>({
 
 	extension: async ({ scale }, use) => {
 		const profile = fs.mkdtempSync(path.join(os.tmpdir(), "captgrab-"));
+		const downloads = fs.mkdtempSync(path.join(os.tmpdir(), "captgrab-dl-"));
+		fs.mkdirSync(path.join(profile, "Default"));
+		fs.writeFileSync(
+			path.join(profile, "Default", "Preferences"),
+			JSON.stringify({
+				download: { default_directory: downloads, prompt_for_download: false },
+			})
+		);
 		const context = await chromium.launchPersistentContext(profile, {
 			channel: "chromium",
 			headless: true,
 			viewport: null,
-			acceptDownloads: true,
 			args: [
 				"--window-size=1000,700",
 				`--force-device-scale-factor=${scale}`,
@@ -56,13 +66,17 @@ export const test = base.extend<Fixtures>({
 		});
 		const worker =
 			context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
-		await use({ context, worker });
+		await use({ context, worker, downloads });
 		await context.close();
 		fs.rmSync(profile, { recursive: true, force: true });
+		fs.rmSync(downloads, { recursive: true, force: true });
 	},
 
 	page: async ({ extension }, use) => {
 		const page = await extension.context.newPage();
+		// Playwright の設定のままだと、chrome.downloads に渡したファイル名が無視される
+		const cdp = await extension.context.newCDPSession(page);
+		await cdp.send("Browser.setDownloadBehavior", { behavior: "default" });
 		await use(page);
 	},
 });
@@ -79,19 +93,32 @@ export async function activeTabId(
 	});
 }
 
-/** 拡張機能のアイコンを押して、撮影用のウィンドウを返す */
+/** 拡張機能のアイコンを押した場合と同じく、ツールバーのパネルを開く */
 export async function clickAction(
-	{ context, worker }: Fixtures["extension"],
+	{ worker }: Fixtures["extension"],
 	page: Page
-): Promise<Page> {
+): Promise<void> {
 	await page.bringToFront();
-	const opened = context.waitForEvent("page");
-	await worker.evaluate(async () => {
-		const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-		// @ts-expect-error dispatch は型定義にないが実行時には存在する
-		chrome.action.onClicked.dispatch(tab);
-	});
-	return opened;
+	await worker.evaluate(() => chrome.action.openPopup());
+}
+
+/** ツールバーのパネルが開いているかを返す */
+export async function isPanelOpen(
+	{ context }: Fixtures["extension"],
+	page: Page
+): Promise<boolean> {
+	const cdp = await context.newCDPSession(page);
+	const { targetInfos } = await cdp.send("Target.getTargets", { filter: [{}] });
+	await cdp.detach();
+	return targetInfos.some((target) => target.url.includes("src/popup/index.html"));
+}
+
+/** パネルが閉じるまで待つ */
+export async function waitForPanelClose(
+	extension: Fixtures["extension"],
+	page: Page
+): Promise<void> {
+	await expect.poll(() => isPanelOpen(extension, page)).toBe(false);
 }
 
 export type Shot = {
@@ -104,9 +131,14 @@ export type Shot = {
 };
 
 /** ダウンロードされた画像を読み取って返す */
-export async function waitForShot(popup: Page, page: Page): Promise<Shot> {
-	const download = await popup.waitForEvent("download");
-	const file = fs.readFileSync(await download.path());
+export async function waitForShot(
+	{ downloads }: Fixtures["extension"],
+	page: Page,
+	filename = "screen-0001.png"
+): Promise<Shot> {
+	const target = path.join(downloads, filename);
+	await expect.poll(() => fs.existsSync(target), { timeout: 20_000 }).toBe(true);
+	const file = fs.readFileSync(target);
 	const result = await page.evaluate(async (base64) => {
 		const image = new Image();
 		image.src = `data:image/png;base64,${base64}`;
@@ -132,7 +164,14 @@ export async function waitForShot(popup: Page, page: Page): Promise<Shot> {
 			bottomColor: color(image.height - 1),
 		};
 	}, file.toString("base64"));
-	return { filename: download.suggestedFilename(), ...result };
+	return { filename, ...result };
 }
 
-export const BLUE = "0,0,255";
+export const GREEN = "0,255,0";
+
+export async function setSettings(
+	{ worker }: Fixtures["extension"],
+	settings: object
+): Promise<void> {
+	await worker.evaluate((settings) => chrome.storage.local.set({ settings }), settings);
+}

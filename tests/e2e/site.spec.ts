@@ -54,3 +54,22 @@ test("カスタムドメインの設定を保っている", () => {
 		"captgrab.shiftonton.net"
 	);
 });
+
+test("サイトマップが全ページを公開URLで載せている", () => {
+	const sitemap = fs.readFileSync(path.join(DOCS, "sitemap.xml"), "utf-8");
+	const locs = [...sitemap.matchAll(/<loc>(.+?)<\/loc>/g)].map((m) => m[1]);
+
+	expect(locs.sort()).toEqual(
+		[
+			"https://captgrab.shiftonton.net/",
+			"https://captgrab.shiftonton.net/guide.html",
+			"https://captgrab.shiftonton.net/privacy-policy.html",
+		].sort()
+	);
+});
+
+test("robots.txt がサイトマップを示している", () => {
+	expect(fs.readFileSync(path.join(DOCS, "robots.txt"), "utf-8")).toContain(
+		"Sitemap: https://captgrab.shiftonton.net/sitemap.xml"
+	);
+});

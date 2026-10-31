@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+		<title>CaptGrab - 撮影した画像</title>
+		<style>
+			body {
+				margin: 0;
+				font-family: system-ui, sans-serif;
+				background: light-dark(#f4f4f4, #1e1e1e);
+			}
+			header {
+				position: sticky;
+				top: 0;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: space-between;
+				gap: 8px 16px;
+				padding: 10px 16px;
+				background: light-dark(#fff, #2b2b2b);
+				border-bottom: 1px solid light-dark(#ddd, #444);
+			}
+			a {
+				padding: 6px 14px;
+				border-radius: 4px;
+				background: light-dark(#111a3a, #fffdf5);
+				color: light-dark(#fffdf5, #111a3a);
+				font-weight: 600;
+				text-decoration: none;
+			}
+			main {
+				padding: 16px;
+				text-align: center;
+			}
+			img {
+				max-width: 100%;
+				height: auto;
+				box-shadow: 0 1px 6px rgb(0 0 0 / 30%);
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<span id="name">撮影した画像</span>
+			<a id="save" hidden>ダウンロード</a>
+		</header>
+		<main>
+			<p id="message" hidden>
+				画像を表示できません。この画面は再読み込みすると画像が消えます。もう一度撮影してください。
+			</p>
+			<img id="image" alt="撮影したページ全体の画像" hidden />
+		</main>
+		<script type="module" src="./index.ts"></script>
+	</body>
+</html>
