@@ -30,7 +30,7 @@ for (const name of PAGES) {
 				.locator("a[href]")
 				.evaluateAll((links) => links.map((a) => a.getAttribute("href")!));
 
-			for (const href of hrefs.filter((h) => !/^https?:/.test(h))) {
+			for (const href of hrefs.filter((h) => !/^(https?|mailto):/.test(h))) {
 				const [file, hash] = href.split("#");
 				const target = file === "" ? name : file === "./" ? "index.html" : file;
 				expect(fs.existsSync(path.join(DOCS, target)), href).toBe(true);
@@ -80,5 +80,14 @@ test("全ページのフッターに OFUSE のリンクがある", async ({ page
 		await expect(
 			page.locator('.site-footer a[href="https://ofuse.me/o?uid=213935"]')
 		).toHaveText("OFUSEで応援を送る");
+	}
+});
+
+test("全ページのフッターにお問い合わせのメールリンクがある", async ({ page }) => {
+	for (const name of PAGES) {
+		await page.goto(fileUrl(name));
+		await expect(
+			page.locator('.site-footer a[href="mailto:captgrab@shiftonton.net"]')
+		).toHaveText("お問い合わせ");
 	}
 });

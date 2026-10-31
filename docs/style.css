@@ -13,6 +13,7 @@
 	--font-display: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
 	--font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 	--icon-external: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'/%3E%3C/svg%3E");
+	--icon-mail: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='m3 7 9 6 9-6'/%3E%3C/svg%3E");
 }
 
 * {
@@ -64,6 +65,20 @@ a[target="_blank"]::after {
 	background: currentColor;
 	-webkit-mask: var(--icon-external) center / contain no-repeat;
 	mask: var(--icon-external) center / contain no-repeat;
+}
+
+/* メールリンク（メールソフトを開く） */
+a[href^="mailto:"]::after {
+	content: "";
+	content: "" / "（メールを作成）";
+	display: inline-block;
+	width: 0.9em;
+	height: 0.9em;
+	margin-left: 0.25em;
+	vertical-align: -0.1em;
+	background: currentColor;
+	-webkit-mask: var(--icon-mail) center / contain no-repeat;
+	mask: var(--icon-mail) center / contain no-repeat;
 }
 
 code {
