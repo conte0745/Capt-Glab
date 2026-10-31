@@ -1,42 +1,191 @@
-<html>
-	<head lang="ja">
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
 		<meta charset="utf-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
-
-		<title>privacy policy : Capt Glab</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Capt Glab - レイアウトを崩さずページ全体を撮るChrome拡張機能</title>
+		<meta
+			name="description"
+			content="Capt Glabは、ビューポートを固定したままWebページ全体を撮影し、PNGの保存とクリップボードへのコピーを1クリックで行うChrome拡張機能です。"
+		/>
+		<link rel="icon" href="images/logo.png" />
+		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
-		<h1>プライバシーポリシー</h1>
+		<header class="site-header">
+			<div class="wrap">
+				<a class="brand" href="./">
+					<img src="images/logo.png" alt="" width="317" height="345" />
+					Capt Glab
+				</a>
+				<nav class="site-nav" aria-label="メイン">
+					<a href="#flow">できること</a>
+					<a href="#privacy">データの扱い</a>
+					<a href="guide.html">使い方ガイド</a>
+				</nav>
+			</div>
+		</header>
 
-		<h2>1. 取得する情報</h2>
-		<p>
-			当アプリケーションは、現在有効なタブの Web
-			ページの全体のキャプチャ画像を取得します。この操作を行う際、ウェブページのコンテンツ、URL、および表示されているデータが含まれる可能性があります。
-		</p>
+		<main>
+			<section class="hero">
+				<div class="wrap">
+					<div>
+						<p class="eyebrow">Chrome拡張機能</p>
+						<h1>
+							<span class="nowrap">見えているレイアウトのまま、</span>
+							<span class="nowrap">ページ全体を1枚に。</span>
+						</h1>
+						<p class="lead">
+							Capt
+							Glabは、ビューポートを固定したままWebページ全体を撮影する拡張機能です。アイコンを押すだけで、PNGの保存とクリップボードへのコピーまで終わります。
+						</p>
+						<div class="actions">
+							<a class="btn btn-primary" href="guide.html#install">導入手順を見る</a>
+							<a class="btn" href="https://github.com/conte0745/Capt-Glab">GitHub</a>
+						</div>
+						<ul class="check-list">
+							<li>アカウント登録不要</li>
+							<li>画像を外部へ送信しない</li>
+							<li>高DPIディスプレイの解像度で保存</li>
+						</ul>
+					</div>
+					<figure class="compare">
+						<div>
+							<h3>固定しない場合</h3>
+							<div class="shot shot-stretched" aria-hidden="true">
+								<div class="shot-first">100vh</div>
+								<div class="shot-rest"></div>
+							</div>
+						</div>
+						<div>
+							<h3>Capt Glab</h3>
+							<div class="shot" aria-hidden="true">
+								<div class="shot-first">100vh</div>
+								<div class="shot-rest"></div>
+							</div>
+						</div>
+						<figcaption>
+							画面の高さに合わせた要素が、撮影の瞬間に伸びて後続の内容を押し出すことがあります。Capt
+							Glabは高さを固定して撮影します（図は説明用のイメージです）。
+						</figcaption>
+					</figure>
+				</div>
+			</section>
 
-		<h2>2. 保存される情報</h2>
-		<p>
-			キャプチャ画像は、クリップボードへの貼り付けやダウンロードのために一時的に処理されます。この過程で、ユーザーのデバイス内に一時的に保存されることがあります。保存された情報は、画像のダウンロードやクリップボードへの貼り付けを行うためにのみ使用され、その後削除されます。
-		</p>
+			<section id="flow">
+				<div class="wrap">
+					<h2>押してから保存まで、操作は1回</h2>
+					<p class="lead">撮影範囲の指定やスクロールは必要ありません。</p>
+					<ol class="steps">
+						<li>
+							<span class="step-label">STEP 1 ・ 押す</span>
+							<h3>撮りたいタブでアイコンを押す</h3>
+							<p>小さなウィンドウが開き、撮影の進み具合を表示します。</p>
+						</li>
+						<li>
+							<span class="step-label">STEP 2 ・ 固定する</span>
+							<h3>今の表示サイズで固定して撮る</h3>
+							<p>
+								幅と高さを押した時点のサイズに固定します。デバッグ中のバーが出ても、レイアウトは変わりません。
+							</p>
+						</li>
+						<li>
+							<span class="step-label">STEP 3 ・ 残す</span>
+							<h3>PNG保存とコピーを同時に</h3>
+							<p>
+								<code>screen-0001.png</code>
+								のような連番でダウンロードし、クリップボードにもコピーします。
+							</p>
+						</li>
+					</ol>
+				</div>
+			</section>
 
-		<h2>3. 情報の共有</h2>
-		<p>
-			当アプリケーションは、ユーザーのデータや情報を外部に送信したり、第三者と共有することはありません。
-		</p>
+			<section>
+				<div class="wrap">
+					<h2>「きれいに全体を撮る」ための作り</h2>
+					<p class="lead">ブラウザのデバッガ機能を使い、Chrome自身の描画結果を画像にします。</p>
+					<div class="features">
+						<div>
+							<h3><code>100vh</code> のレイアウトを保つ</h3>
+							<p>画面いっぱいのヒーローなど、表示領域を基準にした要素も表示中の高さのまま写ります。</p>
+						</div>
+						<div>
+							<h3>つなぎ合わせない1枚撮り</h3>
+							<p>スクロールしながら画像を重ねる方式ではないので、継ぎ目がありません。</p>
+						</div>
+						<div>
+							<h3>高解像度のまま保存</h3>
+							<p>Retinaなどの高DPIディスプレイでは、その倍率の解像度でPNGを出力します。</p>
+						</div>
+						<div>
+							<h3>連番ファイル名</h3>
+							<p>番号は自動で増えます。リセットは設定画面からいつでもできます。</p>
+						</div>
+					</div>
+				</div>
+			</section>
 
-		<h2>4. セキュリティ</h2>
-		<p>
-			当アプリケーションでは、データの安全性を確保するために適切なセキュリティ対策を講じています。ユーザーの情報やデータを保護するために最善を尽くします。
-		</p>
+			<section class="band" id="privacy">
+				<div class="wrap">
+					<h2>画像は、あなたのPCから出ません</h2>
+					<ul class="check-list">
+						<li>撮影した画像はダウンロードとクリップボードにだけ渡します</li>
+						<li>外部サーバーへの送信、アカウント登録、クラウド同期はありません</li>
+						<li>アナリティクスや広告はありません</li>
+						<li>デバッガ権限は、アイコンを押したタブの撮影にだけ使います</li>
+					</ul>
+					<a href="privacy-policy.html">プライバシーポリシーを読む</a>
+				</div>
+			</section>
 
-		<h2>5. お問い合わせ</h2>
-		<p>
-			プライバシーポリシーやデータの取り扱いに関するご質問やご意見がございましたら、いつでもお問い合わせください。
-		</p>
+			<section>
+				<div class="wrap">
+					<h2>導入前に知っておいてほしいこと</h2>
+					<p class="lead">Capt Glabは、1クリックのページ全体キャプチャに絞ったツールです。</p>
+					<div class="fit">
+						<div>
+							<h3>向いている使い方</h3>
+							<ul>
+								<li>Webページのデザイン確認やレビュー資料の作成</li>
+								<li>画面の高さを基準にしたレイアウトの記録</li>
+								<li>撮った画像をすぐチャットや資料に貼り付けたいとき</li>
+							</ul>
+						</div>
+						<div>
+							<h3>対応していないこと</h3>
+							<ul>
+								<li>ブラウザのズームが100%以外のページの正確な撮影</li>
+								<li><code>chrome://</code> など、デバッガを接続できないページ</li>
+								<li>横にはみ出した部分の撮影、範囲指定、画像への書き込み</li>
+								<li>Chrome以外のブラウザでの動作確認</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</section>
 
-		<p>
-			このプライバシーポリシーは、ユーザーのプライバシー保護を重視し、当アプリケーションが情報を取り扱う方法に関する重要な情報を提供するために作成されました。
-		</p>
+			<section class="cta">
+				<div class="wrap">
+					<h2>次のスクリーンショットから、崩れない1枚を</h2>
+					<p>導入手順と、うまく撮れないときの対処はガイドにまとめています。</p>
+					<div class="actions">
+						<a class="btn btn-primary" href="guide.html">使い方ガイドを見る</a>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="site-footer">
+			<div class="wrap">
+				<ul>
+					<li><a href="guide.html">使い方ガイド</a></li>
+					<li><a href="privacy-policy.html">プライバシーポリシー</a></li>
+					<li><a href="https://github.com/conte0745/Capt-Glab">GitHub</a></li>
+					<li><a href="https://github.com/conte0745/Capt-Glab/issues">お問い合わせ</a></li>
+				</ul>
+				<p>© 2024 Conte0745. Released under the <a href="https://github.com/conte0745/Capt-Glab/blob/main/LICENSE">MIT License</a>.</p>
+			</div>
+		</footer>
 	</body>
 </html>

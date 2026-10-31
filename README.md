@@ -2,19 +2,22 @@
 
 ## 　 Google chrome の拡張機能
 
+- [紹介ページ](https://conte0745.github.io/Capt-Glab/) / [使い方ガイド](https://conte0745.github.io/Capt-Glab/guide.html) / [プライバシーポリシー](https://conte0745.github.io/Capt-Glab/privacy-policy.html)
 - アイコン押下時にスクリーンショットを取得します。
-- html2canvas を使用しているため、同一オリジンの複数画像や iframe はサポート対象外です。
+- `chrome.debugger` を使用し、ビューポートを固定したままページ全体を撮影します。
+- 撮影中はブラウザにデバッグ中である旨のバーが表示されます。
+- `chrome://` などのデバッガを接続できないページは撮影できません。
 
 ## 環境構築
 
 ```node
-npm install
+pnpm install
 ```
 
 ## ビルド
 
 ```node
-npm run build
+pnpm build
 ```
 
 ## 依存関係
@@ -23,4 +26,7 @@ npm run build
 - types/chrome
 - typescript
 - vite
-- html2canvas
+
+## ライセンス
+
+[MIT License](LICENSE)

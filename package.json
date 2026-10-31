@@ -10,13 +10,11 @@
 		"zip": "zip -r dist.zip dist -x '*.DS_Store'"
 	},
 	"devDependencies": {
-		"@crxjs/vite-plugin": "^2.0.0-beta.21",
-		"@types/chrome": "^0.0.256",
-		"npm-build-zip": "^1.0.4",
-		"typescript": "^4.9.5",
-		"vite": "^3.2.3"
+		"@crxjs/vite-plugin": "^3.0.0",
+		"@types/chrome": "^0.3.7",
+		"typescript": "^7.0.2",
+		"vite": "^8.3.5"
 	},
-	"dependencies": {
-		"html2canvas": "^1.4.1"
-	}
+	"packageManager": "pnpm@12.5.1",
+	"license": "MIT"
 }

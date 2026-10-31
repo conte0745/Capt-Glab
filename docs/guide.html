@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Capt Glab - 使い方ガイド</title>
+		<meta
+			name="description"
+			content="Chrome拡張機能 Capt Glab の導入手順、基本操作、制限事項、よくある質問をまとめたガイドです。"
+		/>
+		<link rel="icon" href="images/logo.png" />
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="wrap">
+				<a class="brand" href="./">
+					<img src="images/logo.png" alt="" width="317" height="345" />
+					Capt Glab
+				</a>
+				<nav class="site-nav" aria-label="メイン">
+					<a href="./">トップ</a>
+					<a href="privacy-policy.html">プライバシーポリシー</a>
+				</nav>
+			</div>
+		</header>
+
+		<main class="wrap doc">
+			<nav class="toc" aria-label="目次">
+				<p>目次</p>
+				<ul>
+					<li><a href="#install">導入手順</a></li>
+					<li><a href="#usage">基本操作</a></li>
+					<li><a href="#settings">連番のリセット</a></li>
+					<li><a href="#limits">制限事項</a></li>
+					<li><a href="#faq">よくある質問</a></li>
+					<li><a href="#support">サポート</a></li>
+				</ul>
+			</nav>
+			<article>
+				<h1>使い方ガイド</h1>
+				<p class="doc-meta">導入から、うまく撮れないときの対処までをまとめています。</p>
+
+				<h2 id="install">導入手順</h2>
+				<p>ソースコードからビルドして読み込みます。Node.js、pnpm、Git が必要です。</p>
+				<ol>
+					<li>
+						リポジトリを取得してビルドします。
+						<pre><code>git clone https://github.com/conte0745/Capt-Glab.git
+cd Capt-Glab
+pnpm install
+pnpm build</code></pre>
+					</li>
+					<li>Chromeで <code>chrome://extensions</code> を開きます。</li>
+					<li>右上の「デベロッパー モード」をオンにします。</li>
+					<li>「パッケージ化されていない拡張機能を読み込む」から、生成された <code>dist</code> フォルダを選びます。</li>
+				</ol>
+
+				<h2 id="usage">基本操作</h2>
+				<ol>
+					<li>撮りたいページをタブに表示します。</li>
+					<li>ツールバーの Capt Glab のアイコンを押します。</li>
+					<li>「作成中・・・」のウィンドウが開き、撮影が始まります。</li>
+					<li>「画像を保存しました」と表示されると完了です。ウィンドウは約2秒で閉じます。</li>
+				</ol>
+				<p>
+					画像はブラウザのダウンロード先に <code>screen-0001.png</code>
+					の形式で保存され、クリップボードにもコピーされます。
+				</p>
+
+				<h2 id="settings">連番のリセット</h2>
+				<p>
+					アイコンを右クリックして「オプション」を選ぶと、設定画面が開きます。「カウントをリセット」を押すと、次の画像は
+					<code>screen-0001.png</code> に戻ります。
+				</p>
+
+				<h2 id="limits">制限事項</h2>
+				<ul>
+					<li>ブラウザのズームが100%以外だと、レイアウトや下端が正しく写らないことがあります。100%に戻して撮影してください。</li>
+					<li><code>chrome://</code> などのブラウザ内部ページは撮影できません。</li>
+					<li>撮影範囲の横幅は表示中の幅までです。横にはみ出した部分は写りません。</li>
+					<li>スクロールして初めて読み込まれる画像は、読み込み前だと写らないことがあります。先にページを一度スクロールしてください。</li>
+				</ul>
+
+				<h2 id="faq">よくある質問</h2>
+				<dl>
+					<dt>「デバッグを開始しました」というバーが出ます。問題ありませんか？</dt>
+					<dd>
+						デバッガ権限を使う拡張機能でChromeが表示する正常な動作です。バーは撮影後、数秒で消えます。この間も撮影のレイアウトは固定されています。
+					</dd>
+					<dt>続けて撮影すると、時間がかかります。</dt>
+					<dd>
+						同じタブでは、前回の撮影から約6秒経つまで次の撮影を待ちます。バーの表示中はタブの高さが縮んでいるため、消えてから正しい高さで撮るようにしています。
+					</dd>
+					<dt>「画像を保存しました（クリップボードへのコピーは失敗しました）」と出ます。</dt>
+					<dd>
+						撮影中に別のウィンドウへ移動すると、コピーに失敗することがあります。画像ファイルは保存されているので、ダウンロード先から利用してください。
+					</dd>
+					<dt>「キャプチャに失敗しました」と出ます。</dt>
+					<dd>
+						ブラウザ内部ページなど、デバッガを接続できないページの可能性があります。また、他の拡張機能がタブにデバッガを接続していると失敗することがあります。その場合は、その拡張機能の処理が終わってから再度お試しください。
+					</dd>
+					<dt>撮影した画像はどこかに送信されますか？</dt>
+					<dd>
+						送信しません。詳しくは<a href="privacy-policy.html">プライバシーポリシー</a>をご覧ください。
+					</dd>
+				</dl>
+
+				<h2 id="support">サポート</h2>
+				<p>
+					不具合の報告やご要望は
+					<a href="https://github.com/conte0745/Capt-Glab/issues">GitHub Issues</a>
+					で受け付けています。発生したページの種類とChromeのバージョンを添えていただくと、確認がスムーズです。
+				</p>
+			</article>
+		</main>
+
+		<footer class="site-footer">
+			<div class="wrap">
+				<ul>
+					<li><a href="./">トップ</a></li>
+					<li><a href="privacy-policy.html">プライバシーポリシー</a></li>
+					<li><a href="https://github.com/conte0745/Capt-Glab">GitHub</a></li>
+				</ul>
+				<p>© 2024 Conte0745. Released under the <a href="https://github.com/conte0745/Capt-Glab/blob/main/LICENSE">MIT License</a>.</p>
+			</div>
+		</footer>
+	</body>
+</html>
