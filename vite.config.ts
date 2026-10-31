@@ -1,11 +1,12 @@
 import { crx, defineManifest } from "@crxjs/vite-plugin";
 import { defineConfig } from "vite";
+import pkg from "./package.json";
 
 const manifest = defineManifest({
 	manifest_version: 3,
 	description: "You can get screen shot",
 	name: "CaptGrab",
-	version: "0.1.0",
+	version: pkg.version,
 	icons: {
 		256: "src/icons/logo.png",
 	},
