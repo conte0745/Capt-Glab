@@ -74,6 +74,18 @@ test("robots.txt がサイトマップを示している", () => {
 	);
 });
 
+test("紹介ページとガイドに Chrome ウェブストアのリンクがある", async ({ page }) => {
+	const storeLink =
+		'a[href="https://chromewebstore.google.com/detail/lanhcfgmjnbbalhiljdhcleahpineilm"]';
+
+	await page.goto(fileUrl("index.html"));
+	await expect(page.locator(`.hero ${storeLink}`)).toBeVisible();
+	await expect(page.locator(`.cta ${storeLink}`)).toBeVisible();
+
+	await page.goto(fileUrl("guide.html"));
+	await expect(page.locator(`#install + ol ${storeLink}`)).toBeVisible();
+});
+
 test("全ページのフッターに OFUSE のリンクがある", async ({ page }) => {
 	for (const name of PAGES) {
 		await page.goto(fileUrl(name));

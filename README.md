@@ -2,7 +2,7 @@
 
 画面サイズを固定して、Web ページ全体を 1 枚の PNG にする Chrome 拡張機能です。
 
-[紹介ページ](https://captgrab.shiftonton.net/) / [使い方ガイド](https://captgrab.shiftonton.net/guide.html) / [プライバシーポリシー](https://captgrab.shiftonton.net/privacy-policy.html)
+[Chrome ウェブストア](https://chromewebstore.google.com/detail/lanhcfgmjnbbalhiljdhcleahpineilm) / [紹介ページ](https://captgrab.shiftonton.net/) / [使い方ガイド](https://captgrab.shiftonton.net/guide.html) / [プライバシーポリシー](https://captgrab.shiftonton.net/privacy-policy.html)
 
 ## 特徴
 
@@ -17,7 +17,11 @@
 
 ## インストール
 
-ソースコードからビルドして読み込みます。Node.js(20.19 以上または 22.12 以上)、pnpm、Git が必要です。
+[Chrome ウェブストア](https://chromewebstore.google.com/detail/lanhcfgmjnbbalhiljdhcleahpineilm)から追加できます。
+
+### ソースコードからビルドする場合
+
+Node.js(20.19 以上または 22.12 以上)、pnpm、Git が必要です。
 
 ```sh
 git clone https://github.com/conte0745/Capt-Glab.git
