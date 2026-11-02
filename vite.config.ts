@@ -1,7 +1,7 @@
 import { crx, type ManifestV3Export } from "@crxjs/vite-plugin";
 import { defineConfig } from "vite";
-import manifestBase from "./manifest.json";
-import pkg from "./package.json";
+import manifestBase from "./manifest.json" with { type: "json" };
+import pkg from "./package.json" with { type: "json" };
 
 // version は package.json だけで管理する
 const manifest = { ...manifestBase, version: pkg.version } as ManifestV3Export;
