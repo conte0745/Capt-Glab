@@ -92,7 +92,7 @@ docs/          紹介ページ、使い方ガイド、プライバシーポリ�
 tests/
   unit/        単体テスト(Vitest)
   e2e/         E2E テスト(Playwright)
-vite.config.ts manifest の定義
+manifest.json  拡張機能の定義(version はビルド時に package.json から設定します)
 ```
 
 ### 権限
