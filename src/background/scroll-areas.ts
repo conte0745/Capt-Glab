@@ -29,7 +29,7 @@ export function expandScrollAreas({
 	const scrollY = window.scrollY;
 	const restore = () => {
 		clearTimeout(timer);
-		restores.reverse().forEach((restoreElement) => restoreElement());
+		restores.toReversed().forEach((restoreElement) => restoreElement());
 		window.scrollTo({ top: scrollY, behavior: "instant" });
 		delete (window as unknown as Record<string, unknown>).__captgrabRestore;
 	};

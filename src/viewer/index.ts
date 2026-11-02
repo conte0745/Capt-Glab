@@ -6,10 +6,10 @@ const element = <T extends HTMLElement>(id: string) =>
 	document.getElementById(id) as T;
 
 element("settings").addEventListener("click", () => {
-	chrome.runtime.openOptionsPage();
+	void chrome.runtime.openOptionsPage();
 });
 
-show();
+await show();
 
 async function show() {
 	const id = new URLSearchParams(location.search).get("id");
@@ -82,12 +82,12 @@ async function show() {
 		const key = event.key.toLowerCase();
 		if (key === "s") {
 			event.preventDefault();
-			save(event.shiftKey);
+			void save(event.shiftKey);
 		} else if (key === "c" && !event.shiftKey) {
 			// 文字を選択しているときは、通常のコピーを優先する
 			if (!getSelection()?.toString()) {
 				event.preventDefault();
-				copy();
+				void copy();
 			}
 		}
 	});

@@ -29,7 +29,7 @@ const noteText = document.getElementById("note")!;
 const loading = document.getElementById("loading")!;
 
 document.getElementById("settings")!.addEventListener("click", () => {
-	chrome.runtime.openOptionsPage();
+	void chrome.runtime.openOptionsPage();
 });
 
 // 設定ボタンを押そうとしている間は閉じない
@@ -43,7 +43,7 @@ document.body.addEventListener("mouseleave", () => {
 });
 let closeRequested = false;
 
-start();
+await start();
 
 async function start() {
 	const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

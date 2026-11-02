@@ -49,7 +49,7 @@ async function init() {
 	element<HTMLSelectElement>("preset").addEventListener("change", applyPreset);
 	element("reset-count").addEventListener("click", resetCount);
 	element("shortcuts").addEventListener("click", () => {
-		chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
+		void chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
 	});
 
 	await Promise.all([showNextName(), showShortcut()]);
@@ -74,7 +74,7 @@ function applyPreset() {
 	input("width").value = width;
 	input("height").value = height;
 	input("viewport-custom").checked = true;
-	save();
+	void save();
 }
 
 /** 今の選択に関係しない項目は隠す */
@@ -162,4 +162,4 @@ async function resetCount() {
 	await showNextName();
 }
 
-init();
+await init();

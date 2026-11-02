@@ -29,7 +29,7 @@ const viewerImages = new Map<string, { data: string; filename: string | null }>(
 chrome.runtime.onInstalled.addListener(function ({ reason }) {
 	// 設定の入口を知ってもらうため、最初の1回だけ開く
 	if (reason === "install") {
-		chrome.runtime.openOptionsPage();
+		void chrome.runtime.openOptionsPage();
 	}
 });
 
@@ -44,7 +44,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 				return;
 			}
 			capturingTabs.add(message.tabId);
-			handleCapture(port, message.tabId).finally(() =>
+			void handleCapture(port, message.tabId).finally(() =>
 				capturingTabs.delete(message.tabId)
 			);
 		}
@@ -53,7 +53,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 
 chrome.runtime.onMessage.addListener(function (
 	message,
-	sender,
+	_sender,
 	sendResponse
 ) {
 	if (message.request === "viewer-image") {
