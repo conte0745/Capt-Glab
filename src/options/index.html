@@ -207,6 +207,36 @@
 			a {
 				color: inherit;
 			}
+			.price {
+				margin-left: 8px;
+				padding: 1px 8px;
+				border: 1px solid var(--accent);
+				border-radius: 999px;
+				color: var(--accent);
+				font-size: 12px;
+				font-weight: 600;
+			}
+			.choice:has(input:disabled) {
+				cursor: default;
+				opacity: 0.6;
+			}
+			.buttons {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+			.primary {
+				border-color: var(--button);
+				background: var(--button);
+				color: var(--button-ink);
+			}
+			#purchase {
+				margin-top: 12px;
+			}
+			.row[hidden],
+			.hint[hidden] {
+				display: none;
+			}
 			#saved {
 				position: fixed;
 				left: 50%;
@@ -308,6 +338,25 @@
 					<span><strong>サイドメニューを最後まで撮る</strong><small>長いメニューも全部写します。メニューの見た目が変わることがあります</small></span>
 				</label>
 				<p class="hint">オフの領域は広げません。ただし、本文を広げるとメニューが一緒に伸びて、全部写る画面もあります。</p>
+			</section>
+
+			<section class="card">
+				<h2>有料機能<span class="price">買い切り 500 円</span></h2>
+				<p class="description">購入の確認のときだけ ExtensionPay と通信します。撮影した画像は送信しません。</p>
+				<label class="choice">
+					<input type="checkbox" id="loadLazyImages" />
+					<span><strong>遅延読み込みの画像も写す</strong><small>撮影前にページを下までスクロールして、まだ読み込まれていない画像を読み込ませます。長いページでは撮影に最大 10 秒ほどかかります</small></span>
+				</label>
+				<div class="row" id="purchase" hidden>
+					<span>購入すると使えるようになります。</span>
+					<span class="buttons">
+						<button type="button" class="primary" id="buy">購入する</button>
+						<button type="button" id="login">購入済みの方</button>
+					</span>
+				</div>
+				<p class="hint" id="paid-text" hidden>購入済みです。ありがとうございます。</p>
+				<p class="hint" id="login-hint">別の Chrome で購入した場合は「購入済みの方」から、購入時のメールアドレスで引き継げます。</p>
+				<p class="error" id="payment-error" role="alert" hidden>購入ページを開けませんでした。インターネットの接続を確認してください。</p>
 			</section>
 
 			<section class="card" id="name-section">

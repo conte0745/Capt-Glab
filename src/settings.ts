@@ -6,6 +6,8 @@ export type Settings = {
 	askEveryTime: boolean;
 	expandContent: boolean;
 	expandMenu: boolean;
+	/** 有料機能。購入していなければ、オンでも使わない */
+	loadLazyImages: boolean;
 	viewport: {
 		mode: "current" | "custom";
 		width: number;
@@ -21,6 +23,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	askEveryTime: false,
 	expandContent: true,
 	expandMenu: false,
+	loadLazyImages: false,
 	viewport: { mode: "current", width: 1280, height: 800 },
 };
 

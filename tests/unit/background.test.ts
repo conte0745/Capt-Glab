@@ -60,6 +60,10 @@ function setup(settings: Partial<Settings> = {}) {
 				get: vi.fn(async (key: string) => ({ [key]: store[key] })),
 				set: vi.fn(async (items: object) => Object.assign(store, items)),
 			},
+			sync: {
+				get: vi.fn(async (key: string) => ({ [key]: store[key] })),
+				set: vi.fn(async (items: object) => Object.assign(store, items)),
+			},
 		},
 		tabs: {
 			get: vi.fn(async () => TAB),
@@ -440,6 +444,66 @@ describe("background", () => {
 			await flush();
 
 			expect(evaluated(ctx).at(-1)).toBe(RESTORE_SCROLL_AREAS);
+		});
+	});
+
+	describe("遅延読み込みの画像", () => {
+		const lazyEvaluations = (ctx: Awaited<ReturnType<typeof load>>) =>
+			ctx.sendCommand.mock.calls
+				.filter(([, method]) => method === "Runtime.evaluate")
+				.map(([, , params]) => String(params?.expression))
+				.filter((expression) => expression.includes('"stepMs"'));
+
+		it("購入済みでオンなら、領域を広げる前に画像を読み込ませる", async () => {
+			const ctx = await load({ loadLazyImages: true });
+			ctx.store["payment-paid"] = true;
+
+			ctx.capture();
+			await flush();
+
+			const expressions = ctx.sendCommand.mock.calls
+				.filter(([, method]) => method === "Runtime.evaluate")
+				.map(([, , params]) => String(params?.expression));
+			expect(expressions[0]).toContain('{"stepMs":200,"maxMs":10000}');
+			expect(expressions[1]).toContain('"expandContent"');
+			expect(commands(ctx)).toContain("Page.captureScreenshot");
+		});
+
+		it("オンでも未購入なら使わない", async () => {
+			const ctx = await load({ loadLazyImages: true });
+
+			ctx.capture();
+			await flush();
+
+			expect(lazyEvaluations(ctx)).toEqual([]);
+			expect(commands(ctx)).toContain("Page.captureScreenshot");
+		});
+
+		it("購入済みでもオフなら使わない", async () => {
+			const ctx = await load();
+			ctx.store["payment-paid"] = true;
+
+			ctx.capture();
+			await flush();
+
+			expect(lazyEvaluations(ctx)).toEqual([]);
+		});
+
+		it("読み込みに失敗しても撮影する", async () => {
+			const ctx = await load({ loadLazyImages: true });
+			ctx.store["payment-paid"] = true;
+			const original = ctx.sendCommand.getMockImplementation()!;
+			ctx.sendCommand.mockImplementation(async (target, method, params) => {
+				if (String(params?.expression).includes('"stepMs"')) {
+					return { result: {}, exceptionDetails: { text: "boom" } };
+				}
+				return original(target, method, params);
+			});
+
+			const port = ctx.capture();
+			await flush();
+
+			expect(port.posted.at(-1)).toMatchObject({ type: "done" });
 		});
 	});
 

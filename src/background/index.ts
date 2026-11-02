@@ -4,6 +4,8 @@ import {
 	peekImageName,
 	type Settings,
 } from "../settings";
+import { isPaid } from "../payment";
+import { loadLazyImages } from "./lazy-images";
 import {
 	expandScrollAreas,
 	RESTORE_SCROLL_AREAS,
@@ -17,6 +19,10 @@ const VIEWPORT_APPLY_MS = 500;
 const CUSTOM_VIEWPORT_APPLY_MS = 1000;
 // 広げた領域の再レイアウトと画像の読み込み、先頭へのスクロールの反映を待つ
 const SCROLL_AREA_APPLY_MS = 300;
+// 遅延読み込みの画像は、画面に入ってから読み込みが始まるまで少しかかる
+const LAZY_IMAGE_STEP_MS = 200;
+// 長いページでも撮影が終わらなくならないよう、待つのはここまでにする
+const LAZY_IMAGE_MAX_MS = 10000;
 // 撮影が終わる前に戻らないよう、十分に長くする
 const SCROLL_AREA_RESTORE_MS = 30000;
 // 実測では高さ 16100px は正常で、16500px を超えると画像が壊れる
@@ -164,6 +170,9 @@ async function captureTab(
 		throw new Error("ビューポートサイズを取得できませんでした");
 	}
 
+	// 撮影中に通信を待たないよう、デバッガを接続する前に購入を確認する
+	const lazyImages = settings.loadLazyImages && (await isPaid());
+
 	const target: chrome.debugger.Debuggee = { tabId };
 	await chrome.debugger.attach(target, "1.3");
 	let restoreContextId: number | undefined;
@@ -178,6 +187,19 @@ async function captureTab(
 		await sleep(custom ? CUSTOM_VIEWPORT_APPLY_MS : VIEWPORT_APPLY_MS);
 
 		const contextId = await createIsolatedContext(target);
+		if (lazyImages) {
+			await evaluate(
+				target,
+				contextId,
+				`(${loadLazyImages})(${JSON.stringify({
+					stepMs: LAZY_IMAGE_STEP_MS,
+					maxMs: LAZY_IMAGE_MAX_MS,
+				})})`
+			).catch((error) => {
+				// 読み込めなくても、読み込み済みの画像で撮影する
+				console.error(error);
+			});
+		}
 		const areas = await evaluate<ScrollAreaResult>(
 			target,
 			contextId,
@@ -258,7 +280,7 @@ async function createIsolatedContext(
 	return executionContextId;
 }
 
-/** 隔離された実行環境で式を評価し、結果を値で返す。例外が出たらエラーにする */
+/** 隔離された実行環境で式を評価し、結果を値で返す。Promise なら終わるまで待つ。例外が出たらエラーにする */
 async function evaluate<T>(
 	target: chrome.debugger.Debuggee,
 	contextId: number,
@@ -267,7 +289,7 @@ async function evaluate<T>(
 	const { result, exceptionDetails } = (await chrome.debugger.sendCommand(
 		target,
 		"Runtime.evaluate",
-		{ expression, contextId, returnByValue: true }
+		{ expression, contextId, returnByValue: true, awaitPromise: true }
 	)) as { result: { value: T }; exceptionDetails?: { text: string } };
 	if (exceptionDetails) {
 		throw new Error(exceptionDetails.text);

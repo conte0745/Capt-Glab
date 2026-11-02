@@ -4,6 +4,7 @@ import {
 	normalizeFolder,
 	saveSettings,
 } from "../settings";
+import { isPaid, openLoginPage, openPaymentPage } from "../payment";
 
 const COUNT_KEY = "image-name-count";
 const SAVED_TOAST_MS = 2000;
@@ -22,6 +23,7 @@ const allFields = [
 	"askEveryTime",
 	"expandContent",
 	"expandMenu",
+	"loadLazyImages",
 	"viewport-current",
 	"viewport-custom",
 	"width",
@@ -39,6 +41,7 @@ async function init() {
 	input("askEveryTime").checked = settings.askEveryTime;
 	input("expandContent").checked = settings.expandContent;
 	input("expandMenu").checked = settings.expandMenu;
+	input("loadLazyImages").checked = settings.loadLazyImages;
 	input("viewport-current").checked = settings.viewport.mode === "current";
 	input("viewport-custom").checked = settings.viewport.mode === "custom";
 	input("width").value = String(settings.viewport.width);
@@ -54,8 +57,36 @@ async function init() {
 	element("shortcuts").addEventListener("click", () => {
 		void chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
 	});
+	element("buy").addEventListener("click", () => void openPurchasePage(openPaymentPage));
+	element("login").addEventListener("click", () => void openPurchasePage(openLoginPage));
+	// 購入ページのタブから戻ってきたときに、購入が反映されるようにする
+	document.addEventListener("visibilitychange", () => {
+		if (document.visibilityState === "visible") {
+			void showPaymentStatus();
+		}
+	});
 
-	await Promise.all([showNextName(), showShortcut()]);
+	await Promise.all([showNextName(), showShortcut(), showPaymentStatus()]);
+}
+
+/** 購入済みなら有料機能を使えるようにし、未購入なら購入の案内を出す */
+async function showPaymentStatus() {
+	const paid = await isPaid();
+	input("loadLazyImages").disabled = !paid;
+	element("purchase").hidden = paid;
+	element("login-hint").hidden = paid;
+	element("paid-text").hidden = !paid;
+}
+
+/** 購入や引き継ぎのページを開く。開けなければ案内を出す */
+async function openPurchasePage(open: () => Promise<void>) {
+	element("payment-error").hidden = true;
+	try {
+		await open();
+	} catch (error) {
+		console.error(error);
+		element("payment-error").hidden = false;
+	}
 }
 
 /** OS やユーザーの変更で変わるので、実際に割り当てられているキーを表示する */
@@ -135,6 +166,7 @@ async function save() {
 		askEveryTime: input("askEveryTime").checked,
 		expandContent: input("expandContent").checked,
 		expandMenu: input("expandMenu").checked,
+		loadLazyImages: input("loadLazyImages").checked,
 		viewport: custom
 			? { mode: "custom", width, height }
 			: { ...current.viewport, mode: "current" },

@@ -6,11 +6,26 @@ const BODY = /<body>([\s\S]*)<\/body>/.exec(
 	fs.readFileSync("src/options/index.html", "utf-8")
 )![1];
 
-async function load(store: Record<string, unknown> = {}, shortcut = "Alt+Shift+S") {
+async function load(
+	store: Record<string, unknown> = {},
+	shortcut = "Alt+Shift+S",
+	syncStore: Record<string, unknown> = {}
+) {
 	document.body.innerHTML = BODY;
 	const create = vi.fn();
+	const fetch = vi.fn(async (url: string) =>
+		Response.json(url.endsWith("/api/new-key") ? "KEY" : { paid: false })
+	);
+	vi.stubGlobal("fetch", fetch);
 	vi.stubGlobal("chrome", {
+		runtime: { getManifest: () => ({}) },
 		storage: {
+			sync: {
+				get: vi.fn(async (key: string) => ({ [key]: syncStore[key] })),
+				set: vi.fn(async (items: object) => {
+					Object.assign(syncStore, items);
+				}),
+			},
 			local: {
 				get: vi.fn(async (key: string) => ({ [key]: store[key] })),
 				set: vi.fn(async (items: object) => {
@@ -29,7 +44,7 @@ async function load(store: Record<string, unknown> = {}, shortcut = "Alt+Shift+S
 	vi.resetModules();
 	await import("../../src/options/index");
 	await settle();
-	return { store, create };
+	return { store, syncStore, create, fetch };
 }
 
 const settle = () => new Promise((resolve) => setTimeout(resolve));
@@ -233,5 +248,70 @@ describe("options", () => {
 		document.getElementById("shortcuts")!.click();
 
 		expect(create).toHaveBeenCalledWith({ url: "chrome://extensions/shortcuts" });
+	});
+
+	describe("有料機能", () => {
+		it("未購入なら選べず、購入の案内を出す。通信もしない", async () => {
+			const { fetch } = await load();
+
+			expect(input("loadLazyImages").disabled).toBe(true);
+			expect(hidden("purchase")).toBe(false);
+			expect(hidden("paid-text")).toBe(true);
+			expect(fetch).not.toHaveBeenCalled();
+		});
+
+		it("購入済みなら選べるようにし、設定を保存する", async () => {
+			const { store } = await load({ "payment-paid": true });
+
+			expect(input("loadLazyImages").disabled).toBe(false);
+			expect(hidden("purchase")).toBe(true);
+			expect(hidden("login-hint")).toBe(true);
+			expect(hidden("paid-text")).toBe(false);
+
+			await change("loadLazyImages", true);
+			expect(store.settings).toMatchObject({ loadLazyImages: true });
+		});
+
+		it("購入するを押すと、鍵を発行して購入ページを開く", async () => {
+			const { create, syncStore } = await load();
+
+			document.getElementById("buy")!.click();
+			await settle();
+
+			expect(syncStore["payment-api-key"]).toBe("KEY");
+			expect(create).toHaveBeenCalledWith({
+				url: "https://extensionpay.com/extension/captgrab/choose-plan?api_key=KEY",
+			});
+		});
+
+		it("購入済みの方を押すと、引き継ぎのページを開く", async () => {
+			const { create } = await load({}, undefined, { "payment-api-key": "KEY" });
+
+			document.getElementById("login")!.click();
+			await settle();
+
+			expect(create.mock.calls[0][0].url).toContain("/reactivate?api_key=KEY");
+		});
+
+		it("購入ページを開けなければ案内を出す", async () => {
+			const { fetch } = await load();
+			fetch.mockRejectedValue(new Error("offline"));
+
+			document.getElementById("buy")!.click();
+			await settle();
+
+			expect(hidden("payment-error")).toBe(false);
+		});
+
+		it("購入ページから戻ると、購入が反映される", async () => {
+			const { fetch } = await load({}, undefined, { "payment-api-key": "KEY" });
+			expect(input("loadLazyImages").disabled).toBe(true);
+
+			fetch.mockResolvedValue(Response.json({ paid: true }));
+			document.dispatchEvent(new Event("visibilitychange"));
+			await settle();
+
+			expect(input("loadLazyImages").disabled).toBe(false);
+		});
 	});
 });

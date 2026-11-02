@@ -150,6 +150,35 @@ test.describe("等倍", () => {
 	});
 });
 
+test.describe("遅延読み込みの画像", () => {
+	test("購入済みでオンなら、画面に入ってから読み込む画像も写す", async ({
+		extension,
+		page,
+		url,
+	}) => {
+		await extension.worker.evaluate(() => chrome.storage.local.set({ "payment-paid": true }));
+		await setSettings(extension, { loadLazyImages: true });
+		await page.goto(url + "lazy-images");
+
+		await clickAction(extension, page);
+		const shot = await waitForShot(extension, page);
+
+		expect(shot.bottomColor).toBe(GREEN);
+		expect(await page.evaluate(() => window.scrollY)).toBe(0);
+	});
+
+	test("未購入ならオンでも読み込ませない", async ({ extension, page, url }) => {
+		await setSettings(extension, { loadLazyImages: true });
+		await page.goto(url + "lazy-images");
+
+		await clickAction(extension, page);
+		const shot = await waitForShot(extension, page);
+
+		// 読み込まれていない画像は枠だけが写る
+		expect(shot.bottomColor).not.toBe(GREEN);
+	});
+});
+
 test.describe("高DPI", () => {
 	test.use({ scale: 2 });
 
