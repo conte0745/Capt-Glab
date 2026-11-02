@@ -475,6 +475,22 @@ describe("background", () => {
 			expect(ctx.chromeStub.debugger.detach).toHaveBeenCalledTimes(1);
 		});
 
+		it("撮影中に接続が切れたら、中断されたと伝える", async () => {
+			const ctx = await load();
+			const original = ctx.sendCommand.getMockImplementation()!;
+			ctx.sendCommand.mockImplementation(async (target, method, params) => {
+				if (method === "Page.captureScreenshot") {
+					throw new Error("Debugger is not attached to the tab with id: 1.");
+				}
+				return original(target, method, params);
+			});
+
+			const port = ctx.capture();
+			await flush();
+
+			expect(port.posted.at(-1)).toEqual({ type: "error", reason: "detached" });
+		});
+
 		it("切断に失敗しても結果を返す", async () => {
 			const ctx = await load();
 			ctx.chromeStub.debugger.detach.mockRejectedValue(new Error("detached"));

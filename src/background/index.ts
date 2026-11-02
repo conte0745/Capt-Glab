@@ -125,6 +125,10 @@ function classifyError(error: unknown): string {
 	if (/cannot (access|attach)/i.test(message)) {
 		return "restricted";
 	}
+	// デバッグのバーのキャンセルやタブの移動で、撮影中に接続が切れた
+	if (/not attached/i.test(message)) {
+		return "detached";
+	}
 	return "unknown";
 }
 
