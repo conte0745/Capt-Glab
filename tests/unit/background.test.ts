@@ -127,6 +127,11 @@ async function load(settings?: Partial<Settings>) {
 
 const flush = (ms = 1000) => vi.advanceTimersByTimeAsync(ms);
 
+const downloadedNames = (ctx: Awaited<ReturnType<typeof load>>) =>
+	(ctx.chromeStub.downloads.download.mock.calls as unknown as [{ filename: string }][]).map(
+		([options]) => options.filename
+	);
+
 const commands = (ctx: Awaited<ReturnType<typeof load>>) =>
 	ctx.sendCommand.mock.calls.map(([, method]) => method);
 
@@ -504,6 +509,194 @@ describe("background", () => {
 			await flush();
 
 			expect(port.posted.at(-1)).toMatchObject({ type: "done" });
+		});
+	});
+
+	describe("長いページの分割", () => {
+		type Clip = { x: number; y: number; width: number; height: number; scale: number };
+		const clips = (ctx: Awaited<ReturnType<typeof load>>) =>
+			ctx.sendCommand.mock.calls
+				.filter(([, method]) => method === "Page.captureScreenshot")
+				.map(([, , params]) => (params as unknown as { clip: Clip }).clip);
+
+		it("購入済みでオンなら、縮小せずに上限ごとに分けて撮り、番号を付けて保存する", async () => {
+			const ctx = await load({ splitLongPages: true });
+			ctx.store["payment-paid"] = true;
+			ctx.store["image-name-count"] = 6;
+			ctx.metrics.current = { ...METRICS, cssContentSize: { height: 20000 } };
+			ctx.metrics.dpr = 2;
+
+			const port = ctx.capture();
+			await flush();
+
+			expect(clips(ctx)).toEqual([
+				{ x: 0, y: 0, width: 985, height: 8000, scale: 1 },
+				{ x: 0, y: 8000, width: 985, height: 8000, scale: 1 },
+				{ x: 0, y: 16000, width: 985, height: 4000, scale: 1 },
+			]);
+			const filenames = downloadedNames(ctx);
+			expect(filenames).toEqual([
+				"screen-0007-1.png",
+				"screen-0007-2.png",
+				"screen-0007-3.png",
+			]);
+			expect(ctx.store["image-name-count"]).toBe(7);
+			expect(port.posted.at(-1)).toMatchObject({ count: 3, scaled: false });
+		});
+
+		it("上限に収まるページは分けない", async () => {
+			const ctx = await load({ splitLongPages: true });
+			ctx.store["payment-paid"] = true;
+
+			ctx.capture();
+			await flush();
+
+			expect(clips(ctx)).toHaveLength(1);
+			expect(ctx.chromeStub.downloads.download).toHaveBeenCalledWith(
+				expect.objectContaining({ filename: "screen-0001.png" })
+			);
+		});
+
+		it.each([
+			[
+				"高さの上限を下げると、その高さごとに分ける",
+				{ splitMode: "height" as const, splitHeight: 5000 },
+				[0, 2500, 5000, 7500],
+			],
+			[
+				"枚数で分けると、短いページでも同じ高さに分ける",
+				{ splitMode: "count" as const, splitCount: 3 },
+				[0, 1005, 2010],
+			],
+			[
+				"高さの値が正しくなければ、上限ごとに分ける",
+				{ splitMode: "height" as const, splitHeight: 50 },
+				[0, 8000],
+			],
+		])("%s", async (_, split, ys) => {
+			const ctx = await load({ splitLongPages: true, ...split });
+			ctx.store["payment-paid"] = true;
+			ctx.metrics.dpr = 2;
+			ctx.metrics.current = { ...METRICS, cssContentSize: { height: split.splitMode === "count" ? 3013 : 9000 } };
+
+			ctx.capture();
+			await flush();
+
+			expect(clips(ctx).map((clip) => clip.y)).toEqual(ys);
+		});
+
+		it("枚数が少なすぎて1枚が上限を超えるなら、枚数を増やす", async () => {
+			const ctx = await load({ splitLongPages: true, splitMode: "count", splitCount: 2 });
+			ctx.store["payment-paid"] = true;
+			ctx.metrics.dpr = 2;
+			ctx.metrics.current = { ...METRICS, cssContentSize: { height: 20000 } };
+
+			ctx.capture();
+			await flush();
+
+			// 画像では 40000px なので、16000px に収めるには 3 枚要る
+			expect(clips(ctx).map((clip) => clip.height)).toEqual([6667, 6667, 6666]);
+		});
+
+		it("オンでも未購入なら、これまでどおり縮小する", async () => {
+			const ctx = await load({ splitLongPages: true });
+			ctx.metrics.current = { ...METRICS, cssContentSize: { height: 20000 } };
+			ctx.metrics.dpr = 2;
+
+			ctx.capture();
+			await flush();
+
+			expect(clips(ctx)).toHaveLength(1);
+			expect(clips(ctx)[0].scale).toBe(0.4);
+		});
+	});
+
+	describe("複数サイズ", () => {
+		const overrides = (ctx: Awaited<ReturnType<typeof load>>) =>
+			ctx.sendCommand.mock.calls
+				.filter(([, method]) => method === "Emulation.setDeviceMetricsOverride")
+				.map(([, , params]) => {
+					const { width, height } = params as unknown as { width: number; height: number };
+					return `${width}x${height}`;
+				});
+
+		it("購入済みでオンなら、選んだサイズで続けて撮り、サイズ付きの名前で保存する", async () => {
+			const ctx = await load({
+				multiSize: true,
+				multiSizes: ["1920x1080", "375x667"],
+				clipboard: true,
+				openTab: true,
+			});
+			ctx.store["payment-paid"] = true;
+
+			const port = ctx.capture();
+			await flush(5000);
+			port.send({ request: "copied" });
+			await flush();
+
+			expect(overrides(ctx)).toEqual(["1920x1080", "375x667"]);
+			const filenames = downloadedNames(ctx);
+			expect(filenames).toEqual([
+				"screen-0001-1920x1080.png",
+				"screen-0001-375x667.png",
+			]);
+			expect(port.posted.at(-1)).toMatchObject({ type: "done", count: 2, data: "BASE64" });
+			expect(ctx.chromeStub.tabs.create).toHaveBeenCalledTimes(2);
+		});
+
+		it("サイズを切り替える前に、広げた領域を元に戻す", async () => {
+			const ctx = await load({ multiSize: true, multiSizes: ["1920x1080", "375x667"] });
+			ctx.store["payment-paid"] = true;
+
+			ctx.capture();
+			await flush(5000);
+
+			const steps = ctx.sendCommand.mock.calls
+				.map(([, method, params]) =>
+					method === "Runtime.evaluate"
+						? String(params?.expression) === RESTORE_SCROLL_AREAS
+							? "restore"
+							: String(params?.expression).includes('"expandContent"')
+								? "expand"
+								: null
+						: method === "Page.captureScreenshot"
+							? "capture"
+							: method === "Emulation.setDeviceMetricsOverride"
+								? "size"
+								: null
+				)
+				.filter(Boolean);
+			expect(steps).toEqual([
+				"size",
+				"expand",
+				"capture",
+				"size",
+				"restore",
+				"expand",
+				"capture",
+				"restore",
+			]);
+		});
+
+		it("ズーム中は、サイズをズーム後の大きさに換算する", async () => {
+			const ctx = await load({ multiSize: true, multiSizes: ["375x667"] });
+			ctx.store["payment-paid"] = true;
+			ctx.chromeStub.tabs.getZoom.mockResolvedValue(2);
+
+			ctx.capture();
+			await flush(5000);
+
+			expect(overrides(ctx)).toEqual(["750x1334"]);
+		});
+
+		it("オンでも未購入なら、画面サイズの設定で1枚だけ撮る", async () => {
+			const ctx = await load({ multiSize: true, multiSizes: ["1920x1080", "375x667"] });
+
+			const port = ctx.capture();
+			await flush(10000);
+
+			expect(overrides(ctx)).toEqual([`${TAB.width}x${TAB.height}`]);
+			expect(port.posted.at(-1)).toMatchObject({ count: 1 });
 		});
 	});
 

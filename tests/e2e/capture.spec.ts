@@ -179,6 +179,65 @@ test.describe("遅延読み込みの画像", () => {
 	});
 });
 
+test.describe("長いページの分割", () => {
+	test("購入済みでオンなら、縮小せずに分けて保存する", async ({ extension, page, url }) => {
+		await extension.worker.evaluate(() => chrome.storage.local.set({ "payment-paid": true }));
+		await setSettings(extension, { splitLongPages: true });
+		await page.goto(url + "?blue=20000");
+		const viewport = await page.evaluate(() => ({
+			width: innerWidth,
+			pageHeight: document.documentElement.scrollHeight,
+		}));
+
+		await clickAction(extension, page);
+		const first = await waitForShot(extension, page, "screen-0001-1.png");
+		const second = await waitForShot(extension, page, "screen-0001-2.png");
+
+		expect(first).toMatchObject({ width: viewport.width, height: 16000 });
+		expect(second).toMatchObject({
+			width: viewport.width,
+			height: viewport.pageHeight - 16000,
+			bottomColor: GREEN,
+		});
+	});
+});
+
+test.describe("枚数で分ける", () => {
+	test("短いページでも、指定した枚数に分けて保存する", async ({ extension, page, url }) => {
+		await extension.worker.evaluate(() => chrome.storage.local.set({ "payment-paid": true }));
+		await setSettings(extension, { splitLongPages: true, splitMode: "count", splitCount: 3 });
+		await page.goto(url);
+		const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+
+		await clickAction(extension, page);
+		const shots = [];
+		for (const part of [1, 2, 3]) {
+			shots.push(await waitForShot(extension, page, `screen-0001-${part}.png`));
+		}
+
+		expect(shots.reduce((sum, shot) => sum + shot.height, 0)).toBe(pageHeight);
+		expect(shots[2].bottomColor).toBe(GREEN);
+	});
+});
+
+test.describe("複数サイズ", () => {
+	test("購入済みでオンなら、選んだサイズごとに保存する", async ({ extension, page, url }) => {
+		await extension.worker.evaluate(() => chrome.storage.local.set({ "payment-paid": true }));
+		await setSettings(extension, { multiSize: true, multiSizes: ["1280x800", "375x667"] });
+		await page.goto(url);
+
+		await clickAction(extension, page);
+		const wide = await waitForShot(extension, page, "screen-0001-1280x800.png");
+		const narrow = await waitForShot(extension, page, "screen-0001-375x667.png");
+
+		// 100vh の要素の高さが、それぞれのサイズの高さになる
+		expect(wide).toMatchObject({ firstScreenEnd: 800, bottomColor: GREEN });
+		expect(narrow).toMatchObject({ firstScreenEnd: 667, bottomColor: GREEN });
+		expect(wide.width).toBeGreaterThan(1200);
+		expect(narrow.width).toBeLessThanOrEqual(375);
+	});
+});
+
 test.describe("高DPI", () => {
 	test.use({ scale: 2 });
 

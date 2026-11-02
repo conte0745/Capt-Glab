@@ -174,6 +174,16 @@ describe("popup", () => {
 		expect(close).toHaveBeenCalledTimes(1);
 	});
 
+	it("複数枚なら、保存した枚数と、コピーしたのは1枚目だと伝える", async () => {
+		const { receive } = await load();
+
+		await receive(done({ count: 3 }));
+
+		expect(statusText()).toBe("保存してコピーしました");
+		expect(noteText()).toContain("3 枚の画像を保存しました");
+		expect(noteText()).toContain("1枚目をコピー");
+	});
+
 	it("写っていない領域があれば設定を案内する", async () => {
 		const { receive } = await load();
 

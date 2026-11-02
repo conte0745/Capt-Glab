@@ -6,8 +6,19 @@ export type Settings = {
 	askEveryTime: boolean;
 	expandContent: boolean;
 	expandMenu: boolean;
-	/** 有料機能。購入していなければ、オンでも使わない */
+	// 有料機能。購入していなければ、オンでも使わない
 	loadLazyImages: boolean;
+	/** 長いページを縮小せず、複数の画像に分けて保存する */
+	splitLongPages: boolean;
+	/** 1枚の高さの上限で分けるか、決めた枚数に分けるか */
+	splitMode: "height" | "count";
+	/** 1枚の高さの上限。画像のピクセル数で数える */
+	splitHeight: number;
+	splitCount: number;
+	/** オンなら viewport の代わりに、multiSizes のサイズで続けて撮る */
+	multiSize: boolean;
+	/** "1920x1080" の形式 */
+	multiSizes: string[];
 	viewport: {
 		mode: "current" | "custom";
 		width: number;
@@ -24,8 +35,20 @@ export const DEFAULT_SETTINGS: Settings = {
 	expandContent: true,
 	expandMenu: false,
 	loadLazyImages: false,
+	splitLongPages: false,
+	splitMode: "height",
+	splitHeight: 16000,
+	splitCount: 2,
+	multiSize: false,
+	multiSizes: ["1920x1080", "768x1024", "375x667"],
 	viewport: { mode: "current", width: 1280, height: 800 },
 };
+
+// 実測では高さ 16100px は正常で、16500px を超えると画像が壊れる
+export const MAX_IMAGE_SIDE = 16000;
+export const MIN_SPLIT_HEIGHT = 1000;
+export const MIN_SPLIT_COUNT = 2;
+export const MAX_SPLIT_COUNT = 20;
 
 export const MIN_VIEWPORT = 200;
 export const MAX_VIEWPORT = 7680;
@@ -59,6 +82,30 @@ export function normalizeFolder(input: string): string | null {
 			!/[<>:"|?*\u0000-\u001f]/.test(segment)
 	);
 	return isValid ? segments.join("/") : null;
+}
+
+/** 撮影時に固定する幅や高さとして使える整数かを返す */
+/** 分けるときの1枚の高さの上限として使える整数かを返す */
+export function isValidSplitHeight(height: number): boolean {
+	return Number.isInteger(height) && height >= MIN_SPLIT_HEIGHT && height <= MAX_IMAGE_SIDE;
+}
+
+/** 分ける枚数として使える整数かを返す */
+export function isValidSplitCount(count: number): boolean {
+	return Number.isInteger(count) && count >= MIN_SPLIT_COUNT && count <= MAX_SPLIT_COUNT;
+}
+
+/** "1920x1080" の形式のサイズを数値にする。形式や範囲が正しくなければ null を返す */
+export function parseSize(size: string): { width: number; height: number } | null {
+	const match = /^(\d+)x(\d+)$/.exec(size);
+	if (!match) {
+		return null;
+	}
+	const width = Number(match[1]);
+	const height = Number(match[2]);
+	return isValidViewportSize(width) && isValidViewportSize(height)
+		? { width, height }
+		: null;
 }
 
 /** 撮影時に固定する幅や高さとして使える整数かを返す */

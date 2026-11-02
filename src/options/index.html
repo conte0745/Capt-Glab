@@ -233,6 +233,21 @@
 			#purchase {
 				margin-top: 12px;
 			}
+			.size-options {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px 16px;
+			}
+			.size-options label {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				cursor: pointer;
+			}
+			.size-options input {
+				margin: 0;
+				accent-color: var(--ink);
+			}
 			.row[hidden],
 			.hint[hidden] {
 				display: none;
@@ -324,6 +339,7 @@
 					<p class="error" id="viewport-error" role="alert" hidden>幅と高さは 200〜7680 の整数で指定してください。</p>
 					<p class="hint">幅と高さだけを変えます。スマートフォン専用の表示になるとは限りません。</p>
 				</div>
+				<p class="hint" id="viewport-overridden" hidden>「複数のサイズで一度に撮る」がオンのため、この設定は使われません。</p>
 			</section>
 
 			<section class="card">
@@ -340,13 +356,51 @@
 				<p class="hint">オフの領域は広げません。ただし、本文を広げるとメニューが一緒に伸びて、全部写る画面もあります。</p>
 			</section>
 
-			<section class="card">
+			<section class="card" id="paid-section">
 				<h2>有料機能<span class="price">買い切り 500 円</span></h2>
 				<p class="description">購入の確認のときだけ ExtensionPay と通信します。撮影した画像は送信しません。</p>
 				<label class="choice">
 					<input type="checkbox" id="loadLazyImages" />
 					<span><strong>遅延読み込みの画像も写す</strong><small>撮影前にページを下までスクロールして、まだ読み込まれていない画像を読み込ませます。長いページでは撮影に最大 10 秒ほどかかります</small></span>
 				</label>
+				<label class="choice">
+					<input type="checkbox" id="splitLongPages" />
+					<span><strong>縮小せずに画像を分けて保存</strong><small>長いページを縮小する代わりに、複数の画像に分けて元の解像度のまま保存します</small></span>
+				</label>
+				<div class="nested" id="split-fields">
+					<label class="choice">
+						<input type="radio" name="splitMode" id="split-height" />
+						<span><strong>高さで分ける</strong><small>1枚の高さがこの値を超えるときだけ分けます</small></span>
+					</label>
+					<div class="size">
+						<label>1枚の高さの上限 <input type="number" id="splitHeight" min="1000" max="16000" step="1000" /></label>
+						<span>px</span>
+					</div>
+					<label class="choice">
+						<input type="radio" name="splitMode" id="split-count" />
+						<span><strong>枚数で分ける</strong><small>ページの長さに関係なく、同じ高さの画像に分けます</small></span>
+					</label>
+					<div class="size">
+						<label>枚数 <input type="number" id="splitCount" min="2" max="20" /></label>
+						<span>枚</span>
+					</div>
+					<p class="error" id="split-error" role="alert" hidden>高さは 1000〜16000、枚数は 2〜20 の整数で指定してください。</p>
+					<p class="hint">保存される画像のピクセル数で数えます。高 DPI の画面では、ページの見た目の 2 倍ほどになります。1枚が 16,000px を超えるときは、枚数を増やします。</p>
+				</div>
+				<label class="choice">
+					<input type="checkbox" id="multiSize" />
+					<span><strong>複数のサイズで一度に撮る</strong><small>選んだ画面サイズで続けて撮影し、サイズごとに保存します。オンのあいだは「撮影するときの画面サイズ」の設定を使いません</small></span>
+				</label>
+				<div class="nested" id="multi-size-fields">
+					<div class="size-options">
+						<label><input type="checkbox" name="multiSizes" value="1920x1080" />1920 × 1080（フルHD）</label>
+						<label><input type="checkbox" name="multiSizes" value="1440x900" />1440 × 900</label>
+						<label><input type="checkbox" name="multiSizes" value="1280x800" />1280 × 800</label>
+						<label><input type="checkbox" name="multiSizes" value="768x1024" />768 × 1024（タブレット）</label>
+						<label><input type="checkbox" name="multiSizes" value="375x667" />375 × 667（スマートフォン）</label>
+					</div>
+					<p class="error" id="multi-size-error" role="alert" hidden>サイズを1つ以上選んでください。</p>
+				</div>
 				<div class="row" id="purchase" hidden>
 					<span>購入すると使えるようになります。</span>
 					<span class="buttons">

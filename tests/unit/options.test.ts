@@ -313,5 +313,126 @@ describe("options", () => {
 
 			expect(input("loadLazyImages").disabled).toBe(false);
 		});
+
+		describe("分割と複数サイズ", () => {
+			const sizes = () =>
+				[...document.querySelectorAll<HTMLInputElement>('input[name="multiSizes"]')];
+			const check = async (value: string, checked: boolean) => {
+				const size = sizes().find((size) => size.value === value)!;
+				size.checked = checked;
+				size.dispatchEvent(new Event("change"));
+				await settle();
+			};
+
+			it("未購入なら、有料機能の欄の入力をすべて押せない", async () => {
+				await load();
+
+				for (const id of ["splitLongPages", "multiSize"]) {
+					expect(input(id).disabled).toBe(true);
+				}
+				expect(sizes().every((size) => size.disabled)).toBe(true);
+			});
+
+			it("保存されたサイズを表示し、オンのときだけサイズの欄を出す", async () => {
+				await load({
+					"payment-paid": true,
+					settings: { multiSize: false, multiSizes: ["1440x900"] },
+				});
+
+				expect(sizes().filter((size) => size.checked).map((size) => size.value)).toEqual([
+					"1440x900",
+				]);
+				expect(hidden("multi-size-fields")).toBe(true);
+
+				await change("multiSize", true);
+				expect(hidden("multi-size-fields")).toBe(false);
+				expect(hidden("viewport-overridden")).toBe(false);
+			});
+
+			it("選んだサイズと分割の設定を保存する", async () => {
+				const { store } = await load({ "payment-paid": true });
+
+				await change("splitLongPages", true);
+				await change("multiSize", true);
+				await check("1280x800", true);
+				await check("768x1024", false);
+
+				expect(store.settings).toMatchObject({
+					splitLongPages: true,
+					multiSize: true,
+					multiSizes: ["1920x1080", "1280x800", "375x667"],
+				});
+			});
+
+			it("分け方の設定を表示し、オンのときだけ出す", async () => {
+				await load({
+					"payment-paid": true,
+					settings: { splitLongPages: false, splitMode: "count", splitCount: 4 },
+				});
+
+				expect(input("split-count").checked).toBe(true);
+				expect(input("splitCount").value).toBe("4");
+				expect(input("splitHeight").value).toBe("16000");
+				expect(hidden("split-fields")).toBe(true);
+
+				await change("splitLongPages", true);
+				expect(hidden("split-fields")).toBe(false);
+			});
+
+			it("分け方と値を保存する", async () => {
+				const { store } = await load({ "payment-paid": true });
+				await change("splitLongPages", true);
+
+				await change("splitHeight", "8000");
+				expect(store.settings).toMatchObject({ splitMode: "height", splitHeight: 8000 });
+
+				await change("splitCount", "5");
+				await change("split-count", true);
+				expect(store.settings).toMatchObject({ splitMode: "count", splitCount: 5 });
+			});
+
+			it.each([
+				["split-height", "splitHeight", "999"],
+				["split-height", "splitHeight", "16001"],
+				["split-count", "splitCount", "1"],
+				["split-count", "splitCount", "2.5"],
+			])("%s で %s が %s なら保存せずエラーを出す", async (mode, field, value) => {
+				const { store } = await load({
+					"payment-paid": true,
+					settings: { splitLongPages: true },
+				});
+				await change(mode, true);
+
+				await change(field, value);
+
+				expect(hidden("split-error")).toBe(false);
+				expect(store.settings).not.toHaveProperty(field, Number(value));
+			});
+
+			it("選んでいない方の値が正しくなくても、保存は止めない", async () => {
+				const { store } = await load({
+					"payment-paid": true,
+					settings: { splitLongPages: true, splitMode: "height" },
+				});
+				input("splitCount").value = "0";
+
+				await change("splitHeight", "4000");
+
+				expect(hidden("split-error")).toBe(true);
+				expect(store.settings).toMatchObject({ splitHeight: 4000, splitCount: 2 });
+			});
+
+			it("サイズを1つも選ばないと保存せずエラーを出す", async () => {
+				const { store } = await load({ "payment-paid": true });
+				await change("multiSize", true);
+
+				for (const size of ["1920x1080", "768x1024", "375x667"]) {
+					await check(size, false);
+				}
+
+				expect(hidden("multi-size-error")).toBe(false);
+				expect((store.settings as { multiSizes: string[] }).multiSizes).toHaveLength(1);
+			});
+		});
 	});
 });

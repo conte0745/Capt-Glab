@@ -1,4 +1,6 @@
 import {
+	isValidSplitCount,
+	isValidSplitHeight,
 	isValidViewportSize,
 	loadSettings,
 	normalizeFolder,
@@ -24,6 +26,12 @@ const allFields = [
 	"expandContent",
 	"expandMenu",
 	"loadLazyImages",
+	"splitLongPages",
+	"split-height",
+	"split-count",
+	"splitHeight",
+	"splitCount",
+	"multiSize",
 	"viewport-current",
 	"viewport-custom",
 	"width",
@@ -42,6 +50,16 @@ async function init() {
 	input("expandContent").checked = settings.expandContent;
 	input("expandMenu").checked = settings.expandMenu;
 	input("loadLazyImages").checked = settings.loadLazyImages;
+	input("splitLongPages").checked = settings.splitLongPages;
+	input("split-height").checked = settings.splitMode === "height";
+	input("split-count").checked = settings.splitMode === "count";
+	input("splitHeight").value = String(settings.splitHeight);
+	input("splitCount").value = String(settings.splitCount);
+	input("multiSize").checked = settings.multiSize;
+	for (const size of sizeInputs()) {
+		size.checked = settings.multiSizes.includes(size.value);
+		size.addEventListener("change", save);
+	}
 	input("viewport-current").checked = settings.viewport.mode === "current";
 	input("viewport-custom").checked = settings.viewport.mode === "custom";
 	input("width").value = String(settings.viewport.width);
@@ -72,10 +90,13 @@ async function init() {
 /** 購入済みなら有料機能を使えるようにし、未購入なら購入の案内を出す */
 async function showPaymentStatus() {
 	const paid = await isPaid();
-	input("loadLazyImages").disabled = !paid;
+	for (const field of element("paid-section").querySelectorAll("input")) {
+		field.disabled = !paid;
+	}
 	element("purchase").hidden = paid;
 	element("login-hint").hidden = paid;
 	element("paid-text").hidden = !paid;
+	updateVisibility();
 }
 
 /** 購入や引き継ぎのページを開く。開けなければ案内を出す */
@@ -112,6 +133,13 @@ function applyPreset() {
 	void save();
 }
 
+/** 複数サイズで撮るときの、サイズの選択肢 */
+function sizeInputs() {
+	return [
+		...document.querySelectorAll<HTMLInputElement>('input[name="multiSizes"]'),
+	];
+}
+
 /** 今の選択に関係しない項目は隠す */
 function updateVisibility() {
 	const download = input("download").checked;
@@ -119,6 +147,11 @@ function updateVisibility() {
 	element("name-section").hidden = !download;
 
 	element("viewport-fields").hidden = !input("viewport-custom").checked;
+	element("multi-size-fields").hidden = !input("multiSize").checked;
+	element("split-fields").hidden = !input("splitLongPages").checked;
+	element("viewport-overridden").hidden = !(
+		input("multiSize").checked && !input("multiSize").disabled
+	);
 	updateSavePreview();
 }
 
@@ -148,12 +181,31 @@ async function save() {
 		input("openTab").checked;
 	const viewportValid =
 		!custom || (isValidViewportSize(width) && isValidViewportSize(height));
+	const multiSizes = sizeInputs()
+		.filter((size) => size.checked)
+		.map((size) => size.value);
+	const multiSizeValid = !input("multiSize").checked || multiSizes.length > 0;
+	const splitMode = input("split-count").checked ? "count" : "height";
+	const splitHeight = Number(input("splitHeight").value);
+	const splitCount = Number(input("splitCount").value);
+	// 選んでいない方の値は使わないので、正しくなくても保存を止めない
+	const splitValid =
+		!input("splitLongPages").checked ||
+		(splitMode === "height" ? isValidSplitHeight(splitHeight) : isValidSplitCount(splitCount));
 
 	element("actions-error").hidden = actionsValid;
 	element("folder-error").hidden = folder !== null;
 	element("viewport-error").hidden = viewportValid;
+	element("multi-size-error").hidden = multiSizeValid;
+	element("split-error").hidden = splitValid;
 
-	if (!actionsValid || folder === null || !viewportValid) {
+	if (
+		!actionsValid ||
+		folder === null ||
+		!viewportValid ||
+		!multiSizeValid ||
+		!splitValid
+	) {
 		return;
 	}
 
@@ -167,6 +219,13 @@ async function save() {
 		expandContent: input("expandContent").checked,
 		expandMenu: input("expandMenu").checked,
 		loadLazyImages: input("loadLazyImages").checked,
+		splitLongPages: input("splitLongPages").checked,
+		splitMode,
+		// 正しくない値は保存せず、前の値を残す
+		splitHeight: isValidSplitHeight(splitHeight) ? splitHeight : current.splitHeight,
+		splitCount: isValidSplitCount(splitCount) ? splitCount : current.splitCount,
+		multiSize: input("multiSize").checked,
+		multiSizes,
 		viewport: custom
 			? { mode: "custom", width, height }
 			: { ...current.viewport, mode: "current" },
