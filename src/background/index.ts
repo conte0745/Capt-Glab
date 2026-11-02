@@ -15,7 +15,7 @@ const INFOBAR_CLOSE_MS = 6000;
 const VIEWPORT_APPLY_MS = 500;
 // サイズを変えるとページが組み変わるので、長めに待つ
 const CUSTOM_VIEWPORT_APPLY_MS = 1000;
-// 広げた領域の再レイアウトと画像の読み込みを待つ
+// 広げた領域の再レイアウトと画像の読み込み、先頭へのスクロールの反映を待つ
 const SCROLL_AREA_APPLY_MS = 300;
 // 撮影が終わる前に戻らないよう、十分に長くする
 const SCROLL_AREA_RESTORE_MS = 30000;
@@ -182,10 +182,11 @@ async function captureTab(
 		).catch((error): ScrollAreaResult => {
 			// 広げられなくても、見えている範囲は撮影する
 			console.error(error);
-			return { bottom: 0, contentCut: false };
+			return { bottom: 0, contentCut: false, scrolled: false };
 		});
 		restoreContextId = contextId;
-		if (areas.bottom > 0) {
+		// スクロールに合わせて出し入れするヘッダーなどが、先頭の状態に戻るのも待つ
+		if (areas.bottom > 0 || areas.scrolled) {
 			await sleep(SCROLL_AREA_APPLY_MS);
 		}
 

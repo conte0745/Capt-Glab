@@ -33,6 +33,8 @@ const LAYOUTS: Record<string, string> = {
 	"spoof-rect": `<!doctype html><script>Element.prototype.getBoundingClientRect=()=>({width:900,height:900,top:0,bottom:1e9})</script><body style="margin:0;height:100vh;overflow:hidden"><main style="height:100vh;overflow:auto">${CONTENT}</main>`,
 	"spoof-dpr": `<!doctype html><script>Object.defineProperty(window,"devicePixelRatio",{value:-1})</script><body style="margin:0">${CONTENT}`,
 	"spoof-style": `<!doctype html><script>window.getComputedStyle=()=>{throw new Error("x")}</script><body style="margin:0">${CONTENT}`,
+	"fixed-header": `<!doctype html><body style="margin:0"><header style="position:fixed;top:0;left:0;right:0;height:60px;background:#888888"></header>${CONTENT}`,
+	"sticky-header": `<!doctype html><body style="margin:0"><header style="position:sticky;top:0;height:60px;background:#888888"></header>${CONTENT}`,
 	"small-box": `<!doctype html><body style="margin:0"><div id="box" style="height:100px;overflow:auto"><div style="height:500px"></div></div>${CONTENT}`,
 };
 
@@ -149,6 +151,7 @@ export type Shot = {
 	height: number;
 	/** 100vh の要素が終わる、画像上の y 座標。見つからなければ -1 */
 	firstScreenEnd: number;
+	topColor: string;
 	bottomColor: string;
 	/** 本文の最後（緑）とメニューの最後（オレンジ）が写っているか */
 	hasContentEnd: boolean;
@@ -195,6 +198,7 @@ export async function waitForShot(
 			width: image.width,
 			height: image.height,
 			firstScreenEnd,
+			topColor: color(0),
 			bottomColor: color(image.height - 1),
 		};
 	}, file.toString("base64"));
@@ -202,6 +206,7 @@ export async function waitForShot(
 }
 
 export const GREEN = "0,255,0";
+export const GRAY = "136,136,136";
 
 export async function setSettings(
 	{ worker }: Fixtures["extension"],
