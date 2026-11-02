@@ -24,7 +24,7 @@ function setup(settings: Partial<Settings> = {}) {
 	const metrics = {
 		current: METRICS,
 		dpr: 1,
-		areas: { bottom: 0, contentCut: false },
+		areas: { bottom: 0, contentCut: false, scrolled: false },
 	};
 	const sendCommand = vi.fn(async (
 		_target: unknown,
@@ -327,9 +327,21 @@ describe("background", () => {
 			);
 		});
 
+		it("先頭へスクロールしたら反映を待ってから撮影する", async () => {
+			const ctx = await load();
+			ctx.metrics.areas = { bottom: 0, contentCut: false, scrolled: true };
+
+			ctx.capture();
+			await flush(500);
+			expect(commands(ctx)).not.toContain("Page.getLayoutMetrics");
+
+			await flush(300);
+			expect(commands(ctx)).toContain("Page.captureScreenshot");
+		});
+
 		it("広げたら再レイアウトを待ってから撮影する", async () => {
 			const ctx = await load();
-			ctx.metrics.areas = { bottom: 5000, contentCut: false };
+			ctx.metrics.areas = { bottom: 5000, contentCut: false, scrolled: false };
 
 			ctx.capture();
 			await flush(500);
@@ -341,7 +353,7 @@ describe("background", () => {
 
 		it("広げた領域がページより長ければ、その下端まで撮る", async () => {
 			const ctx = await load();
-			ctx.metrics.areas = { bottom: 5000, contentCut: false };
+			ctx.metrics.areas = { bottom: 5000, contentCut: false, scrolled: false };
 
 			ctx.capture();
 			await flush();
@@ -393,7 +405,7 @@ describe("background", () => {
 
 		it("本文が切れたままなら伝える", async () => {
 			const ctx = await load();
-			ctx.metrics.areas = { bottom: 0, contentCut: true };
+			ctx.metrics.areas = { bottom: 0, contentCut: true, scrolled: false };
 
 			const port = ctx.capture();
 			await flush();

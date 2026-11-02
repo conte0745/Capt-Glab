@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
 	activeTabId,
+	GRAY,
 	GREEN,
 	clickAction,
 	isPanelOpen,
@@ -31,6 +32,31 @@ test.describe("等倍", () => {
 			bottomColor: GREEN,
 		});
 	});
+
+	for (const layout of ["fixed-header", "sticky-header"]) {
+		test(`${layout}: 下までスクロールしていても、ヘッダーをページの先頭に写す`, async ({
+			extension,
+			page,
+			url,
+		}) => {
+			await page.goto(url + layout);
+			const scrollY = await page.evaluate(() => {
+				scrollTo(0, document.documentElement.scrollHeight);
+				return window.scrollY;
+			});
+			expect(scrollY).toBeGreaterThan(0);
+
+			await clickAction(extension, page);
+			const shot = await waitForShot(extension, page);
+
+			expect(shot).toMatchObject({
+				topColor: GRAY,
+				firstScreenEnd: 60,
+				bottomColor: GREEN,
+			});
+			await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrollY);
+		});
+	}
 
 	test("保存後にパネルを閉じる", async ({ extension, page, url }) => {
 		await page.goto(url);

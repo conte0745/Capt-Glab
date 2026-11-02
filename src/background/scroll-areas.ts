@@ -10,6 +10,8 @@ export type ScrollAreaResult = {
 	bottom: number;
 	/** 広げたあとも、本文に写らない部分が残っているか */
 	contentCut: boolean;
+	/** 先頭へスクロールしたか。スクロールに応じて動く要素が落ち着くまで待つために返す */
+	scrolled: boolean;
 };
 
 // ページの DOM を見るが、ページのスクリプトとは隔離された環境で実行する。外の変数は参照できない
@@ -20,6 +22,22 @@ export function expandScrollAreas({
 }: ScrollAreaOptions): ScrollAreaResult {
 	const TALL_RATIO = 0.6;
 	const MENU_WIDTH_RATIO = 0.35;
+
+	// ページの外まで撮るとき、fixed や sticky の要素は今のスクロール位置を基準に描かれる。
+	// 下までスクロールしたまま撮るとヘッダーが画像の途中に写るので、先頭へ戻してから撮る
+	const restores: (() => void)[] = [];
+	const scrollY = window.scrollY;
+	const restore = () => {
+		clearTimeout(timer);
+		restores.reverse().forEach((restoreElement) => restoreElement());
+		window.scrollTo({ top: scrollY, behavior: "instant" });
+		delete (window as unknown as Record<string, unknown>).__captgrabRestore;
+	};
+	// 途中で例外が出ても元に戻せるよう、スクロールや変更の前に登録する
+	const timer = setTimeout(restore, restoreAfterMs);
+	(window as unknown as Record<string, unknown>).__captgrabRestore = restore;
+	window.scrollTo({ top: 0, behavior: "instant" });
+	const scrolled = scrollY !== window.scrollY;
 
 	const areas = [...document.querySelectorAll<HTMLElement>("body *")].filter(
 		(element) => {
@@ -49,7 +67,6 @@ export function expandScrollAreas({
 		...(expandMenu ? menus : []),
 	];
 
-	const restores: (() => void)[] = [];
 	const expanded = new Set<HTMLElement>();
 	const expand = (element: HTMLElement) => {
 		if (expanded.has(element)) {
@@ -87,16 +104,6 @@ export function expandScrollAreas({
 		}
 	}
 
-	const scrollY = window.scrollY;
-	const restore = () => {
-		clearTimeout(timer);
-		restores.reverse().forEach((restoreElement) => restoreElement());
-		window.scrollTo({ top: scrollY, behavior: "instant" });
-		delete (window as unknown as Record<string, unknown>).__captgrabRestore;
-	};
-	const timer = setTimeout(restore, restoreAfterMs);
-	(window as unknown as Record<string, unknown>).__captgrabRestore = restore;
-
 	const isCut = (element: HTMLElement) =>
 		element.scrollHeight > element.clientHeight + 1;
 
@@ -108,6 +115,7 @@ export function expandScrollAreas({
 			)
 		),
 		contentCut: contents.some(isCut),
+		scrolled,
 	};
 }
 
