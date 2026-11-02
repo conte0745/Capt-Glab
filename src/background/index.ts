@@ -63,6 +63,7 @@ chrome.runtime.onMessage.addListener(function (
 	}
 });
 
+/** パネルから頼まれた撮影を行い、保存やコピーの結果をパネルに知らせる */
 async function handleCapture(port: chrome.runtime.Port, tabId: number) {
 	let connected = true;
 	let onGone = () => {};
@@ -117,6 +118,7 @@ async function handleCapture(port: chrome.runtime.Port, tabId: number) {
 	}
 }
 
+/** パネルに出す案内を選べるよう、エラーを種類に分ける */
 function classifyError(error: unknown): string {
 	const message = String(error);
 	if (/already attached/i.test(message)) {
@@ -132,6 +134,7 @@ function classifyError(error: unknown): string {
 	return "unknown";
 }
 
+/** デバッガで画面サイズを固定し、ページ全体を PNG で撮って base64 で返す */
 async function captureTab(
 	tabId: number,
 	settings: Settings,
@@ -255,6 +258,7 @@ async function createIsolatedContext(
 	return executionContextId;
 }
 
+/** 隔離された実行環境で式を評価し、結果を値で返す。例外が出たらエラーにする */
 async function evaluate<T>(
 	target: chrome.debugger.Debuggee,
 	contextId: number,
@@ -275,6 +279,7 @@ type SaveResult =
 	| { state: "saved"; filename: string }
 	| { state: "canceled" | "failed" };
 
+/** 画像を設定の保存先に連番で保存する。失敗しても例外にせず、結果を返す */
 async function downloadImage(
 	data: string,
 	settings: Settings
@@ -297,6 +302,7 @@ async function downloadImage(
 	}
 }
 
+/** 画像を別タブで開く。URL に入れると長すぎるので、画像はタブから取りに来させる */
 async function openViewer(data: string, filename: string | null) {
 	const id = crypto.randomUUID();
 	viewerImages.set(id, { data, filename });
@@ -305,6 +311,7 @@ async function openViewer(data: string, filename: string | null) {
 	});
 }
 
+/** 指定したミリ秒だけ待つ */
 function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }

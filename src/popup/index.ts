@@ -45,6 +45,7 @@ let closeRequested = false;
 
 await start();
 
+/** 開いているタブの撮影を頼み、届いた進み具合を表示する */
 async function start() {
 	const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 	const port = chrome.runtime.connect({ name: "capture" });
@@ -71,6 +72,7 @@ type DoneMessage = {
 	openTab: boolean;
 };
 
+/** 撮影の結果を表示し、しばらくしたらパネルを閉じる */
 async function finish(port: chrome.runtime.Port, message: DoneMessage) {
 	const copied = message.data ? await copyImage(message.data) : null;
 
@@ -100,6 +102,7 @@ async function finish(port: chrome.runtime.Port, message: DoneMessage) {
 	}
 }
 
+/** 保存とコピーの結果から、表示する見出しを選ぶ */
 function completedText(saved: DoneMessage["saved"], copied: boolean | null) {
 	if (saved === "saved" && copied) return "保存してコピーしました";
 	if (saved === "saved") return "保存しました";
@@ -108,6 +111,7 @@ function completedText(saved: DoneMessage["saved"], copied: boolean | null) {
 	return "撮影しました";
 }
 
+/** 画像をクリップボードにコピーし、成功したかを返す */
 async function copyImage(data: string): Promise<boolean> {
 	try {
 		const image = await fetch(`data:image/png;base64,${data}`);
@@ -120,12 +124,14 @@ async function copyImage(data: string): Promise<boolean> {
 	}
 }
 
+/** 読み込み中の表示を消して、見出しと補足を表示する */
 function show(status: string, note: string) {
 	loading.remove();
 	statusText.textContent = status;
 	noteText.textContent = note;
 }
 
+/** 指定したミリ秒だけ待つ */
 function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }

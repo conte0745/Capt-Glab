@@ -8,8 +8,10 @@ import {
 const COUNT_KEY = "image-name-count";
 const SAVED_TOAST_MS = 2000;
 
+/** id で要素を取得する。画面に必ずある要素だけに使う */
 const element = <T extends HTMLElement>(id: string) =>
 	document.getElementById(id) as T;
+/** id で入力欄を取得する */
 const input = (id: string) => element<HTMLInputElement>(id);
 
 const allFields = [
@@ -26,6 +28,7 @@ const allFields = [
 	"height",
 ];
 
+/** 保存された設定を画面に反映し、変更したらすぐ保存されるようにする */
 async function init() {
 	const settings = await loadSettings();
 
@@ -65,6 +68,7 @@ async function showShortcut() {
 		: "割り当てられていません。「変更する」から設定できます。";
 }
 
+/** 選んだ画面サイズを入力欄に入れ、指定したサイズで撮る設定にする */
 function applyPreset() {
 	const preset = element<HTMLSelectElement>("preset");
 	if (!preset.value) {
@@ -87,6 +91,7 @@ function updateVisibility() {
 	updateSavePreview();
 }
 
+/** 入力中のフォルダと次のファイル名から、保存先の例を表示する */
 function updateSavePreview() {
 	const folder = normalizeFolder(input("folder").value);
 	const preview = element("save-preview");
@@ -140,6 +145,7 @@ async function save() {
 
 let savedTimer: ReturnType<typeof setTimeout>;
 
+/** 「保存しました」を少しのあいだ表示する */
 function showSaved() {
 	const saved = element("saved");
 	saved.textContent = "保存しました";
@@ -149,6 +155,7 @@ function showSaved() {
 
 let nextName = "";
 
+/** 次に保存するときのファイル名を表示する */
 async function showNextName() {
 	const stored = await chrome.storage.local.get(COUNT_KEY);
 	const next = (Number(stored[COUNT_KEY]) || 0) + 1;
@@ -157,6 +164,7 @@ async function showNextName() {
 	updateSavePreview();
 }
 
+/** 連番を最初に戻す */
 async function resetCount() {
 	await chrome.storage.local.remove(COUNT_KEY);
 	await showNextName();

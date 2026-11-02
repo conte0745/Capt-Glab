@@ -2,6 +2,7 @@ import { advanceImageCount, loadSettings, peekImageName } from "../settings";
 
 const TOAST_MS = 2000;
 
+/** id で要素を取得する。画面に必ずある要素だけに使う */
 const element = <T extends HTMLElement>(id: string) =>
 	document.getElementById(id) as T;
 
@@ -11,6 +12,7 @@ element("settings").addEventListener("click", () => {
 
 await show();
 
+/** 撮影した画像を受け取って表示し、保存とコピーの操作を使えるようにする */
 async function show() {
 	const id = new URLSearchParams(location.search).get("id");
 	const result = await chrome.runtime.sendMessage({
@@ -34,6 +36,7 @@ async function show() {
 	let filename: string | null = result.filename;
 	element("name").textContent = filename ?? "撮影した画像";
 
+	/** 画像を保存する。saveAs が true なら保存先を選ばせる */
 	async function save(saveAs: boolean) {
 		const name = filename ?? (await peekImageName());
 		const { folder } = await loadSettings();
@@ -58,6 +61,7 @@ async function show() {
 		}
 	}
 
+	/** 画像をクリップボードにコピーする */
 	async function copy() {
 		try {
 			await navigator.clipboard.write([
@@ -95,6 +99,7 @@ async function show() {
 
 let toastTimer: ReturnType<typeof setTimeout>;
 
+/** 操作の結果を少しのあいだ表示する */
 function showToast(text: string) {
 	const toast = element("toast");
 	toast.textContent = text;

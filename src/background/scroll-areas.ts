@@ -14,7 +14,10 @@ export type ScrollAreaResult = {
 	scrolled: boolean;
 };
 
-// ページの DOM を見るが、ページのスクリプトとは隔離された環境で実行する。外の変数は参照できない
+/**
+ * 中でスクロールする領域を広げ、ページ全体が1枚に写るようにする。元に戻す関数はページに登録する。
+ * ページの DOM を見るが、ページのスクリプトとは隔離された環境で実行する。外の変数は参照できない
+ */
 export function expandScrollAreas({
 	expandContent,
 	expandMenu,
@@ -27,6 +30,7 @@ export function expandScrollAreas({
 	// 下までスクロールしたまま撮るとヘッダーが画像の途中に写るので、先頭へ戻してから撮る
 	const restores: (() => void)[] = [];
 	const scrollY = window.scrollY;
+	/** 広げた領域とスクロール位置を元に戻す。2回呼ばれても同じ結果になる */
 	const restore = () => {
 		clearTimeout(timer);
 		restores.toReversed().forEach((restoreElement) => restoreElement());
@@ -54,6 +58,7 @@ export function expandScrollAreas({
 			);
 		}
 	);
+	/** 画面の幅に比べて細い領域をメニューとみなす */
 	const isMenu = (element: HTMLElement) =>
 		element.getBoundingClientRect().width <= innerWidth * MENU_WIDTH_RATIO;
 	const menus = areas.filter(isMenu);
@@ -68,6 +73,7 @@ export function expandScrollAreas({
 	];
 
 	const expanded = new Set<HTMLElement>();
+	/** 要素の高さの制限を外して中身をすべて表示し、元に戻す処理を登録する */
 	const expand = (element: HTMLElement) => {
 		if (expanded.has(element)) {
 			return;
@@ -104,6 +110,7 @@ export function expandScrollAreas({
 		}
 	}
 
+	/** 中身の一部が隠れたままになっているかを返す */
 	const isCut = (element: HTMLElement) =>
 		element.scrollHeight > element.clientHeight + 1;
 
