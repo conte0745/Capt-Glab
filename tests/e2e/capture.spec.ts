@@ -150,6 +150,94 @@ test.describe("等倍", () => {
 	});
 });
 
+test.describe("遅延読み込みの画像", () => {
+	test("購入済みでオンなら、画面に入ってから読み込む画像も写す", async ({
+		extension,
+		page,
+		url,
+	}) => {
+		await extension.worker.evaluate(() => chrome.storage.local.set({ "payment-paid": true }));
+		await setSettings(extension, { loadLazyImages: true });
+		await page.goto(url + "lazy-images");
+
+		await clickAction(extension, page);
+		const shot = await waitForShot(extension, page);
+
+		expect(shot.bottomColor).toBe(GREEN);
+		expect(await page.evaluate(() => window.scrollY)).toBe(0);
+	});
+
+	test("未購入ならオンでも読み込ませない", async ({ extension, page, url }) => {
+		await setSettings(extension, { loadLazyImages: true });
+		await page.goto(url + "lazy-images");
+
+		await clickAction(extension, page);
+		const shot = await waitForShot(extension, page);
+
+		// 読み込まれていない画像は枠だけが写る
+		expect(shot.bottomColor).not.toBe(GREEN);
+	});
+});
+
+test.describe("長いページの分割", () => {
+	test("購入済みでオンなら、縮小せずに分けて保存する", async ({ extension, page, url }) => {
+		await extension.worker.evaluate(() => chrome.storage.local.set({ "payment-paid": true }));
+		await setSettings(extension, { splitLongPages: true });
+		await page.goto(url + "?blue=20000");
+		const viewport = await page.evaluate(() => ({
+			width: innerWidth,
+			pageHeight: document.documentElement.scrollHeight,
+		}));
+
+		await clickAction(extension, page);
+		const first = await waitForShot(extension, page, "screen-0001-1.png");
+		const second = await waitForShot(extension, page, "screen-0001-2.png");
+
+		expect(first).toMatchObject({ width: viewport.width, height: 16000 });
+		expect(second).toMatchObject({
+			width: viewport.width,
+			height: viewport.pageHeight - 16000,
+			bottomColor: GREEN,
+		});
+	});
+});
+
+test.describe("枚数で分ける", () => {
+	test("短いページでも、指定した枚数に分けて保存する", async ({ extension, page, url }) => {
+		await extension.worker.evaluate(() => chrome.storage.local.set({ "payment-paid": true }));
+		await setSettings(extension, { splitLongPages: true, splitMode: "count", splitCount: 3 });
+		await page.goto(url);
+		const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+
+		await clickAction(extension, page);
+		const shots = [];
+		for (const part of [1, 2, 3]) {
+			shots.push(await waitForShot(extension, page, `screen-0001-${part}.png`));
+		}
+
+		expect(shots.reduce((sum, shot) => sum + shot.height, 0)).toBe(pageHeight);
+		expect(shots[2].bottomColor).toBe(GREEN);
+	});
+});
+
+test.describe("複数サイズ", () => {
+	test("購入済みでオンなら、選んだサイズごとに保存する", async ({ extension, page, url }) => {
+		await extension.worker.evaluate(() => chrome.storage.local.set({ "payment-paid": true }));
+		await setSettings(extension, { multiSize: true, multiSizes: ["1280x800", "375x667"] });
+		await page.goto(url);
+
+		await clickAction(extension, page);
+		const wide = await waitForShot(extension, page, "screen-0001-1280x800.png");
+		const narrow = await waitForShot(extension, page, "screen-0001-375x667.png");
+
+		// 100vh の要素の高さが、それぞれのサイズの高さになる
+		expect(wide).toMatchObject({ firstScreenEnd: 800, bottomColor: GREEN });
+		expect(narrow).toMatchObject({ firstScreenEnd: 667, bottomColor: GREEN });
+		expect(wide.width).toBeGreaterThan(1200);
+		expect(narrow.width).toBeLessThanOrEqual(375);
+	});
+});
+
 test.describe("高DPI", () => {
 	test.use({ scale: 2 });
 
@@ -463,7 +551,7 @@ test.describe("設定", () => {
 		await clickAction(extension, page);
 
 		const viewer = await opened;
-		await expect(viewer.locator("#image")).toBeVisible();
+		await expect(viewer.locator("#images img")).toBeVisible();
 		expect(fs.readdirSync(extension.downloads)).toEqual([]);
 	});
 
@@ -512,16 +600,44 @@ test.describe("設定", () => {
 		await clickAction(extension, page);
 		const viewer = await opened;
 
-		await expect(viewer.locator("#image")).toBeVisible();
+		await expect(viewer.locator("#images img")).toBeVisible();
 		await expect
 			.poll(() =>
 				viewer
-					.locator("#image")
+					.locator("#images img")
 					.evaluate((image: HTMLImageElement) => image.naturalWidth)
 			)
 			.toBeGreaterThan(0);
 		await expect(viewer.locator("#actions")).toBeVisible();
 		expect(fs.readdirSync(extension.downloads)).toEqual([]);
+	});
+
+	test("複数枚は1つのタブに並べ、矢印キーで横に切り替える", async ({ extension, page, url }) => {
+		await extension.worker.evaluate(() => chrome.storage.local.set({ "payment-paid": true }));
+		await setSettings(extension, {
+			...settings,
+			download: false,
+			openTab: true,
+			multiSize: true,
+			multiSizes: ["1280x800", "375x667"],
+		});
+		await page.goto(url);
+		const pages = () => extension.context.pages().filter((p) => p.url().includes("src/viewer/"));
+
+		const opened = extension.context.waitForEvent("page");
+		await clickAction(extension, page);
+		const viewer = await opened;
+
+		await expect(viewer.locator("#images img")).toHaveCount(2);
+		await expect(viewer.locator("#position")).toHaveText("1 / 2");
+		await viewer.keyboard.press("ArrowRight");
+		await expect(viewer.locator("#position")).toHaveText("2 / 2");
+		// 2枚目が見える位置まで、実際に横へスクロールしている
+		await expect
+			.poll(() => viewer.locator("#images").evaluate((images) => images.scrollLeft))
+			.toBeGreaterThan(0);
+		await page.waitForTimeout(1000);
+		expect(pages()).toHaveLength(1);
 	});
 
 	test.describe("別タブのショートカット", () => {
@@ -583,7 +699,7 @@ test.describe("設定", () => {
 		const opened = extension.context.waitForEvent("page");
 		await clickAction(extension, page);
 		const viewer = await opened;
-		await expect(viewer.locator("#image")).toBeVisible();
+		await expect(viewer.locator("#images img")).toBeVisible();
 
 		await page.bringToFront();
 		const types = await page.evaluate(async () => {

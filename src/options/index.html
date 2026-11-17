@@ -199,6 +199,38 @@
 			button:hover {
 				border-color: var(--ink);
 			}
+			/* ブラウザの確認ダイアログは見出しを変えられないので、画面の中に出す */
+			#reset-dialog {
+				max-width: 360px;
+				padding: 20px 22px;
+				border: 1px solid var(--line);
+				border-radius: 10px;
+				background: var(--card);
+				color: var(--ink);
+				box-shadow: 0 8px 30px rgb(0 0 0 / 30%);
+			}
+			#reset-dialog::backdrop {
+				background: rgb(0 0 0 / 35%);
+			}
+			#reset-dialog h3 {
+				margin: 0 0 8px;
+				font-size: 16px;
+			}
+			#reset-dialog p {
+				margin: 0 0 18px;
+				font-size: 13px;
+				line-height: 1.6;
+			}
+			#reset-dialog .buttons {
+				display: flex;
+				justify-content: flex-end;
+				gap: 8px;
+			}
+			.danger {
+				border-color: var(--accent);
+				background: var(--accent);
+				color: var(--paper);
+			}
 			footer {
 				margin-top: 20px;
 				color: var(--ink-soft);
@@ -206,6 +238,54 @@
 			}
 			a {
 				color: inherit;
+			}
+			.price {
+				margin-left: 8px;
+				padding: 1px 8px;
+				border: 1px solid var(--accent);
+				border-radius: 999px;
+				color: var(--accent);
+				font-size: 12px;
+				font-weight: 600;
+			}
+			.price[hidden] {
+				display: none;
+			}
+			.choice:has(input:disabled) {
+				cursor: default;
+				opacity: 0.6;
+			}
+			.buttons {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+			.primary {
+				border-color: var(--button);
+				background: var(--button);
+				color: var(--button-ink);
+			}
+			#purchase {
+				margin-top: 12px;
+			}
+			.size-options {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px 16px;
+			}
+			.size-options label {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				cursor: pointer;
+			}
+			.size-options input {
+				margin: 0;
+				accent-color: var(--ink);
+			}
+			.row[hidden],
+			.hint[hidden] {
+				display: none;
 			}
 			#saved {
 				position: fixed;
@@ -294,6 +374,7 @@
 					<p class="error" id="viewport-error" role="alert" hidden>幅と高さは 200〜7680 の整数で指定してください。</p>
 					<p class="hint">幅と高さだけを変えます。スマートフォン専用の表示になるとは限りません。</p>
 				</div>
+				<p class="hint" id="viewport-overridden" hidden>「複数のサイズで一度に撮る」がオンのため、この設定は使われません。</p>
 			</section>
 
 			<section class="card">
@@ -308,6 +389,68 @@
 					<span><strong>サイドメニューを最後まで撮る</strong><small>長いメニューも全部写します。メニューの見た目が変わることがあります</small></span>
 				</label>
 				<p class="hint">オフの領域は広げません。ただし、本文を広げるとメニューが一緒に伸びて、全部写る画面もあります。</p>
+			</section>
+
+			<section class="card" id="paid-section">
+				<h2>有料機能<span class="price" id="price">買い切り 500 円</span></h2>
+				<p class="description">購入の確認のときだけ外部サービスと通信します。撮影した画像は送信しません。</p>
+				<label class="choice">
+					<input type="checkbox" id="loadLazyImages" disabled />
+					<span><strong>遅延読み込みの画像も写す</strong><small>撮影前にページを下までスクロールして、まだ読み込まれていない画像を読み込ませます。長いページでは撮影に最大 10 秒ほどかかります</small></span>
+				</label>
+				<label class="choice">
+					<input type="checkbox" id="splitLongPages" disabled />
+					<span><strong>縮小せずに画像を分けて保存</strong><small>長いページを縮小する代わりに、複数の画像に分けて元の解像度のまま保存します</small></span>
+				</label>
+				<div class="nested" id="split-fields">
+					<label class="choice">
+						<input type="radio" name="splitMode" id="split-height" disabled />
+						<span><strong>高さで分ける</strong><small>1枚の高さがこの値を超えるときだけ分けます</small></span>
+					</label>
+					<div class="size">
+						<label>1枚の高さの上限 <input type="number" id="splitHeight" min="1000" max="16000" step="1000" disabled /></label>
+						<span>px</span>
+					</div>
+					<label class="choice">
+						<input type="radio" name="splitMode" id="split-count" disabled />
+						<span><strong>枚数で分ける</strong><small>ページの長さに関係なく、同じ高さの画像に分けます</small></span>
+					</label>
+					<div class="size">
+						<label>枚数 <input type="number" id="splitCount" min="2" max="20" disabled /></label>
+						<span>枚</span>
+					</div>
+					<p class="error" id="split-error" role="alert" hidden>高さは 1000〜16000、枚数は 2〜20 の整数で指定してください。</p>
+					<p class="hint">保存される画像のピクセル数で数えます。撮影した画像を別タブで開くと、横の目盛りで分かれる位置を確かめて、そこから高さを決められます。高 DPI の画面では、ページの見た目の 2 倍ほどになります。1枚が 16,000px を超えるときは、枚数を増やします。</p>
+				</div>
+				<label class="choice">
+					<input type="checkbox" id="multiSize" disabled />
+					<span><strong>複数のサイズで一度に撮る</strong><small>選んだ画面サイズで続けて撮影し、サイズごとに保存します。オンのあいだは「撮影するときの画面サイズ」の設定を使いません</small></span>
+				</label>
+				<div class="nested" id="multi-size-fields">
+					<div class="size-options">
+						<label><input type="checkbox" name="multiSizes" value="1920x1080" disabled />1920 × 1080（フルHD）</label>
+						<label><input type="checkbox" name="multiSizes" value="1440x900" disabled />1440 × 900</label>
+						<label><input type="checkbox" name="multiSizes" value="1280x800" disabled />1280 × 800</label>
+						<label><input type="checkbox" name="multiSizes" value="768x1024" disabled />768 × 1024（タブレット）</label>
+						<label><input type="checkbox" name="multiSizes" value="375x667" disabled />375 × 667（スマートフォン）</label>
+					</div>
+					<p class="error" id="multi-size-error" role="alert" hidden>サイズを1つ以上選んでください。</p>
+				</div>
+				<p class="hint" id="payment-checking">購入状況を確認しています…</p>
+				<div class="row" id="purchase" hidden>
+					<span>購入すると使えるようになります。</span>
+					<span class="buttons">
+						<button type="button" class="primary" id="buy">購入する</button>
+						<button type="button" id="login">購入済みの方</button>
+					</span>
+				</div>
+				<p class="hint" id="paid-text" hidden>購入済みです。ありがとうございます。</p>
+				<p class="hint" id="purchase-hint" hidden>購入後に確認のメールが届いた場合は、メールのリンクを開いてから、この画面に戻ってください。</p>
+				<p class="hint" id="login-hint">別の Chrome で購入した場合は「購入済みの方」から、購入時のメールアドレスで引き継げます。</p>
+				<p class="hint">
+					<a href="https://captgrab.shiftonton.net/tokushoho.html" target="_blank" rel="noopener noreferrer">特定商取引法に基づく表記</a>
+				</p>
+				<p class="error" id="payment-error" role="alert" hidden>購入ページを開けませんでした。インターネットの接続を確認してください。</p>
 			</section>
 
 			<section class="card" id="name-section">
@@ -326,10 +469,30 @@
 				</div>
 			</section>
 
+			<section class="card">
+				<h2>設定を初期値に戻す</h2>
+				<div class="row">
+					<span>この画面の設定をすべて、インストールしたときの状態に戻します。</span>
+					<button type="button" id="reset-settings">初期値に戻す</button>
+				</div>
+				<p class="hint">ファイル名の連番も 1 に戻ります。ショートカットキーは「変更する」から戻してください。</p>
+			</section>
+
 			<footer>
 				<a href="https://captgrab.shiftonton.net/guide.html" target="_blank" rel="noopener noreferrer">使い方ガイド</a>
 			</footer>
 		</div>
+
+		<dialog id="reset-dialog" aria-labelledby="reset-dialog-title">
+			<form method="dialog">
+				<h3 id="reset-dialog-title">設定を初期値に戻しますか？</h3>
+				<p>この画面の設定とファイル名の連番を、インストールしたときの状態に戻します。元には戻せません。</p>
+				<div class="buttons">
+					<button value="cancel" autofocus>キャンセル</button>
+					<button value="reset" class="danger">初期値に戻す</button>
+				</div>
+			</form>
+		</dialog>
 
 		<p id="saved" role="status"></p>
 		<script type="module" src="/src/options/index.ts"></script>

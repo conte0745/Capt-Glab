@@ -35,6 +35,8 @@ const LAYOUTS: Record<string, string> = {
 	"spoof-style": `<!doctype html><script>window.getComputedStyle=()=>{throw new Error("x")}</script><body style="margin:0">${CONTENT}`,
 	"fixed-header": `<!doctype html><body style="margin:0"><header style="position:fixed;top:0;left:0;right:0;height:60px;background:#888888"></header>${CONTENT}`,
 	"sticky-header": `<!doctype html><body style="margin:0"><header style="position:sticky;top:0;height:60px;background:#888888"></header>${CONTENT}`,
+	// 画面に入ったら読み込む画像を、ブラウザの遅延読み込みとスクリプトの両方で置く。最後がスクリプトの画像
+	"lazy-images": `<!doctype html><body style="margin:0;background:#fff"><div style="height:2000px;background:#0000ff"></div><img loading="lazy" src="/green.svg?native" style="display:block;width:100%;height:200px"><img id="js" data-src="/green.svg?js" style="display:block;width:100%;height:200px"><script>new IntersectionObserver((entries, observer) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.src = entry.target.dataset.src; observer.disconnect(); } })).observe(document.getElementById("js"))</script>`,
 	"small-box": `<!doctype html><body style="margin:0"><div id="box" style="height:100px;overflow:auto"><div style="height:500px"></div></div>${CONTENT}`,
 };
 
@@ -51,6 +53,11 @@ export const test = base.extend<Fixtures>({
 	url: async ({}, use) => {
 		const server = http.createServer((req, res) => {
 			const { searchParams, pathname } = new URL(req.url!, "http://localhost");
+			if (pathname === "/green.svg") {
+				res.setHeader("content-type", "image/svg+xml");
+				res.end(`<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="#00ff00"/></svg>`);
+				return;
+			}
 			res.setHeader("content-type", "text/html");
 			res.end(
 				LAYOUTS[pathname.slice(1)] ?? testPage(searchParams.get("blue") ?? "2400")
@@ -165,7 +172,13 @@ export async function waitForShot(
 	filename = "screen-0001.png"
 ): Promise<Shot> {
 	const target = path.join(downloads, filename);
-	await expect.poll(() => fs.existsSync(target), { timeout: 20_000 }).toBe(true);
+	// Chrome は書き込みの途中でも保存先の名前でファイルを作るので、PNG の終わりまで書かれるのを待つ
+	const PNG_END = Buffer.from("49454e44ae426082", "hex");
+	await expect
+		.poll(() => fs.existsSync(target) && fs.readFileSync(target).subarray(-8).equals(PNG_END), {
+			timeout: 20_000,
+		})
+		.toBe(true);
 	const file = fs.readFileSync(target);
 	const result = await page.evaluate(async (base64) => {
 		const image = new Image();

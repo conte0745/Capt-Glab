@@ -60,6 +60,10 @@ function setup(settings: Partial<Settings> = {}) {
 				get: vi.fn(async (key: string) => ({ [key]: store[key] })),
 				set: vi.fn(async (items: object) => Object.assign(store, items)),
 			},
+			sync: {
+				get: vi.fn(async (key: string) => ({ [key]: store[key] })),
+				set: vi.fn(async (items: object) => Object.assign(store, items)),
+			},
 		},
 		tabs: {
 			get: vi.fn(async () => TAB),
@@ -107,10 +111,22 @@ function setup(settings: Partial<Settings> = {}) {
 			port.send({ request: "capture", tabId });
 			return port;
 		},
-		viewerImage: (id: string) =>
-			new Promise((resolve) =>
-				onMessage({ request: "viewer-image", id }, {}, resolve)
-			),
+		/** 別タブと同じように、画像を1枚ずつ受け取る */
+		async viewerImage(id: string) {
+			const images: unknown[] = [];
+			for (let index = 0; ; index++) {
+				const response = (await new Promise<unknown>((resolve) =>
+					onMessage({ request: "viewer-image", id, index }, {}, resolve)
+				)) as { image: unknown; count: number } | null;
+				if (!response) {
+					return images.length ? images : null;
+				}
+				images.push(response.image);
+				if (images.length >= response.count) {
+					return images;
+				}
+			}
+		},
 	};
 }
 
@@ -122,6 +138,11 @@ async function load(settings?: Partial<Settings>) {
 }
 
 const flush = (ms = 1000) => vi.advanceTimersByTimeAsync(ms);
+
+const downloadedNames = (ctx: Awaited<ReturnType<typeof load>>) =>
+	(ctx.chromeStub.downloads.download.mock.calls as unknown as [{ filename: string }][]).map(
+		([options]) => options.filename
+	);
 
 const commands = (ctx: Awaited<ReturnType<typeof load>>) =>
 	ctx.sendCommand.mock.calls.map(([, method]) => method);
@@ -264,6 +285,18 @@ describe("background", () => {
 			) as unknown as [unknown, string, { clip: { scale: number } }];
 			expect(screenshot[2].clip.scale).toBe(0.5);
 			expect(port.posted.at(-1).scaled).toBe(true);
+		});
+
+		it("縮小した倍率を別タブに渡す", async () => {
+			const ctx = await load({ openTab: true, clipboard: false });
+			ctx.metrics.current = { ...METRICS, cssContentSize: { height: 32000 } };
+
+			ctx.capture();
+			await flush();
+
+			const [image] = (await ctx.viewerImage("uuid")) as { scale: number; conditions: string[] }[];
+			expect(image.scale).toBe(0.5);
+			expect(image.conditions).toContain("縮小あり");
 		});
 
 		it("画像の上限以内なら縮小しない", async () => {
@@ -440,6 +473,273 @@ describe("background", () => {
 			await flush();
 
 			expect(evaluated(ctx).at(-1)).toBe(RESTORE_SCROLL_AREAS);
+		});
+	});
+
+	describe("遅延読み込みの画像", () => {
+		const lazyEvaluations = (ctx: Awaited<ReturnType<typeof load>>) =>
+			ctx.sendCommand.mock.calls
+				.filter(([, method]) => method === "Runtime.evaluate")
+				.map(([, , params]) => String(params?.expression))
+				.filter((expression) => expression.includes('"stepMs"'));
+
+		it("購入済みでオンなら、領域を広げる前に画像を読み込ませる", async () => {
+			const ctx = await load({ loadLazyImages: true });
+			ctx.store["payment-paid"] = true;
+
+			ctx.capture();
+			await flush();
+
+			const expressions = ctx.sendCommand.mock.calls
+				.filter(([, method]) => method === "Runtime.evaluate")
+				.map(([, , params]) => String(params?.expression));
+			expect(expressions[0]).toContain('{"stepMs":200,"maxMs":10000}');
+			expect(expressions[1]).toContain('"expandContent"');
+			expect(commands(ctx)).toContain("Page.captureScreenshot");
+		});
+
+		it("オンでも未購入なら使わない", async () => {
+			const ctx = await load({ loadLazyImages: true });
+
+			ctx.capture();
+			await flush();
+
+			expect(lazyEvaluations(ctx)).toEqual([]);
+			expect(commands(ctx)).toContain("Page.captureScreenshot");
+		});
+
+		it("購入済みでもオフなら使わない", async () => {
+			const ctx = await load();
+			ctx.store["payment-paid"] = true;
+
+			ctx.capture();
+			await flush();
+
+			expect(lazyEvaluations(ctx)).toEqual([]);
+		});
+
+		it("読み込みに失敗しても撮影する", async () => {
+			const ctx = await load({ loadLazyImages: true });
+			ctx.store["payment-paid"] = true;
+			const original = ctx.sendCommand.getMockImplementation()!;
+			ctx.sendCommand.mockImplementation(async (target, method, params) => {
+				if (String(params?.expression).includes('"stepMs"')) {
+					return { result: {}, exceptionDetails: { text: "boom" } };
+				}
+				return original(target, method, params);
+			});
+
+			const port = ctx.capture();
+			await flush();
+
+			expect(port.posted.at(-1)).toMatchObject({ type: "done" });
+		});
+	});
+
+	describe("長いページの分割", () => {
+		type Clip = { x: number; y: number; width: number; height: number; scale: number };
+		const clips = (ctx: Awaited<ReturnType<typeof load>>) =>
+			ctx.sendCommand.mock.calls
+				.filter(([, method]) => method === "Page.captureScreenshot")
+				.map(([, , params]) => (params as unknown as { clip: Clip }).clip);
+
+		it("購入済みでオンなら、縮小せずに上限ごとに分けて撮り、番号を付けて保存する", async () => {
+			const ctx = await load({ splitLongPages: true });
+			ctx.store["payment-paid"] = true;
+			ctx.store["image-name-count"] = 6;
+			ctx.metrics.current = { ...METRICS, cssContentSize: { height: 20000 } };
+			ctx.metrics.dpr = 2;
+
+			const port = ctx.capture();
+			await flush();
+
+			expect(clips(ctx)).toEqual([
+				{ x: 0, y: 0, width: 985, height: 8000, scale: 1 },
+				{ x: 0, y: 8000, width: 985, height: 8000, scale: 1 },
+				{ x: 0, y: 16000, width: 985, height: 4000, scale: 1 },
+			]);
+			const filenames = downloadedNames(ctx);
+			expect(filenames).toEqual([
+				"screen-0007-1.png",
+				"screen-0007-2.png",
+				"screen-0007-3.png",
+			]);
+			expect(ctx.store["image-name-count"]).toBe(7);
+			expect(port.posted.at(-1)).toMatchObject({ count: 3, scaled: false });
+		});
+
+		it("上限に収まるページは分けない", async () => {
+			const ctx = await load({ splitLongPages: true });
+			ctx.store["payment-paid"] = true;
+
+			ctx.capture();
+			await flush();
+
+			expect(clips(ctx)).toHaveLength(1);
+			expect(ctx.chromeStub.downloads.download).toHaveBeenCalledWith(
+				expect.objectContaining({ filename: "screen-0001.png" })
+			);
+		});
+
+		it.each([
+			[
+				"高さの上限を下げると、その高さごとに分ける",
+				{ splitMode: "height" as const, splitHeight: 5000 },
+				[0, 2500, 5000, 7500],
+			],
+			[
+				"枚数で分けると、短いページでも同じ高さに分ける",
+				{ splitMode: "count" as const, splitCount: 3 },
+				[0, 1005, 2010],
+			],
+			[
+				"高さの値が正しくなければ、上限ごとに分ける",
+				{ splitMode: "height" as const, splitHeight: 50 },
+				[0, 8000],
+			],
+		])("%s", async (_, split, ys) => {
+			const ctx = await load({ splitLongPages: true, ...split });
+			ctx.store["payment-paid"] = true;
+			ctx.metrics.dpr = 2;
+			ctx.metrics.current = { ...METRICS, cssContentSize: { height: split.splitMode === "count" ? 3013 : 9000 } };
+
+			ctx.capture();
+			await flush();
+
+			expect(clips(ctx).map((clip) => clip.y)).toEqual(ys);
+		});
+
+		it("枚数が少なすぎて1枚が上限を超えるなら、枚数を増やす", async () => {
+			const ctx = await load({ splitLongPages: true, splitMode: "count", splitCount: 2 });
+			ctx.store["payment-paid"] = true;
+			ctx.metrics.dpr = 2;
+			ctx.metrics.current = { ...METRICS, cssContentSize: { height: 20000 } };
+
+			ctx.capture();
+			await flush();
+
+			// 画像では 40000px なので、16000px に収めるには 3 枚要る
+			expect(clips(ctx).map((clip) => clip.height)).toEqual([6667, 6667, 6666]);
+		});
+
+		it("オンでも未購入なら、これまでどおり縮小する", async () => {
+			const ctx = await load({ splitLongPages: true });
+			ctx.metrics.current = { ...METRICS, cssContentSize: { height: 20000 } };
+			ctx.metrics.dpr = 2;
+
+			ctx.capture();
+			await flush();
+
+			expect(clips(ctx)).toHaveLength(1);
+			expect(clips(ctx)[0].scale).toBe(0.4);
+		});
+	});
+
+	describe("複数サイズ", () => {
+		const overrides = (ctx: Awaited<ReturnType<typeof load>>) =>
+			ctx.sendCommand.mock.calls
+				.filter(([, method]) => method === "Emulation.setDeviceMetricsOverride")
+				.map(([, , params]) => {
+					const { width, height } = params as unknown as { width: number; height: number };
+					return `${width}x${height}`;
+				});
+
+		it("購入済みでオンなら、選んだサイズで続けて撮り、サイズ付きの名前で保存する", async () => {
+			const ctx = await load({
+				multiSize: true,
+				multiSizes: ["1920x1080", "375x667"],
+				clipboard: true,
+				openTab: true,
+			});
+			ctx.store["payment-paid"] = true;
+
+			const port = ctx.capture();
+			await flush(5000);
+			port.send({ request: "copied" });
+			await flush();
+
+			expect(overrides(ctx)).toEqual(["1920x1080", "375x667"]);
+			const filenames = downloadedNames(ctx);
+			expect(filenames).toEqual([
+				"screen-0001-1920x1080.png",
+				"screen-0001-375x667.png",
+			]);
+			expect(port.posted.at(-1)).toMatchObject({ type: "done", count: 2, data: "BASE64" });
+			// 複数枚でも、タブは1つにまとめる
+			expect(ctx.chromeStub.tabs.create).toHaveBeenCalledTimes(1);
+			// 1枚ずつ受け取り、すべて渡したら手放す
+			expect(await ctx.viewerImage("uuid")).toEqual([
+				{
+					data: "BASE64",
+					filename: "screen-0001-1920x1080.png",
+					suffix: "-1920x1080",
+					conditions: ["画面 1920×1080", "本文を最後まで撮る"],
+					scale: 1,
+				},
+				{
+					data: "BASE64",
+					filename: "screen-0001-375x667.png",
+					suffix: "-375x667",
+					conditions: ["画面 375×667", "本文を最後まで撮る"],
+					scale: 1,
+				},
+			]);
+			expect(await ctx.viewerImage("uuid")).toBeNull();
+		});
+
+		it("サイズを切り替える前に、広げた領域を元に戻す", async () => {
+			const ctx = await load({ multiSize: true, multiSizes: ["1920x1080", "375x667"] });
+			ctx.store["payment-paid"] = true;
+
+			ctx.capture();
+			await flush(5000);
+
+			const steps = ctx.sendCommand.mock.calls
+				.map(([, method, params]) =>
+					method === "Runtime.evaluate"
+						? String(params?.expression) === RESTORE_SCROLL_AREAS
+							? "restore"
+							: String(params?.expression).includes('"expandContent"')
+								? "expand"
+								: null
+						: method === "Page.captureScreenshot"
+							? "capture"
+							: method === "Emulation.setDeviceMetricsOverride"
+								? "size"
+								: null
+				)
+				.filter(Boolean);
+			expect(steps).toEqual([
+				"size",
+				"expand",
+				"capture",
+				"size",
+				"restore",
+				"expand",
+				"capture",
+				"restore",
+			]);
+		});
+
+		it("ズーム中は、サイズをズーム後の大きさに換算する", async () => {
+			const ctx = await load({ multiSize: true, multiSizes: ["375x667"] });
+			ctx.store["payment-paid"] = true;
+			ctx.chromeStub.tabs.getZoom.mockResolvedValue(2);
+
+			ctx.capture();
+			await flush(5000);
+
+			expect(overrides(ctx)).toEqual(["750x1334"]);
+		});
+
+		it("オンでも未購入なら、画面サイズの設定で1枚だけ撮る", async () => {
+			const ctx = await load({ multiSize: true, multiSizes: ["1920x1080", "375x667"] });
+
+			const port = ctx.capture();
+			await flush(10000);
+
+			expect(overrides(ctx)).toEqual([`${TAB.width}x${TAB.height}`]);
+			expect(port.posted.at(-1)).toMatchObject({ count: 1 });
 		});
 	});
 
@@ -681,6 +981,33 @@ describe("background", () => {
 	});
 
 	describe("別タブ", () => {
+		it("撮影したときの画面サイズと設定を、画像ごとに渡す", async () => {
+			const ctx = await load({
+				openTab: true,
+				clipboard: false,
+				splitLongPages: true,
+				loadLazyImages: true,
+				expandMenu: true,
+				viewport: { mode: "custom", width: 1280, height: 800 },
+			});
+			ctx.store["payment-paid"] = true;
+			ctx.chromeStub.tabs.getZoom.mockResolvedValue(1.25);
+			ctx.metrics.current = { ...METRICS, cssContentSize: { height: 20000 } };
+
+			ctx.capture();
+			await flush(15000);
+
+			const images = (await ctx.viewerImage("uuid")) as { conditions: string[] }[];
+			expect(images.map((image) => image.conditions)).toEqual([1, 2].map((part) => [
+				"画面 1280×800",
+				`分割 ${part} / 2`,
+				"ズーム 125%",
+				"遅延読み込みの画像も写す",
+				"本文を最後まで撮る",
+				"サイドメニューを最後まで撮る",
+			]));
+		});
+
 		it("開く設定でなければ開かない", async () => {
 			const ctx = await load();
 
@@ -729,10 +1056,15 @@ describe("background", () => {
 			ctx.capture();
 			await flush();
 
-			await expect(ctx.viewerImage("uuid")).resolves.toEqual({
-				data: "BASE64",
-				filename: null,
-			});
+			await expect(ctx.viewerImage("uuid")).resolves.toEqual([
+				{
+					data: "BASE64",
+					filename: null,
+					suffix: "",
+					conditions: ["画面 1000×613（今の画面のまま）", "本文を最後まで撮る"],
+					scale: 1,
+				},
+			]);
 			expect(ctx.store["image-name-count"]).toBeUndefined();
 		});
 
@@ -741,10 +1073,15 @@ describe("background", () => {
 			ctx.capture();
 			await flush();
 
-			await expect(ctx.viewerImage("uuid")).resolves.toEqual({
-				data: "BASE64",
-				filename: "screen-0001.png",
-			});
+			await expect(ctx.viewerImage("uuid")).resolves.toEqual([
+				{
+					data: "BASE64",
+					filename: "screen-0001.png",
+					suffix: "",
+					conditions: ["画面 1000×613（今の画面のまま）", "本文を最後まで撮る"],
+					scale: 1,
+				},
+			]);
 			await expect(ctx.viewerImage("uuid")).resolves.toBeNull();
 		});
 	});

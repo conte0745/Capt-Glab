@@ -66,6 +66,8 @@ async function start() {
 
 type DoneMessage = {
 	data?: string;
+	/** 撮影した画像の枚数。複数のサイズや、長いページを分けたときは 2 以上 */
+	count?: number;
 	saved: "saved" | "canceled" | "failed" | "off";
 	scaled: boolean;
 	cut: boolean;
@@ -81,6 +83,13 @@ async function finish(port: chrome.runtime.Port, message: DoneMessage) {
 	}
 
 	const notes = [];
+	const count = message.count ?? 1;
+	if (count > 1 && message.saved === "saved") {
+		notes.push(`${count} 枚の画像を保存しました。`);
+	}
+	if (count > 1 && copied) {
+		notes.push("クリップボードには1枚目をコピーしました。");
+	}
 	if (message.scaled) {
 		notes.push("長いページのため、縮小して保存しました。");
 	}

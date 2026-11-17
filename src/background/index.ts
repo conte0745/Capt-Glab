@@ -1,9 +1,15 @@
 import {
 	advanceImageCount,
+	isValidSplitCount,
+	isValidSplitHeight,
 	loadSettings,
+	MAX_IMAGE_SIDE,
+	parseSize,
 	peekImageName,
 	type Settings,
 } from "../settings";
+import { isPaid } from "../payment";
+import { loadLazyImages } from "./lazy-images";
 import {
 	expandScrollAreas,
 	RESTORE_SCROLL_AREAS,
@@ -17,14 +23,24 @@ const VIEWPORT_APPLY_MS = 500;
 const CUSTOM_VIEWPORT_APPLY_MS = 1000;
 // 広げた領域の再レイアウトと画像の読み込み、先頭へのスクロールの反映を待つ
 const SCROLL_AREA_APPLY_MS = 300;
+// 遅延読み込みの画像は、画面に入ってから読み込みが始まるまで少しかかる
+const LAZY_IMAGE_STEP_MS = 200;
+// 長いページでも撮影が終わらなくならないよう、待つのはここまでにする
+const LAZY_IMAGE_MAX_MS = 10000;
 // 撮影が終わる前に戻らないよう、十分に長くする
 const SCROLL_AREA_RESTORE_MS = 30000;
-// 実測では高さ 16100px は正常で、16500px を超えると画像が壊れる
-const MAX_IMAGE_SIDE = 16000;
 
 const detachedAt = new Map<number, number>();
 const capturingTabs = new Set<number>();
-const viewerImages = new Map<string, { data: string; filename: string | null }>();
+/** 別タブに渡す画像。filename は撮影時に保存したときのファイル名 */
+type ViewerImage = {
+	data: string;
+	filename: string | null;
+	suffix: string;
+	conditions: string[];
+	scale: number;
+};
+const viewerImages = new Map<string, ViewerImage[]>();
 
 chrome.runtime.onInstalled.addListener(function ({ reason }) {
 	// 設定の入口を知ってもらうため、最初の1回だけ開く
@@ -57,9 +73,15 @@ chrome.runtime.onMessage.addListener(function (
 	sendResponse
 ) {
 	if (message.request === "viewer-image") {
-		// 画像をメモリに残さないよう、渡したら手放す
-		sendResponse(viewerImages.get(message.id) ?? null);
-		viewerImages.delete(message.id);
+		// まとめて渡すとメッセージの大きさの上限を超えることがあるので、1枚ずつ渡す
+		const images = viewerImages.get(message.id);
+		const index: number = message.index ?? 0;
+		const image = images?.[index];
+		sendResponse(image ? { image, count: images.length } : null);
+		// 画像をメモリに残さないよう、最後の1枚を渡したら手放す
+		if (!images || index >= images.length - 1) {
+			viewerImages.delete(message.id);
+		}
 	}
 });
 
@@ -80,18 +102,20 @@ async function handleCapture(port: chrome.runtime.Port, tabId: number) {
 
 	try {
 		const settings = await loadSettings();
-		const { data, scaled, cut } = await captureTab(tabId, settings, () =>
+		const { shots, scaled, cut } = await captureTab(tabId, settings, () =>
 			post({ type: "waiting" })
 		);
 
 		const saved = settings.download
-			? await downloadImage(data, settings)
+			? await downloadImages(shots, settings)
 			: { state: "off" as const };
-		const filename = saved.state === "saved" ? saved.filename : null;
+		const filenames = saved.state === "saved" ? saved.filenames : [];
 
 		post({
 			type: "done",
-			data: settings.clipboard ? data : undefined,
+			// クリップボードには1枚しか入らないので、1枚目をコピーする
+			data: settings.clipboard ? shots[0].data : undefined,
+			count: shots.length,
 			saved: saved.state,
 			scaled,
 			cut,
@@ -110,7 +134,16 @@ async function handleCapture(port: chrome.runtime.Port, tabId: number) {
 				);
 				await Promise.race([copied, gone]);
 			}
-			await openViewer(data, filename);
+			// 複数枚でも1つのタブにまとめ、横に並べて見せる
+			await openViewer(
+				shots.map((shot, index) => ({
+					data: shot.data,
+					filename: filenames[index] ?? null,
+					suffix: shot.suffix,
+					conditions: shot.conditions,
+					scale: shot.scale,
+				}))
+			);
 		}
 	} catch (error) {
 		console.error(error);
@@ -134,13 +167,32 @@ function classifyError(error: unknown): string {
 	return "unknown";
 }
 
-/** デバッガで画面サイズを固定し、ページ全体を PNG で撮って base64 で返す */
+/** 撮影した1枚の画像 */
+type Shot = {
+	/** PNG の base64 */
+	data: string;
+	/** ファイル名の連番のあとに付ける、サイズや分割の番号。1枚だけなら空 */
+	suffix: string;
+	/** 別タブに出す、撮影したときの条件 */
+	conditions: string[];
+	/** 縮小した倍率。縮小していなければ 1 */
+	scale: number;
+};
+
+type Viewport = { width: number; height: number; label: string | null };
+
+/** デバッガで画面サイズを固定し、ページ全体を PNG で撮る。設定によっては複数枚になる */
 async function captureTab(
 	tabId: number,
 	settings: Settings,
 	onWaiting: () => void
-): Promise<{ data: string; scaled: boolean; cut: boolean }> {
-	const custom = settings.viewport.mode === "custom";
+): Promise<{ shots: Shot[]; scaled: boolean; cut: boolean }> {
+	// 撮影中に通信を待たないよう、デバッガを接続する前に購入を確認する
+	const paid =
+		(settings.loadLazyImages || settings.splitLongPages || settings.multiSize) &&
+		(await isPaid());
+	const sizes = paid && settings.multiSize ? parseSizes(settings.multiSizes) : [];
+	const custom = sizes.length > 0 || settings.viewport.mode === "custom";
 
 	if (!custom) {
 		const elapsed = Date.now() - (detachedAt.get(tabId) ?? 0);
@@ -152,16 +204,26 @@ async function captureTab(
 
 	// 固定するサイズと撮影範囲の単位はズーム前の画面上の大きさなので、CSS ピクセルから換算する
 	const zoom = await chrome.tabs.getZoom(tabId);
+	const toViewport = ({ width, height }: { width: number; height: number }) => ({
+		width: Math.round(width * zoom),
+		height: Math.round(height * zoom),
+	});
 
-	// デバッガ接続時のインフォバーで高さが縮む前にビューポートサイズを取得する
-	const { width, height } = custom
-		? {
-				width: Math.round(settings.viewport.width * zoom),
-				height: Math.round(settings.viewport.height * zoom),
-		  }
-		: await chrome.tabs.get(tabId);
-	if (!width || !height) {
-		throw new Error("ビューポートサイズを取得できませんでした");
+	let viewports: Viewport[];
+	if (sizes.length > 0) {
+		viewports = sizes.map((size) => ({
+			...toViewport(size),
+			label: `${size.width}x${size.height}`,
+		}));
+	} else if (custom) {
+		viewports = [{ ...toViewport(settings.viewport), label: null }];
+	} else {
+		// デバッガ接続時のインフォバーで高さが縮む前にビューポートサイズを取得する
+		const { width, height } = await chrome.tabs.get(tabId);
+		if (!width || !height) {
+			throw new Error("ビューポートサイズを取得できませんでした");
+		}
+		viewports = [{ width, height, label: null }];
 	}
 
 	const target: chrome.debugger.Debuggee = { tabId };
@@ -169,67 +231,104 @@ async function captureTab(
 	let restoreContextId: number | undefined;
 
 	try {
-		await chrome.debugger.sendCommand(
-			target,
-			"Emulation.setDeviceMetricsOverride",
-			{ width, height, deviceScaleFactor: 0, mobile: false }
-		);
-		// 固定が反映される前に撮影すると 100vh の要素がページ全体まで伸びる
-		await sleep(custom ? CUSTOM_VIEWPORT_APPLY_MS : VIEWPORT_APPLY_MS);
+		const shots: Shot[] = [];
+		let scaled = false;
+		let cut = false;
+		let contextId: number | undefined;
 
-		const contextId = await createIsolatedContext(target);
-		const areas = await evaluate<ScrollAreaResult>(
-			target,
-			contextId,
-			`(${expandScrollAreas})(${JSON.stringify({
-				expandContent: settings.expandContent,
-				expandMenu: settings.expandMenu,
-				restoreAfterMs: SCROLL_AREA_RESTORE_MS,
-			})})`
-		).catch((error): ScrollAreaResult => {
-			// 広げられなくても、見えている範囲は撮影する
-			console.error(error);
-			return { bottom: 0, contentCut: false, scrolled: false };
-		});
-		restoreContextId = contextId;
-		// スクロールに合わせて出し入れするヘッダーなどが、先頭の状態に戻るのも待つ
-		if (areas.bottom > 0 || areas.scrolled) {
-			await sleep(SCROLL_AREA_APPLY_MS);
+		for (const [index, viewport] of viewports.entries()) {
+			await chrome.debugger.sendCommand(
+				target,
+				"Emulation.setDeviceMetricsOverride",
+				{
+					width: viewport.width,
+					height: viewport.height,
+					deviceScaleFactor: 0,
+					mobile: false,
+				}
+			);
+			// 固定が反映される前に撮影すると 100vh の要素がページ全体まで伸びる
+			await sleep(custom ? CUSTOM_VIEWPORT_APPLY_MS : VIEWPORT_APPLY_MS);
+
+			if (contextId === undefined) {
+				contextId = await createIsolatedContext(target);
+				if (paid && settings.loadLazyImages) {
+					await evaluate(
+						target,
+						contextId,
+						`(${loadLazyImages})(${JSON.stringify({
+							stepMs: LAZY_IMAGE_STEP_MS,
+							maxMs: LAZY_IMAGE_MAX_MS,
+						})})`
+					).catch((error) => {
+						// 読み込めなくても、読み込み済みの画像で撮影する
+						console.error(error);
+					});
+				}
+			}
+
+			if (index > 0) {
+				// 前のサイズで広げた領域を戻してから、このサイズで測り直す
+				await evaluate(target, contextId, RESTORE_SCROLL_AREAS).catch(
+					console.error
+				);
+			}
+			const areas = await evaluate<ScrollAreaResult>(
+				target,
+				contextId,
+				`(${expandScrollAreas})(${JSON.stringify({
+					expandContent: settings.expandContent,
+					expandMenu: settings.expandMenu,
+					restoreAfterMs: SCROLL_AREA_RESTORE_MS,
+				})})`
+			).catch((error): ScrollAreaResult => {
+				// 広げられなくても、見えている範囲は撮影する
+				console.error(error);
+				return { bottom: 0, contentCut: false, scrolled: false };
+			});
+			restoreContextId = contextId;
+			// スクロールに合わせて出し入れするヘッダーなどが、先頭の状態に戻るのも待つ
+			if (areas.bottom > 0 || areas.scrolled) {
+				await sleep(SCROLL_AREA_APPLY_MS);
+			}
+
+			const page = await screenshotPage(
+				target,
+				contextId,
+				zoom,
+				areas.bottom,
+				paid && settings.splitLongPages ? splitOption(settings) : null
+			);
+			const conditions = [
+				`画面 ${Math.round(viewport.width / zoom)}×${Math.round(viewport.height / zoom)}${
+					custom ? "" : "（今の画面のまま）"
+				}`,
+				zoom !== 1 ? `ズーム ${Math.round(zoom * 100)}%` : null,
+				page.scale < 1 ? "縮小あり" : null,
+				paid && settings.loadLazyImages ? "遅延読み込みの画像も写す" : null,
+				settings.expandContent ? "本文を最後まで撮る" : null,
+				settings.expandMenu ? "サイドメニューを最後まで撮る" : null,
+			].filter((condition) => condition !== null);
+			for (const [part, data] of page.images.entries()) {
+				const labels = [
+					viewport.label,
+					page.images.length > 1 ? String(part + 1) : null,
+				];
+				shots.push({
+					data,
+					suffix: labels.filter((label) => label !== null).map((label) => `-${label}`).join(""),
+					conditions:
+						page.images.length > 1
+							? [conditions[0], `分割 ${part + 1} / ${page.images.length}`, ...conditions.slice(1)]
+							: conditions,
+					scale: page.scale,
+				});
+			}
+			scaled ||= page.scale < 1;
+			cut ||= areas.contentCut;
 		}
 
-		const metrics = (await chrome.debugger.sendCommand(
-			target,
-			"Page.getLayoutMetrics"
-		)) as LayoutMetrics;
-		const clipWidth = Math.round(metrics.cssLayoutViewport.clientWidth * zoom);
-		const clipHeight = Math.round(
-			Math.max(metrics.cssContentSize.height, areas.bottom) * zoom
-		);
-
-		const devicePixelRatio = await evaluate<number>(
-			target,
-			contextId,
-			"window.devicePixelRatio"
-		);
-		// devicePixelRatio にはズームも含まれるので、ズーム分を除いて画像の大きさを求める
-		const longestSide = (Math.max(clipWidth, clipHeight) * devicePixelRatio) / zoom;
-		const scale = Math.min(1, MAX_IMAGE_SIDE / longestSide);
-
-		const screenshot = (await chrome.debugger.sendCommand(
-			target,
-			"Page.captureScreenshot",
-			{
-				format: "png",
-				captureBeyondViewport: true,
-				clip: { x: 0, y: 0, width: clipWidth, height: clipHeight, scale },
-			}
-		)) as { data: string };
-
-		return {
-			data: screenshot.data,
-			scaled: scale < 1,
-			cut: areas.contentCut,
-		};
+		return { shots, scaled, cut };
 	} finally {
 		if (restoreContextId !== undefined) {
 			await evaluate(target, restoreContextId, RESTORE_SCROLL_AREAS).catch(
@@ -240,6 +339,90 @@ async function captureTab(
 		await chrome.debugger.detach(target).catch(console.error);
 		detachedAt.set(tabId, Date.now());
 	}
+}
+
+/** 設定のサイズのうち、正しいものだけを数値にして返す */
+function parseSizes(sizes: string[]): { width: number; height: number }[] {
+	return sizes
+		.map(parseSize)
+		.filter((size): size is { width: number; height: number } => size !== null);
+}
+
+/** 縦の分け方。height は画像のピクセル数 */
+type Split = { mode: "height"; height: number } | { mode: "count"; count: number };
+
+/** 設定から分け方を決める。値が正しくなければ、上限ごとに分ける */
+function splitOption(settings: Settings): Split {
+	if (settings.splitMode === "count" && isValidSplitCount(settings.splitCount)) {
+		return { mode: "count", count: settings.splitCount };
+	}
+	return {
+		mode: "height",
+		height: isValidSplitHeight(settings.splitHeight) ? settings.splitHeight : MAX_IMAGE_SIDE,
+	};
+}
+
+/**
+ * 今のレイアウトでページ全体を撮る。画像の長辺が上限を超えるときは縮小するが、
+ * split があれば縦は縮小せずに、その分け方で撮る
+ */
+async function screenshotPage(
+	target: chrome.debugger.Debuggee,
+	contextId: number,
+	zoom: number,
+	expandedBottom: number,
+	split: Split | null
+): Promise<{ images: string[]; scale: number }> {
+	const metrics = (await chrome.debugger.sendCommand(
+		target,
+		"Page.getLayoutMetrics"
+	)) as LayoutMetrics;
+	const clipWidth = Math.round(metrics.cssLayoutViewport.clientWidth * zoom);
+	const clipHeight = Math.round(
+		Math.max(metrics.cssContentSize.height, expandedBottom) * zoom
+	);
+
+	const devicePixelRatio = await evaluate<number>(
+		target,
+		contextId,
+		"window.devicePixelRatio"
+	);
+	// devicePixelRatio にはズームも含まれるので、ズーム分を除いて画像の大きさを求める
+	const imagePerClip = devicePixelRatio / zoom;
+	const scale = Math.min(
+		1,
+		MAX_IMAGE_SIDE / ((split ? clipWidth : Math.max(clipWidth, clipHeight)) * imagePerClip)
+	);
+	// 撮る範囲を区切る。どの分け方でも、1枚の高さは画像の上限に収める
+	const maxPartHeight = Math.floor(MAX_IMAGE_SIDE / (imagePerClip * scale));
+	let partHeight = clipHeight;
+	if (split?.mode === "height") {
+		partHeight = Math.min(maxPartHeight, Math.floor(split.height / (imagePerClip * scale)));
+	} else if (split?.mode === "count") {
+		const count = Math.max(split.count, Math.ceil(clipHeight / maxPartHeight));
+		partHeight = Math.ceil(clipHeight / count);
+	}
+
+	const images: string[] = [];
+	for (let y = 0; y < clipHeight; y += partHeight) {
+		const screenshot = (await chrome.debugger.sendCommand(
+			target,
+			"Page.captureScreenshot",
+			{
+				format: "png",
+				captureBeyondViewport: true,
+				clip: {
+					x: 0,
+					y,
+					width: clipWidth,
+					height: Math.min(partHeight, clipHeight - y),
+					scale,
+				},
+			}
+		)) as { data: string };
+		images.push(screenshot.data);
+	}
+	return { images, scale };
 }
 
 /** ページのスクリプトに結果を偽装されないよう、隔離された実行環境を作る */
@@ -258,7 +441,7 @@ async function createIsolatedContext(
 	return executionContextId;
 }
 
-/** 隔離された実行環境で式を評価し、結果を値で返す。例外が出たらエラーにする */
+/** 隔離された実行環境で式を評価し、結果を値で返す。Promise なら終わるまで待つ。例外が出たらエラーにする */
 async function evaluate<T>(
 	target: chrome.debugger.Debuggee,
 	contextId: number,
@@ -267,7 +450,7 @@ async function evaluate<T>(
 	const { result, exceptionDetails } = (await chrome.debugger.sendCommand(
 		target,
 		"Runtime.evaluate",
-		{ expression, contextId, returnByValue: true }
+		{ expression, contextId, returnByValue: true, awaitPromise: true }
 	)) as { result: { value: T }; exceptionDetails?: { text: string } };
 	if (exceptionDetails) {
 		throw new Error(exceptionDetails.text);
@@ -276,26 +459,30 @@ async function evaluate<T>(
 }
 
 type SaveResult =
-	| { state: "saved"; filename: string }
+	| { state: "saved"; filenames: string[] }
 	| { state: "canceled" | "failed" };
 
-/** 画像を設定の保存先に連番で保存する。失敗しても例外にせず、結果を返す */
-async function downloadImage(
-	data: string,
+/** 画像を設定の保存先に保存する。複数枚でも同じ連番を使い、連番は1つだけ進める */
+async function downloadImages(
+	shots: Shot[],
 	settings: Settings
 ): Promise<SaveResult> {
-	const name = await peekImageName();
-	const filename = settings.folder ? `${settings.folder}/${name}` : name;
+	const base = (await peekImageName()).replace(/\.png$/, "");
+	const filenames: string[] = [];
 
 	try {
-		await chrome.downloads.download({
-			url: `data:image/png;base64,${data}`,
-			filename,
-			conflictAction: "uniquify",
-			saveAs: settings.askEveryTime,
-		});
+		for (const shot of shots) {
+			const name = `${base}${shot.suffix}.png`;
+			await chrome.downloads.download({
+				url: `data:image/png;base64,${shot.data}`,
+				filename: settings.folder ? `${settings.folder}/${name}` : name,
+				conflictAction: "uniquify",
+				saveAs: settings.askEveryTime,
+			});
+			filenames.push(name);
+		}
 		await advanceImageCount();
-		return { state: "saved", filename: name };
+		return { state: "saved", filenames };
 	} catch (error) {
 		console.error(error);
 		return { state: /cancel/i.test(String(error)) ? "canceled" : "failed" };
@@ -303,9 +490,9 @@ async function downloadImage(
 }
 
 /** 画像を別タブで開く。URL に入れると長すぎるので、画像はタブから取りに来させる */
-async function openViewer(data: string, filename: string | null) {
+async function openViewer(images: ViewerImage[]) {
 	const id = crypto.randomUUID();
-	viewerImages.set(id, { data, filename });
+	viewerImages.set(id, images);
 	await chrome.tabs.create({
 		url: chrome.runtime.getURL(`src/viewer/index.html?id=${id}`),
 	});
