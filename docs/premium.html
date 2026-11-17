@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CaptGrab - 有料機能（買い切り 500 円）</title>
+    <meta
+      name="description"
+      content="CaptGrab の有料機能は、500円の買い切りです。遅延読み込みの画像も写す、縮小せずに画像を分けて保存、複数のサイズで一度に撮る、の3つが使えるようになります。"
+    />
+    <link rel="icon" href="images/icon.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="./">
+          <img src="images/icon.png" alt="" width="256" height="256" />
+          CaptGrab
+        </a>
+        <nav class="site-nav" aria-label="メイン">
+          <a href="./">トップ</a>
+          <a href="premium.html" aria-current="page">有料機能</a>
+          <a href="guide.html">使い方ガイド</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="wrap">
+          <div>
+            <p class="eyebrow">有料機能</p>
+            <h1>
+              <span class="nowrap">500円の買い切りで、</span>
+              <span class="nowrap">撮れるページを広げる。</span>
+            </h1>
+            <p class="lead">
+              画像が空白のまま写る、長いページが縮んで読めない、サイズを変えて何度も撮り直す。そんな手間を減らす3つの機能が使えるようになります。
+            </p>
+            <div class="actions">
+              <a class="btn btn-primary" href="#buy">購入方法を見る</a>
+              <a class="btn" href="#features">機能を見る</a>
+            </div>
+          </div>
+          <div class="price-card">
+            <p class="price-label">有料機能</p>
+            <p class="price-value">500<span>円（税込）</span></p>
+            <ul class="check-list">
+              <li>一度の支払いで、追加の料金はかかりません</li>
+              <li>別の Chrome でも、購入時のメールアドレスで引き継げます</li>
+              <li>無料の機能は、購入しなくても今までどおり使えます</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="features">
+        <div class="wrap">
+          <h2>使えるようになる3つの機能</h2>
+          <p class="lead">設定画面の「有料機能」の欄で、使うものだけをオンにします。</p>
+          <div class="features features-3">
+            <div>
+              <h3><a href="#lazy">遅延読み込みの画像も写す</a></h3>
+              <p>まだ読み込まれていない画像も、撮影前に読み込ませてから写します。</p>
+            </div>
+            <div>
+              <h3><a href="#split">縮小せずに画像を分けて保存</a></h3>
+              <p>長いページを縮めず、元の解像度のまま複数の画像に分けて保存します。</p>
+            </div>
+            <div>
+              <h3><a href="#multi-size">複数のサイズで一度に撮る</a></h3>
+              <p>PC、タブレット、スマートフォンなど、選んだサイズで続けて撮影します。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="lazy">
+        <div class="wrap premium-detail">
+          <div>
+            <p class="step-label">FEATURE 1</p>
+            <h2>遅延読み込みの画像も写す</h2>
+            <p>
+              ニュースサイトやブログ、通販サイトの多くは、画面に入ってから画像を読み込みます。そのまま撮ると、まだスクロールしていない部分の画像が空白で写ります。
+            </p>
+            <p>
+              オンにすると、撮影前にページを下までスクロールして画像を読み込ませ、元の位置に戻してから撮影します。
+            </p>
+            <ul class="check-list">
+              <li>画像の多いページを、1回で最後まで撮れます</li>
+              <li>下までスクロールすると続きが追加されるページでは、追加された分も写ります</li>
+              <li>長いページでは、撮影に最大10秒ほどかかります</li>
+            </ul>
+          </div>
+          <figure class="lazy-demo">
+            <div>
+              <h3>オフのとき</h3>
+              <div class="mini-page" aria-hidden="true">
+                <div class="mini-text"></div>
+                <div class="mini-img"></div>
+                <div class="mini-text"></div>
+                <div class="mini-img mini-img-empty"></div>
+                <div class="mini-text"></div>
+                <div class="mini-img mini-img-empty"></div>
+              </div>
+            </div>
+            <div>
+              <h3>オンのとき</h3>
+              <div class="mini-page" aria-hidden="true">
+                <div class="mini-text"></div>
+                <div class="mini-img"></div>
+                <div class="mini-text"></div>
+                <div class="mini-img"></div>
+                <div class="mini-text"></div>
+                <div class="mini-img"></div>
+              </div>
+            </div>
+            <figcaption>
+              オフのときは、スクロールしていない部分の画像が空白になることがあります（図は説明用のイメージです）。
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="split">
+        <div class="wrap">
+          <p class="step-label">FEATURE 2</p>
+          <h2>縮小せずに画像を分けて保存</h2>
+          <p class="lead">
+            無料の機能では、とても長いページは画像の長辺が16,000pxに収まるよう縮小します。この機能をオンにすると、縮小する代わりに複数の画像に分けて、元の解像度のまま保存します。文字が小さくて読めなくなることがありません。
+          </p>
+          <div class="premium-detail">
+            <div>
+              <h3>分け方を選べる</h3>
+              <ul class="check-list">
+                <li>高さで分ける：1枚の高さの上限を1,000〜16,000pxで指定します</li>
+                <li>枚数で分ける：2〜20枚の、同じ高さの画像に分けます</li>
+                <li>
+                  <code>screen-0001-1.png</code>、<code>screen-0001-2.png</code>
+                  のように、番号を付けて保存します
+                </li>
+              </ul>
+              <h3>撮った画像を見ながら高さを決める</h3>
+              <p>
+                別タブで開いた画像の左には、保存される画像のピクセル数で目盛りが付きます。目盛りをドラッグすると、その高さで分けたときに分かれる位置に線が引かれ、何枚になるかもわかります。「次の撮影からこの高さで分ける」を押すと、その高さが設定になります。
+              </p>
+            </div>
+            <figure class="screen">
+              <img
+                src="images/premium-split.jpg"
+                alt="撮影した画像のタブ。画像の左に目盛りがあり、1,000pxの位置に分かれる位置を示す赤い線が引かれている。上部に「1,000px で分けると、この画像は 7 枚になります。」と表示されている"
+                width="2000"
+                height="1354"
+                loading="lazy"
+              />
+              <figcaption>目盛りをドラッグすると、分かれる位置と枚数がわかります。</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section id="multi-size">
+        <div class="wrap">
+          <p class="step-label">FEATURE 3</p>
+          <h2>複数のサイズで一度に撮る</h2>
+          <p class="lead">
+            選んだ画面サイズで続けて撮影し、サイズごとに保存します。Webサイトの表示確認やレビューで、サイズを変えて何度も撮り直す必要がありません。
+          </p>
+          <div class="premium-detail">
+            <div>
+              <h3>選べるサイズ</h3>
+              <ul class="check-list">
+                <li>1920 × 1080（フルHD）</li>
+                <li>1440 × 900</li>
+                <li>1280 × 800</li>
+                <li>768 × 1024（タブレット）</li>
+                <li>375 × 667（スマートフォン）</li>
+              </ul>
+              <h3>撮った画像は1つのタブで確認</h3>
+              <p>
+                <code>screen-0001-1920x1080.png</code>
+                のように、サイズを付けた名前で保存します。別タブでは、撮った画像を横に並べて表示し、‹ › ボタンや ← → キーで切り替えられます。画面上部には、その画像を撮ったときの画面サイズを表示します。
+              </p>
+              <p>
+                分けて保存する機能と組み合わせると、サイズごとに分けて保存します。クリップボードには1枚目だけをコピーします。
+              </p>
+            </div>
+            <figure class="screen">
+              <img
+                src="images/premium-multi-size.jpg"
+                alt="撮影した画像のタブ。上部に「1 / 2」と表示中の位置、「画面 1280×800」と撮影したときの条件、「すべて保存」ボタンがある"
+                width="2000"
+                height="994"
+                loading="lazy"
+              />
+              <figcaption>2つのサイズで撮った画像を、1つのタブで切り替えて確認できます。</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section id="buy">
+        <div class="wrap premium-detail">
+          <div>
+            <h2>購入方法</h2>
+            <ol class="buy-steps">
+              <li>
+                CaptGrab の設定画面を開きます。撮影時に出る表示の歯車ボタンか、アイコンを右クリックして「オプション」から開けます。
+              </li>
+              <li>「有料機能」の欄の「購入する」を押します。</li>
+              <li>
+                表示される購入ページで、メールアドレスと支払い方法を入力して支払います。クレジットカードなど、購入ページに表示される方法で支払えます。
+              </li>
+              <li>
+                設定画面に戻ると、有料機能が使えるようになります。確認のメールが届いた場合は、メールのリンクを開いてから戻ってください。
+              </li>
+            </ol>
+            <p>
+              別の Chrome で使うときは、その Chrome の設定画面で「購入済みの方」を押し、購入時のメールアドレスで引き継いでください。
+            </p>
+          </div>
+          <figure class="screen">
+            <img
+              src="images/premium-purchase.jpg"
+              alt="設定画面の有料機能の欄。3つの機能のチェックボックスと、「購入する」「購入済みの方」のボタンがある"
+              width="1280"
+              height="962"
+              loading="lazy"
+            />
+            <figcaption>設定画面の「有料機能」の欄から購入できます。</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="faq">
+        <div class="wrap">
+          <h2>よくある質問</h2>
+          <dl class="premium-faq">
+            <dt>月額の料金はかかりますか？</dt>
+            <dd>かかりません。500円を一度支払えば、追加の料金なしで使えます。</dd>
+            <dt>購入しないと、今までの機能は使えなくなりますか？</dt>
+            <dd>
+              いいえ。ページ全体の撮影、保存、コピー、画面サイズの指定などの無料の機能は、購入しなくてもこれまでどおり使えます。
+            </dd>
+            <dt>パソコンを買い替えたり、別の Chrome で使ったりできますか？</dt>
+            <dd>
+              できます。設定画面の「購入済みの方」から、購入時のメールアドレスで引き継げます。
+            </dd>
+            <dt>返金やキャンセルはできますか？</dt>
+            <dd>
+              デジタルコンテンツの性質上、購入後の返品とキャンセルはお受けしていません。不具合で有料機能が使えない場合は、<a
+                href="mailto:captgrab@shiftonton.net"
+                >captgrab@shiftonton.net</a
+              >
+              までお問い合わせください。詳しくは<a href="tokushoho.html">特定商取引法に基づく表記</a>をご覧ください。
+            </dd>
+            <dt>購入すると、撮影した画像が送信されますか？</dt>
+            <dd>
+              送信しません。通信するのは購入を確認するときだけで、撮影した画像やページの内容は送りません。詳しくは<a
+                href="privacy-policy.html"
+                >プライバシーポリシー</a
+              >をご覧ください。
+            </dd>
+            <dt>スマートフォンでも使えますか？</dt>
+            <dd>
+              使えません。CaptGrab はパソコン版の Google Chrome 専用です。スマートフォンの表示は、パソコンから「複数のサイズで一度に撮る」や画面サイズの指定で撮影できます。
+            </dd>
+          </dl>
+        </div>
+      </section>
+
+      <section class="cta">
+        <div class="wrap">
+          <h2>まずは無料の機能から</h2>
+          <p>CaptGrab は Chrome ウェブストアから追加できます。有料機能は、使いたくなったときに設定画面から購入できます。</p>
+          <div class="actions">
+            <a
+              class="btn btn-primary"
+              href="https://chromewebstore.google.com/detail/lanhcfgmjnbbalhiljdhcleahpineilm"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Chromeウェブストアで入手</a
+            >
+            <a class="btn" href="guide.html">使い方ガイドを見る</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <ul>
+          <li><a href="./">トップ</a></li>
+          <li><a href="guide.html">使い方ガイド</a></li>
+          <li><a href="privacy-policy.html">プライバシーポリシー</a></li>
+          <li><a href="tokushoho.html">特定商取引法に基づく表記</a></li>
+          <li><a href="terms.html">利用規約</a></li>
+          <li>
+            <a
+              href="https://github.com/conte0745/Capt-Glab"
+              target="_blank"
+              rel="noopener noreferrer"
+              >GitHub</a
+            >
+          </li>
+          <li><a href="mailto:captgrab@shiftonton.net">お問い合わせ</a></li>
+          <li>
+            <a
+              href="https://ofuse.me/o?uid=213935"
+              target="_blank"
+              rel="noopener noreferrer"
+              >OFUSEで応援を送る</a
+            >
+          </li>
+        </ul>
+        <p>
+          © 2024 Conte0745. Released under the
+          <a
+            href="https://github.com/conte0745/Capt-Glab/blob/main/LICENSE"
+            target="_blank"
+            rel="noopener noreferrer"
+            >MIT License</a
+          >.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -3,7 +3,14 @@ import fs from "node:fs";
 import path from "node:path";
 
 const DOCS = path.resolve("docs");
-const PAGES = ["index.html", "privacy-policy.html", "guide.html", "tokushoho.html", "terms.html"];
+const PAGES = [
+	"index.html",
+	"privacy-policy.html",
+	"guide.html",
+	"tokushoho.html",
+	"terms.html",
+	"premium.html",
+];
 const fileUrl = (name: string) => `file://${path.join(DOCS, name)}`;
 
 for (const name of PAGES) {
@@ -66,6 +73,7 @@ test("サイトマップが全ページを公開URLで載せている", () => {
 			"https://captgrab.shiftonton.net/privacy-policy.html",
 			"https://captgrab.shiftonton.net/tokushoho.html",
 			"https://captgrab.shiftonton.net/terms.html",
+			"https://captgrab.shiftonton.net/premium.html",
 		].sort()
 	);
 });
@@ -113,6 +121,22 @@ test("ほかの全ページのフッターに利用規約のリンクがある",
 		await page.goto(fileUrl(name));
 		await expect(page.locator('.site-footer a[href="terms.html"]')).toHaveText("利用規約");
 	}
+});
+
+test("ほかの全ページのフッターに有料機能のリンクがある", async ({ page }) => {
+	// フッターには、そのページ自身へのリンクを載せない
+	for (const name of PAGES.filter((name) => name !== "premium.html")) {
+		await page.goto(fileUrl(name));
+		await expect(page.locator('.site-footer a[href="premium.html"]')).toHaveText("有料機能");
+	}
+});
+
+test("紹介ページとガイドから有料機能のページに行ける", async ({ page }) => {
+	await page.goto(fileUrl("index.html"));
+	await expect(page.locator('#premium a[href="premium.html"]')).toBeVisible();
+
+	await page.goto(fileUrl("guide.html"));
+	await expect(page.locator('#settings ~ ul a[href="premium.html"]')).toBeVisible();
 });
 
 test("全ページのフッターにお問い合わせのメールリンクがある", async ({ page }) => {
