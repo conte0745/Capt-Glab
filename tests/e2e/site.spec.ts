@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const DOCS = path.resolve("docs");
-const PAGES = ["index.html", "privacy-policy.html", "guide.html", "tokushoho.html"];
+const PAGES = ["index.html", "privacy-policy.html", "guide.html", "tokushoho.html", "terms.html"];
 const fileUrl = (name: string) => `file://${path.join(DOCS, name)}`;
 
 for (const name of PAGES) {
@@ -65,6 +65,7 @@ test("サイトマップが全ページを公開URLで載せている", () => {
 			"https://captgrab.shiftonton.net/guide.html",
 			"https://captgrab.shiftonton.net/privacy-policy.html",
 			"https://captgrab.shiftonton.net/tokushoho.html",
+			"https://captgrab.shiftonton.net/terms.html",
 		].sort()
 	);
 });
@@ -103,6 +104,14 @@ test("ほかの全ページのフッターに特定商取引法に基づく表�
 		await expect(page.locator('.site-footer a[href="tokushoho.html"]')).toHaveText(
 			"特定商取引法に基づく表記"
 		);
+	}
+});
+
+test("ほかの全ページのフッターに利用規約のリンクがある", async ({ page }) => {
+	// フッターには、そのページ自身へのリンクを載せない
+	for (const name of PAGES.filter((name) => name !== "terms.html")) {
+		await page.goto(fileUrl(name));
+		await expect(page.locator('.site-footer a[href="terms.html"]')).toHaveText("利用規約");
 	}
 });
 
