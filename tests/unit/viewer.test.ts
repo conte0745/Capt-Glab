@@ -500,6 +500,17 @@ describe("viewer", () => {
 		const cuts = () =>
 			[...document.querySelectorAll(".cut")].map((cut) => cut.textContent);
 
+		it("高 DPI の画面でも拡大せず、撮ったときと同じ大きさで表示する", async () => {
+			await load(IMAGE);
+			vi.stubGlobal("devicePixelRatio", 2);
+			const img = document.querySelector<HTMLImageElement>("#images img")!;
+			Object.defineProperty(img, "naturalWidth", { value: 750 });
+
+			img.dispatchEvent(new Event("load"));
+
+			expect(img.style.width).toBe("375px");
+		});
+
 		it("画像の横に、保存される画像のピクセル数で目盛りを付ける", async () => {
 			await load(IMAGE);
 			layout(20000);
