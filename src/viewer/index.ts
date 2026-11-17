@@ -394,6 +394,9 @@ function createFrame(img: HTMLImageElement, scale: number): Frame {
 		ruler.replaceChildren(...ticks);
 	};
 	img.addEventListener("load", () => {
+		// 画像は画面の倍率の分だけ大きく保存されるので、そのまま並べると高 DPI の画面では拡大して見える。
+		// 画像の1ピクセルを画面の1ピクセルで表示し、撮ったときと同じ大きさに見せる
+		img.style.width = `${img.naturalWidth / (window.devicePixelRatio || 1)}px`;
 		drawTicks();
 		frame.drawCuts(frame.getSplitHeight());
 	});
