@@ -1,3 +1,4 @@
+import { formatNumber, initI18n, localizePage, t, tPlural } from "../i18n";
 import { isPaid } from "../payment";
 import {
 	MAX_IMAGE_SIDE,
@@ -30,6 +31,9 @@ type ReceivedImage = {
 	scale: number;
 };
 
+await initI18n();
+localizePage();
+
 element("settings").addEventListener("click", () => {
 	void chrome.runtime.openOptionsPage();
 });
@@ -61,8 +65,8 @@ async function show() {
 		img.src = image.url;
 		img.alt =
 			images.length > 1
-				? `撮影したページの画像（${index + 1} / ${images.length}）`
-				: "撮影したページ全体の画像";
+				? t("viewerImageAltPart", index + 1, images.length)
+				: t("viewerImageAlt");
 		const frame = createFrame(img, image.scale || 1);
 		slide.append(frame.element);
 		slides.append(slide);
@@ -94,10 +98,10 @@ async function show() {
 		const total = frames[current].fullHeight();
 		element("split-text").textContent =
 			splitHeight === null
-				? "左の目盛りをドラッグすると、高さで分けたときに分かれる位置を確かめられます。"
-				: `${splitHeight.toLocaleString()}px で分けると、この画像は ${
-						total ? Math.ceil(total / splitHeight) : "?"
-					} 枚になります。`;
+				? t("viewerSplitHint")
+				: total
+					? tPlural("viewerSplitResult", Math.ceil(total / splitHeight), formatNumber(splitHeight))
+					: t("viewerSplitResult_other", "?", formatNumber(splitHeight));
 		element("apply-split").hidden = splitHeight === null || !paid;
 		element("split-paid-only").hidden = splitHeight === null || paid;
 	};
@@ -130,9 +134,9 @@ async function show() {
 	/** 表示中の画像の名前と位置、撮影したときの条件を表示する */
 	const showCurrent = () => {
 		const image = images[current];
-		element("name").textContent = image.filename ?? "撮影した画像";
+		element("name").textContent = image.filename ?? t("capturedImage");
 		const conditions = image.conditions ?? [];
-		element("conditions").textContent = conditions.join(" ・ ");
+		element("conditions").textContent = conditions.join(t("viewerConditionsSeparator"));
 		element("conditions").hidden = conditions.length === 0;
 		element("position").textContent = `${current + 1} / ${images.length}`;
 		element<HTMLButtonElement>("prev").disabled = current === 0;
@@ -179,7 +183,7 @@ async function show() {
 		} catch (error) {
 			console.error(error);
 			if (!/cancel/i.test(String(error))) {
-				showToast("保存できませんでした");
+				showToast(t("viewerSaveFailed"));
 			}
 			return false;
 		}
@@ -188,7 +192,7 @@ async function show() {
 	/** 表示中の画像を保存する */
 	async function saveCurrent(saveAs: boolean) {
 		if (await save(current, saveAs)) {
-			showToast("保存しました");
+			showToast(t("saved"));
 		}
 	}
 
@@ -199,7 +203,7 @@ async function show() {
 				return;
 			}
 		}
-		showToast(`${images.length} 枚を保存しました`);
+		showToast(tPlural("viewerSavedAll", images.length));
 	}
 
 	/** 表示中の画像をクリップボードにコピーする */
@@ -208,10 +212,10 @@ async function show() {
 			await navigator.clipboard.write([
 				new ClipboardItem({ "image/png": images[current].blob }),
 			]);
-			showToast("コピーしました");
+			showToast(t("copied"));
 		} catch (error) {
 			console.error(error);
-			showToast("コピーできませんでした");
+			showToast(t("viewerCopyFailed"));
 		}
 	}
 
@@ -222,7 +226,7 @@ async function show() {
 		}
 		const settings = await loadSettings();
 		await saveSettings({ ...settings, splitLongPages: true, splitMode: "height", splitHeight });
-		showToast(`次の撮影から ${splitHeight.toLocaleString()}px で分けます`);
+		showToast(t("viewerSplitApplied", formatNumber(splitHeight)));
 	}
 
 	element("apply-split").addEventListener("click", () => void applySplit());
@@ -330,7 +334,7 @@ function createFrame(img: HTMLImageElement, scale: number): Frame {
 	ruler.className = "ruler";
 	ruler.tabIndex = 0;
 	ruler.setAttribute("role", "slider");
-	ruler.setAttribute("aria-label", "分ける高さ（px）");
+	ruler.setAttribute("aria-label", t("viewerRulerLabel"));
 	ruler.setAttribute("aria-valuemin", String(MIN_SPLIT_HEIGHT));
 	ruler.setAttribute("aria-valuemax", String(MAX_IMAGE_SIDE));
 	const cuts = document.createElement("div");

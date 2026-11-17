@@ -1,6 +1,6 @@
 # CaptGrab
 
-画面サイズを固定して、Web ページ全体を 1 枚の PNG にする Chrome 拡張機能です。
+画面サイズを固定して、Web ページ全体を PNG で撮影する Chrome 拡張機能です。
 
 [Chrome ウェブストア](https://chromewebstore.google.com/detail/lanhcfgmjnbbalhiljdhcleahpineilm) / [紹介ページ](https://captgrab.shiftonton.net/) / [使い方ガイド](https://captgrab.shiftonton.net/guide.html) / [プライバシーポリシー](https://captgrab.shiftonton.net/privacy-policy.html)
 
@@ -14,6 +14,7 @@
 - 設定画面で、撮影後の動作(保存、コピー、別タブ)、保存先のフォルダ、撮影するときの画面サイズ(ビューポート)、スクロール領域の撮り方を変更できます。
 - 長いページは、画像の長辺が 16,000px に収まるよう縮小します。
 - 画像を外部へ送信しません。
+- 画面は日本語、英語、スペイン語、ポルトガル語(ブラジル)、ドイツ語、フランス語、韓国語、中国語(繁体字)に対応しています。初期設定では Chrome の言語で表示し、設定画面で言語を変えられます。
 - 有料機能(買い切り 500 円): 遅延読み込みの画像も写す、縮小せずに画像を分けて保存、複数のサイズで一度に撮る。購入の確認には [ExtensionPay](https://extensionpay.com) を使います。
 
 ## インストール
@@ -65,6 +66,20 @@ pnpm build
 | `pnpm preview` | ビルド結果をプレビューします                    |
 | `pnpm zip`     | ビルドして `dist/` を圧縮し、`release/` に zip を出力します |
 | `pnpm test`    | 単体テストと E2E テストを実行します             |
+
+### 翻訳
+
+画面の文言は `public/_locales/<言語>/messages.json` にあります。日本語(`ja`)の文言を正とします。コードからは `src/i18n.ts` の `t()` で、HTML からは `data-i18n="キー"`(属性は `data-i18n-title` など)で使います。
+
+言語を足すときの手順です。
+
+1. `public/_locales/ja/messages.json` をコピーして、`public/_locales/<言語>/messages.json` を作ります。フォルダ名は Chrome の言語コード(`fr`、`pt_BR` など)です。
+2. `message` だけを訳します。キーと `placeholders` は変えません。
+3. 数で文が変わる文言(キーが `_other` で終わるもの)は、その言語の複数形の分類に合わせて `_one`、`_few`、`_many` などを足せます。分類は `Intl.PluralRules` に従います。
+4. `src/i18n.ts` の `LOCALES` に言語コードを足します。
+5. `pnpm test:unit` を実行します。訳し漏れ、置き換える値の違い、画面に残った日本語はテストで見つかります。
+
+ツールバーのボタンの説明とショートカットの名前は、`manifest.json` から Chrome が表示するため、設定で選んだ言語ではなく Chrome の言語になります。
 
 ### テスト
 

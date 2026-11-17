@@ -1,0 +1,516 @@
+{
+	"lang": {
+		"message": "zh-TW"
+	},
+	"extDescription": {
+		"message": "固定畫面大小，一鍵將整個網頁擷取成 PNG。可選擇儲存、複製到剪貼簿，或兩者皆是。"
+	},
+	"commandCapture": {
+		"message": "擷取整個網頁"
+	},
+	"settings": {
+		"message": "設定"
+	},
+	"saved": {
+		"message": "已儲存"
+	},
+	"copied": {
+		"message": "已複製"
+	},
+	"capturedImage": {
+		"message": "擷取的圖片"
+	},
+	"featureLazyImages": {
+		"message": "一併擷取延遲載入的圖片"
+	},
+	"featureExpandContent": {
+		"message": "完整擷取主要內容"
+	},
+	"featureExpandMenu": {
+		"message": "完整擷取側邊選單"
+	},
+	"featureMultiSize": {
+		"message": "一次擷取多種尺寸"
+	},
+	"sizeFullHd": {
+		"message": "1920 × 1080（Full HD）"
+	},
+	"sizeTablet": {
+		"message": "768 × 1024（平板）"
+	},
+	"sizePhone": {
+		"message": "375 × 667（手機）"
+	},
+	"popupCapturing": {
+		"message": "擷取中…"
+	},
+	"popupOpenSettings": {
+		"message": "開啟設定"
+	},
+	"popupWaiting": {
+		"message": "正在等待上一次擷取完成…"
+	},
+	"errorFailedTitle": {
+		"message": "無法擷取"
+	},
+	"errorRestrictedTitle": {
+		"message": "無法擷取這個網頁"
+	},
+	"errorRestrictedNote": {
+		"message": "這是 chrome:// 或 Chrome 線上應用程式商店等受瀏覽器保護的網頁。"
+	},
+	"errorBusyTitle": {
+		"message": "正在擷取"
+	},
+	"errorBusyNote": {
+		"message": "請稍候，等上一次擷取完成。"
+	},
+	"errorOtherDebuggerNote": {
+		"message": "其他擴充功能正在操作這個分頁。請等它完成後再試一次。"
+	},
+	"errorDetachedTitle": {
+		"message": "擷取已中斷"
+	},
+	"errorDetachedNote": {
+		"message": "擷取期間偵錯列被關閉，或網頁已跳轉。請再試一次。"
+	},
+	"errorUnknownNote": {
+		"message": "請重新載入網頁後再試一次。"
+	},
+	"noteSeparator": {
+		"message": ""
+	},
+	"noteSavedCount_other": {
+		"message": "已儲存 $COUNT$ 張圖片。",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"noteCopiedFirst": {
+		"message": "已將第 1 張圖片複製到剪貼簿。"
+	},
+	"noteScaled": {
+		"message": "網頁較長，因此已縮小後儲存。"
+	},
+	"noteCut": {
+		"message": "主要內容中看不到的部分沒有擷取到。可以在設定中變更。"
+	},
+	"noteSaveFailed": {
+		"message": "無法儲存檔案。請確認設定中的儲存位置。"
+	},
+	"noteCopyFailed": {
+		"message": "無法複製到剪貼簿。"
+	},
+	"doneSavedCopied": {
+		"message": "已儲存並複製"
+	},
+	"doneCanceled": {
+		"message": "已取消儲存"
+	},
+	"doneCaptured": {
+		"message": "已擷取"
+	},
+	"conditionViewport": {
+		"message": "畫面 $WIDTH$×$HEIGHT$",
+		"placeholders": {
+			"width": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"conditionViewportCurrent": {
+		"message": "畫面 $WIDTH$×$HEIGHT$（維持目前畫面）",
+		"placeholders": {
+			"width": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"conditionZoom": {
+		"message": "縮放 $PERCENT$%",
+		"placeholders": {
+			"percent": {
+				"content": "$1"
+			}
+		}
+	},
+	"conditionScaled": {
+		"message": "已縮小"
+	},
+	"conditionPart": {
+		"message": "分割 $PART$ / $TOTAL$",
+		"placeholders": {
+			"part": {
+				"content": "$1"
+			},
+			"total": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerTitle": {
+		"message": "CaptGrab - 擷取的圖片"
+	},
+	"viewerPrev": {
+		"message": "上一張圖片"
+	},
+	"viewerNext": {
+		"message": "下一張圖片"
+	},
+	"viewerSave": {
+		"message": "儲存"
+	},
+	"viewerSaveAs": {
+		"message": "另存新檔"
+	},
+	"viewerCopy": {
+		"message": "複製"
+	},
+	"viewerSaveAll": {
+		"message": "全部儲存"
+	},
+	"viewerApplySplit": {
+		"message": "從下次擷取起以此高度分割"
+	},
+	"viewerSplitPaidOnly": {
+		"message": "依高度分割儲存是付費功能。可以在設定畫面購買。"
+	},
+	"viewerNoImage": {
+		"message": "無法顯示圖片。重新載入這個畫面後圖片會消失。請重新擷取。"
+	},
+	"viewerImageAlt": {
+		"message": "擷取的整個網頁圖片"
+	},
+	"viewerImageAltPart": {
+		"message": "擷取的網頁圖片（$INDEX$ / $TOTAL$）",
+		"placeholders": {
+			"index": {
+				"content": "$1"
+			},
+			"total": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerSplitHint": {
+		"message": "拖曳左側的刻度，即可確認依高度分割時的分割位置。"
+	},
+	"viewerSplitResult_other": {
+		"message": "以 $HEIGHT$px 分割時，這張圖片會變成 $COUNT$ 張。",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerConditionsSeparator": {
+		"message": "・"
+	},
+	"viewerSaveFailed": {
+		"message": "無法儲存"
+	},
+	"viewerSavedAll_other": {
+		"message": "已儲存 $COUNT$ 張",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerCopyFailed": {
+		"message": "無法複製"
+	},
+	"viewerSplitApplied": {
+		"message": "從下次擷取起以 $HEIGHT$px 分割",
+		"placeholders": {
+			"height": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerRulerLabel": {
+		"message": "分割高度（px）"
+	},
+	"optionsTitle": {
+		"message": "CaptGrab - 設定"
+	},
+	"optionsHeading": {
+		"message": "CaptGrab 設定"
+	},
+	"optionsLead": {
+		"message": "變更會立即儲存，並從下次擷取起生效。"
+	},
+	"actionsHeading": {
+		"message": "擷取後的動作"
+	},
+	"actionsDescription": {
+		"message": "可以選擇多項。"
+	},
+	"actionDownload": {
+		"message": "儲存成檔案"
+	},
+	"actionDownloadNote": {
+		"message": "以 PNG 圖片儲存到電腦"
+	},
+	"actionClipboard": {
+		"message": "複製到剪貼簿"
+	},
+	"actionClipboardNote": {
+		"message": "可以直接貼到聊天或文件中"
+	},
+	"actionOpenTab": {
+		"message": "在新分頁開啟"
+	},
+	"actionOpenTabNote": {
+		"message": "可以立即確認擷取結果"
+	},
+	"actionsError": {
+		"message": "請至少選擇一項。"
+	},
+	"saveHeading": {
+		"message": "儲存位置"
+	},
+	"saveDescription": {
+		"message": "由於 Chrome 的限制，固定的儲存位置必須在「下載」資料夾內。"
+	},
+	"folderLabel": {
+		"message": "「下載」資料夾內的資料夾（選填）"
+	},
+	"folderPlaceholder": {
+		"message": "例如：CaptGrab"
+	},
+	"folderErrorInvalid": {
+		"message": "無法使用這個資料夾名稱。"
+	},
+	"folderErrorAnd": {
+		"message": "和"
+	},
+	"folderErrorNotAllowed": {
+		"message": "不能使用。"
+	},
+	"askEveryTime": {
+		"message": "每次儲存時選擇位置"
+	},
+	"askEveryTimeNote": {
+		"message": "也可以儲存到「下載」資料夾以外"
+	},
+	"savePreview": {
+		"message": "儲存位置：$PATH$",
+		"placeholders": {
+			"path": {
+				"content": "$1"
+			}
+		}
+	},
+	"downloadsFolder": {
+		"message": "下載"
+	},
+	"viewportHeading": {
+		"message": "擷取時的畫面大小"
+	},
+	"viewportDescription": {
+		"message": "決定網頁版面的檢視區大小。"
+	},
+	"viewportCurrent": {
+		"message": "維持目前畫面"
+	},
+	"viewportCurrentNote": {
+		"message": "以目前看到的版面擷取"
+	},
+	"viewportCustom": {
+		"message": "指定大小"
+	},
+	"viewportCustomNote": {
+		"message": "不論螢幕大小，都以相同大小擷取"
+	},
+	"presetLabel": {
+		"message": "常用大小"
+	},
+	"presetChoose": {
+		"message": "請選擇"
+	},
+	"widthLabel": {
+		"message": "寬"
+	},
+	"heightLabel": {
+		"message": "高"
+	},
+	"viewportError": {
+		"message": "寬和高請指定 200～7680 的整數。"
+	},
+	"viewportHint": {
+		"message": "只會變更寬和高，不一定會切換成手機版畫面。"
+	},
+	"viewportOverridden": {
+		"message": "「一次擷取多種尺寸」已開啟，因此不會使用這個設定。"
+	},
+	"scrollHeading": {
+		"message": "可捲動的區域"
+	},
+	"scrollDescription": {
+		"message": "用於擷取只有部分區域會捲動（而非整個網頁）的畫面。只在擷取期間展開區域，擷取後會恢復原狀。"
+	},
+	"expandContentNote": {
+		"message": "在管理介面或網頁應用程式中，主要內容不會被截斷"
+	},
+	"expandMenuNote": {
+		"message": "長選單也會完整擷取。選單外觀可能會改變"
+	},
+	"scrollHint": {
+		"message": "未勾選的區域不會展開。不過有些畫面在展開主要內容時，選單也會一起拉長而被完整擷取。"
+	},
+	"paidHeading": {
+		"message": "付費功能"
+	},
+	"price": {
+		"message": "¥500，一次買斷"
+	},
+	"paidDescription": {
+		"message": "只有在確認購買時才會與外部服務通訊。擷取的圖片不會傳送出去。"
+	},
+	"lazyImagesNote": {
+		"message": "擷取前會將網頁捲動到底部，載入尚未載入的圖片。較長的網頁最多需要約 10 秒"
+	},
+	"featureSplit": {
+		"message": "不縮小，分割成多張圖片儲存"
+	},
+	"featureSplitNote": {
+		"message": "較長的網頁不縮小，而是分割成多張圖片並以原始解析度儲存"
+	},
+	"splitByHeight": {
+		"message": "依高度分割"
+	},
+	"splitByHeightNote": {
+		"message": "只有在單張高度超過此值時才分割"
+	},
+	"splitHeightLabel": {
+		"message": "單張高度上限"
+	},
+	"splitByCount": {
+		"message": "依圖片數量分割"
+	},
+	"splitByCountNote": {
+		"message": "不論網頁長度，都分割成相同高度的圖片"
+	},
+	"splitCountLabel": {
+		"message": "圖片數量"
+	},
+	"splitCountUnit": {
+		"message": "張"
+	},
+	"splitError": {
+		"message": "高度請指定 1000～16000、張數請指定 2～20 的整數。"
+	},
+	"splitHint": {
+		"message": "以儲存圖片的像素數計算。在新分頁開啟擷取的圖片，即可用旁邊的刻度確認分割位置並決定高度。在高 DPI 螢幕上，約為網頁看起來大小的 2 倍。單張超過 16,000px 時會增加張數。"
+	},
+	"multiSizeNote": {
+		"message": "依序以選擇的畫面大小擷取，並分別儲存各尺寸。開啟期間不會使用「擷取時的畫面大小」設定"
+	},
+	"multiSizeError": {
+		"message": "請至少選擇一種尺寸。"
+	},
+	"paymentChecking": {
+		"message": "正在確認購買狀態…"
+	},
+	"purchasePrompt": {
+		"message": "購買後即可使用。"
+	},
+	"buy": {
+		"message": "購買"
+	},
+	"login": {
+		"message": "已購買"
+	},
+	"paidText": {
+		"message": "已購買，謝謝！"
+	},
+	"purchaseHint": {
+		"message": "購買後若收到確認信，請開啟信中的連結，再回到這個畫面。"
+	},
+	"loginHint": {
+		"message": "如果是在其他瀏覽器或裝置購買，可以從「已購買」以購買時的電子郵件地址恢復購買。"
+	},
+	"tokushohoLink": {
+		"message": "法律聲明（日文）"
+	},
+	"paymentError": {
+		"message": "無法開啟購買頁面。請確認網路連線。"
+	},
+	"nameHeading": {
+		"message": "檔名流水號"
+	},
+	"nextNameLabel": {
+		"message": "下一個檔名："
+	},
+	"resetCount": {
+		"message": "重設為 1"
+	},
+	"shortcutHeading": {
+		"message": "快速鍵"
+	},
+	"shortcutCurrent": {
+		"message": "目前的快速鍵：$KEY$",
+		"placeholders": {
+			"key": {
+				"content": "$1"
+			}
+		}
+	},
+	"shortcutNone": {
+		"message": "尚未指定。可以從「變更」設定。"
+	},
+	"shortcutChange": {
+		"message": "變更"
+	},
+	"languageHeading": {
+		"message": "語言 / Language"
+	},
+	"languageDescription": {
+		"message": "擴充功能畫面顯示的語言。"
+	},
+	"languageAuto": {
+		"message": "與 Chrome 設定相同"
+	},
+	"languageHint": {
+		"message": "工具列按鈕的說明和快速鍵名稱會以 Chrome 的語言顯示。"
+	},
+	"resetHeading": {
+		"message": "將設定恢復為預設值"
+	},
+	"resetDescription": {
+		"message": "將這個畫面的所有設定恢復為安裝時的狀態。"
+	},
+	"resetButton": {
+		"message": "恢復預設值"
+	},
+	"resetHint": {
+		"message": "檔名流水號也會重設為 1。快速鍵請從「變更」恢復。"
+	},
+	"guideLink": {
+		"message": "使用指南（日文）"
+	},
+	"resetDialogTitle": {
+		"message": "要將設定恢復為預設值嗎？"
+	},
+	"resetDialogText": {
+		"message": "這個畫面的設定和檔名流水號將恢復為安裝時的狀態，且無法復原。"
+	},
+	"cancel": {
+		"message": "取消"
+	},
+	"resetDone": {
+		"message": "已恢復預設值"
+	}
+}

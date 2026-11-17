@@ -24,6 +24,8 @@ export type Settings = {
 		width: number;
 		height: number;
 	};
+	/** 画面に表示する言語。"auto" なら Chrome の言語に合わせる */
+	language: string;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -42,6 +44,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	multiSize: false,
 	multiSizes: ["1920x1080", "768x1024", "375x667"],
 	viewport: { mode: "current", width: 1280, height: 800 },
+	language: "auto",
 };
 
 // 実測では高さ 16100px は正常で、16500px を超えると画像が壊れる

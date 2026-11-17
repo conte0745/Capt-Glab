@@ -1,0 +1,543 @@
+{
+	"lang": {
+		"message": "de"
+	},
+	"extDescription": {
+		"message": "Erfasst eine ganze Webseite per Klick als PNG mit fester Fenstergröße. Speichern, in die Zwischenablage kopieren oder beides."
+	},
+	"commandCapture": {
+		"message": "Ganze Seite aufnehmen"
+	},
+	"settings": {
+		"message": "Einstellungen"
+	},
+	"saved": {
+		"message": "Gespeichert"
+	},
+	"copied": {
+		"message": "Kopiert"
+	},
+	"capturedImage": {
+		"message": "Aufgenommenes Bild"
+	},
+	"featureLazyImages": {
+		"message": "Nachgeladene Bilder einbeziehen"
+	},
+	"featureExpandContent": {
+		"message": "Hauptinhalt vollständig aufnehmen"
+	},
+	"featureExpandMenu": {
+		"message": "Seitenmenü vollständig aufnehmen"
+	},
+	"featureMultiSize": {
+		"message": "Mehrere Größen auf einmal aufnehmen"
+	},
+	"sizeFullHd": {
+		"message": "1920 × 1080 (Full HD)"
+	},
+	"sizeTablet": {
+		"message": "768 × 1024 (Tablet)"
+	},
+	"sizePhone": {
+		"message": "375 × 667 (Smartphone)"
+	},
+	"popupCapturing": {
+		"message": "Wird aufgenommen …"
+	},
+	"popupOpenSettings": {
+		"message": "Einstellungen öffnen"
+	},
+	"popupWaiting": {
+		"message": "Warten, bis die vorherige Aufnahme abgeschlossen ist …"
+	},
+	"errorFailedTitle": {
+		"message": "Die Seite konnte nicht aufgenommen werden"
+	},
+	"errorRestrictedTitle": {
+		"message": "Diese Seite kann nicht aufgenommen werden"
+	},
+	"errorRestrictedNote": {
+		"message": "Der Browser schützt Seiten wie chrome:// und den Chrome Web Store."
+	},
+	"errorBusyTitle": {
+		"message": "Aufnahme läuft bereits"
+	},
+	"errorBusyNote": {
+		"message": "Bitte warte, bis die vorherige Aufnahme abgeschlossen ist."
+	},
+	"errorOtherDebuggerNote": {
+		"message": "Eine andere Erweiterung steuert diesen Tab. Versuche es erneut, wenn sie fertig ist."
+	},
+	"errorDetachedTitle": {
+		"message": "Die Aufnahme wurde unterbrochen"
+	},
+	"errorDetachedNote": {
+		"message": "Die Debugging-Leiste wurde geschlossen oder die Seite wurde während der Aufnahme verlassen. Bitte versuche es erneut."
+	},
+	"errorUnknownNote": {
+		"message": "Lade die Seite neu und versuche es noch einmal."
+	},
+	"noteSeparator": {
+		"message": " "
+	},
+	"noteSavedCount_one": {
+		"message": "$COUNT$ Bild gespeichert.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"noteSavedCount_other": {
+		"message": "$COUNT$ Bilder gespeichert.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"noteCopiedFirst": {
+		"message": "Das erste Bild wurde in die Zwischenablage kopiert."
+	},
+	"noteScaled": {
+		"message": "Die Seite war lang, daher wurde das Bild verkleinert."
+	},
+	"noteCut": {
+		"message": "Verdeckte Teile des Hauptinhalts wurden nicht aufgenommen. Du kannst das in den Einstellungen ändern."
+	},
+	"noteSaveFailed": {
+		"message": "Die Datei konnte nicht gespeichert werden. Prüfe den Speicherort in den Einstellungen."
+	},
+	"noteCopyFailed": {
+		"message": "Kopieren in die Zwischenablage fehlgeschlagen."
+	},
+	"doneSavedCopied": {
+		"message": "Gespeichert und kopiert"
+	},
+	"doneCanceled": {
+		"message": "Speichern abgebrochen"
+	},
+	"doneCaptured": {
+		"message": "Aufgenommen"
+	},
+	"conditionViewport": {
+		"message": "Fenster $WIDTH$×$HEIGHT$",
+		"placeholders": {
+			"width": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"conditionViewportCurrent": {
+		"message": "Fenster $WIDTH$×$HEIGHT$ (aktuelle Größe)",
+		"placeholders": {
+			"width": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"conditionZoom": {
+		"message": "Zoom $PERCENT$ %",
+		"placeholders": {
+			"percent": {
+				"content": "$1"
+			}
+		}
+	},
+	"conditionScaled": {
+		"message": "Verkleinert"
+	},
+	"conditionPart": {
+		"message": "Teil $PART$ / $TOTAL$",
+		"placeholders": {
+			"part": {
+				"content": "$1"
+			},
+			"total": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerTitle": {
+		"message": "CaptGrab – Aufgenommenes Bild"
+	},
+	"viewerPrev": {
+		"message": "Vorheriges Bild"
+	},
+	"viewerNext": {
+		"message": "Nächstes Bild"
+	},
+	"viewerSave": {
+		"message": "Speichern"
+	},
+	"viewerSaveAs": {
+		"message": "Speichern unter"
+	},
+	"viewerCopy": {
+		"message": "Kopieren"
+	},
+	"viewerSaveAll": {
+		"message": "Alle speichern"
+	},
+	"viewerApplySplit": {
+		"message": "Ab der nächsten Aufnahme bei dieser Höhe teilen"
+	},
+	"viewerSplitPaidOnly": {
+		"message": "Das Teilen nach Höhe ist eine kostenpflichtige Funktion. Du kannst sie in den Einstellungen kaufen."
+	},
+	"viewerNoImage": {
+		"message": "Das Bild kann nicht angezeigt werden. Beim Neuladen dieser Seite werden die Bilder gelöscht. Bitte nimm die Seite erneut auf."
+	},
+	"viewerImageAlt": {
+		"message": "Aufgenommenes Bild der ganzen Seite"
+	},
+	"viewerImageAltPart": {
+		"message": "Aufgenommenes Bild der Seite ($INDEX$ / $TOTAL$)",
+		"placeholders": {
+			"index": {
+				"content": "$1"
+			},
+			"total": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerSplitHint": {
+		"message": "Ziehe am Lineal links, um zu sehen, wo das Bild beim Teilen nach Höhe getrennt würde."
+	},
+	"viewerSplitResult_one": {
+		"message": "Bei $HEIGHT$ px wird dieses Bild nicht aufgeteilt.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerSplitResult_other": {
+		"message": "Bei $HEIGHT$ px wird dieses Bild in $COUNT$ Bilder aufgeteilt.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerConditionsSeparator": {
+		"message": " · "
+	},
+	"viewerSaveFailed": {
+		"message": "Speichern fehlgeschlagen"
+	},
+	"viewerSavedAll_one": {
+		"message": "$COUNT$ Bild gespeichert",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerSavedAll_other": {
+		"message": "$COUNT$ Bilder gespeichert",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerCopyFailed": {
+		"message": "Kopieren fehlgeschlagen"
+	},
+	"viewerSplitApplied": {
+		"message": "Ab der nächsten Aufnahme wird bei $HEIGHT$ px geteilt",
+		"placeholders": {
+			"height": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerRulerLabel": {
+		"message": "Teilungshöhe (px)"
+	},
+	"optionsTitle": {
+		"message": "CaptGrab – Einstellungen"
+	},
+	"optionsHeading": {
+		"message": "CaptGrab-Einstellungen"
+	},
+	"optionsLead": {
+		"message": "Änderungen werden sofort gespeichert und gelten ab der nächsten Aufnahme."
+	},
+	"actionsHeading": {
+		"message": "Nach der Aufnahme"
+	},
+	"actionsDescription": {
+		"message": "Du kannst mehrere auswählen."
+	},
+	"actionDownload": {
+		"message": "Als Datei speichern"
+	},
+	"actionDownloadNote": {
+		"message": "Speichert ein PNG-Bild auf deinem Computer"
+	},
+	"actionClipboard": {
+		"message": "In die Zwischenablage kopieren"
+	},
+	"actionClipboardNote": {
+		"message": "Direkt in Chats und Dokumente einfügen"
+	},
+	"actionOpenTab": {
+		"message": "In neuem Tab öffnen"
+	},
+	"actionOpenTabNote": {
+		"message": "Ergebnis sofort prüfen"
+	},
+	"actionsError": {
+		"message": "Wähle mindestens eine Option."
+	},
+	"saveHeading": {
+		"message": "Speicherort"
+	},
+	"saveDescription": {
+		"message": "Wegen Einschränkungen von Chrome muss ein fester Speicherort im Downloads-Ordner liegen."
+	},
+	"folderLabel": {
+		"message": "Ordner in Downloads (optional)"
+	},
+	"folderPlaceholder": {
+		"message": "z. B. CaptGrab"
+	},
+	"folderErrorInvalid": {
+		"message": "Dieser Ordnername kann nicht verwendet werden."
+	},
+	"folderErrorAnd": {
+		"message": "und"
+	},
+	"folderErrorNotAllowed": {
+		"message": "sind nicht erlaubt."
+	},
+	"askEveryTime": {
+		"message": "Speicherort jedes Mal wählen"
+	},
+	"askEveryTimeNote": {
+		"message": "Ermöglicht auch das Speichern außerhalb von Downloads"
+	},
+	"savePreview": {
+		"message": "Speichert in: $PATH$",
+		"placeholders": {
+			"path": {
+				"content": "$1"
+			}
+		}
+	},
+	"downloadsFolder": {
+		"message": "Downloads"
+	},
+	"viewportHeading": {
+		"message": "Fenstergröße bei der Aufnahme"
+	},
+	"viewportDescription": {
+		"message": "Die Fenstergröße, die das Layout der Seite bestimmt."
+	},
+	"viewportCurrent": {
+		"message": "Aktuelle Fenstergröße beibehalten"
+	},
+	"viewportCurrentNote": {
+		"message": "Nimmt das Layout in deiner aktuellen Fenstergröße auf"
+	},
+	"viewportCustom": {
+		"message": "Benutzerdefinierte Größe"
+	},
+	"viewportCustomNote": {
+		"message": "Nimmt immer in derselben Größe auf, unabhängig von deinem Bildschirm"
+	},
+	"presetLabel": {
+		"message": "Gängige Größen"
+	},
+	"presetChoose": {
+		"message": "Größe wählen"
+	},
+	"widthLabel": {
+		"message": "Breite"
+	},
+	"heightLabel": {
+		"message": "Höhe"
+	},
+	"viewportError": {
+		"message": "Breite und Höhe müssen ganze Zahlen von 200 bis 7680 sein."
+	},
+	"viewportHint": {
+		"message": "Nur Breite und Höhe ändern sich. Websites wechseln dadurch nicht unbedingt zu ihrem Mobil-Layout."
+	},
+	"viewportOverridden": {
+		"message": "Wird nicht verwendet, weil „Mehrere Größen auf einmal aufnehmen“ aktiviert ist."
+	},
+	"scrollHeading": {
+		"message": "Scrollbare Bereiche"
+	},
+	"scrollDescription": {
+		"message": "So werden Seiten aufgenommen, auf denen nur ein Teil des Bildschirms scrollt. Die Bereiche werden nur während der Aufnahme erweitert und danach wiederhergestellt."
+	},
+	"expandContentNote": {
+		"message": "Verhindert, dass der Hauptinhalt in Dashboards und Web-Apps abgeschnitten wird"
+	},
+	"expandMenuNote": {
+		"message": "Nimmt auch lange Menüs vollständig auf. Das Menü kann anders aussehen"
+	},
+	"scrollHint": {
+		"message": "Deaktivierte Bereiche werden nicht erweitert. Auf manchen Seiten wird beim Erweitern des Hauptinhalts aber auch das Menü gestreckt und dadurch vollständig aufgenommen."
+	},
+	"paidHeading": {
+		"message": "Kostenpflichtige Funktionen"
+	},
+	"price": {
+		"message": "500 ¥, einmaliger Kauf"
+	},
+	"paidDescription": {
+		"message": "Verbindet sich nur zur Prüfung deines Kaufs mit einem externen Dienst. Aufgenommene Bilder werden nie gesendet."
+	},
+	"lazyImagesNote": {
+		"message": "Scrollt vor der Aufnahme bis ans Seitenende, damit noch nicht geladene Bilder geladen werden. Bei langen Seiten kann das bis zu etwa 10 Sekunden dauern"
+	},
+	"featureSplit": {
+		"message": "In mehrere Bilder aufteilen, statt zu verkleinern"
+	},
+	"featureSplitNote": {
+		"message": "Speichert lange Seiten als mehrere Bilder in voller Auflösung, statt sie zu verkleinern"
+	},
+	"splitByHeight": {
+		"message": "Nach Höhe aufteilen"
+	},
+	"splitByHeightNote": {
+		"message": "Teilt nur, wenn ein Bild höher als dieser Wert würde"
+	},
+	"splitHeightLabel": {
+		"message": "Maximale Höhe pro Bild"
+	},
+	"splitByCount": {
+		"message": "In eine feste Anzahl von Bildern aufteilen"
+	},
+	"splitByCountNote": {
+		"message": "Teilt in gleich hohe Bilder, unabhängig von der Seitenlänge"
+	},
+	"splitCountLabel": {
+		"message": "Aufteilen in"
+	},
+	"splitCountUnit": {
+		"message": "Bilder"
+	},
+	"splitError": {
+		"message": "Die Höhe muss eine ganze Zahl von 1000 bis 16000 sein, die Anzahl von 2 bis 20."
+	},
+	"splitHint": {
+		"message": "Gezählt in Pixeln des gespeicherten Bildes. Öffne eine Aufnahme in einem neuen Tab, um die Teilungsstellen am Lineal daneben zu prüfen und dort eine Höhe zu wählen. Auf Bildschirmen mit hoher Pixeldichte ist das etwa das Doppelte der sichtbaren Seitengröße. Würde ein Bild 16.000 px überschreiten, werden mehr Bilder verwendet."
+	},
+	"multiSizeNote": {
+		"message": "Nimmt nacheinander in jeder gewählten Größe auf und speichert ein Bild pro Größe. Solange dies aktiviert ist, wird „Fenstergröße bei der Aufnahme“ nicht verwendet"
+	},
+	"multiSizeError": {
+		"message": "Wähle mindestens eine Größe."
+	},
+	"paymentChecking": {
+		"message": "Kauf wird geprüft …"
+	},
+	"purchasePrompt": {
+		"message": "Nach dem Kauf verfügbar."
+	},
+	"buy": {
+		"message": "Kaufen"
+	},
+	"login": {
+		"message": "Bereits gekauft"
+	},
+	"paidText": {
+		"message": "Gekauft. Vielen Dank!"
+	},
+	"purchaseHint": {
+		"message": "Wenn du nach dem Kauf eine Bestätigungs-E-Mail erhältst, öffne den Link darin und kehre dann zu dieser Seite zurück."
+	},
+	"loginHint": {
+		"message": "Wenn du in einem anderen Browser oder auf einem anderen Gerät gekauft hast, klicke auf „Bereits gekauft“ und gib die beim Kauf verwendete E-Mail-Adresse ein."
+	},
+	"tokushohoLink": {
+		"message": "Rechtliche Hinweise (auf Japanisch)"
+	},
+	"paymentError": {
+		"message": "Die Kaufseite konnte nicht geöffnet werden. Prüfe deine Internetverbindung."
+	},
+	"nameHeading": {
+		"message": "Dateinummerierung"
+	},
+	"nextNameLabel": {
+		"message": "Nächster Dateiname:"
+	},
+	"resetCount": {
+		"message": "Auf 1 zurücksetzen"
+	},
+	"shortcutHeading": {
+		"message": "Tastenkürzel"
+	},
+	"shortcutCurrent": {
+		"message": "Aktuelles Tastenkürzel: $KEY$",
+		"placeholders": {
+			"key": {
+				"content": "$1"
+			}
+		}
+	},
+	"shortcutNone": {
+		"message": "Nicht zugewiesen. Lege eines über „Ändern“ fest."
+	},
+	"shortcutChange": {
+		"message": "Ändern"
+	},
+	"languageHeading": {
+		"message": "Sprache / Language"
+	},
+	"languageDescription": {
+		"message": "Die Sprache der Seiten dieser Erweiterung."
+	},
+	"languageAuto": {
+		"message": "Wie Chrome"
+	},
+	"languageHint": {
+		"message": "Die Beschreibung der Symbolleistenschaltfläche und der Name des Tastenkürzels richten sich nach der Sprache von Chrome."
+	},
+	"resetHeading": {
+		"message": "Einstellungen zurücksetzen"
+	},
+	"resetDescription": {
+		"message": "Setzt alle Einstellungen auf dieser Seite auf den Stand bei der Installation zurück."
+	},
+	"resetButton": {
+		"message": "Zurücksetzen"
+	},
+	"resetHint": {
+		"message": "Auch die Dateinummerierung beginnt wieder bei 1. Das Tastenkürzel setzt du über „Ändern“ zurück."
+	},
+	"guideLink": {
+		"message": "Anleitung (auf Japanisch)"
+	},
+	"resetDialogTitle": {
+		"message": "Einstellungen zurücksetzen?"
+	},
+	"resetDialogText": {
+		"message": "Die Einstellungen auf dieser Seite und die Dateinummerierung werden auf den Stand bei der Installation zurückgesetzt. Das kann nicht rückgängig gemacht werden."
+	},
+	"cancel": {
+		"message": "Abbrechen"
+	},
+	"resetDone": {
+		"message": "Einstellungen zurückgesetzt"
+	}
+}

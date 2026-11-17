@@ -1,0 +1,516 @@
+{
+	"lang": {
+		"message": "ko"
+	},
+	"extDescription": {
+		"message": "화면 크기를 고정해 웹페이지 전체를 클릭 한 번으로 PNG로 캡처합니다. 저장, 클립보드 복사 또는 둘 다 선택할 수 있습니다."
+	},
+	"commandCapture": {
+		"message": "페이지 전체 캡처"
+	},
+	"settings": {
+		"message": "설정"
+	},
+	"saved": {
+		"message": "저장했습니다"
+	},
+	"copied": {
+		"message": "복사했습니다"
+	},
+	"capturedImage": {
+		"message": "캡처한 이미지"
+	},
+	"featureLazyImages": {
+		"message": "지연 로딩 이미지도 캡처"
+	},
+	"featureExpandContent": {
+		"message": "본문을 끝까지 캡처"
+	},
+	"featureExpandMenu": {
+		"message": "사이드 메뉴를 끝까지 캡처"
+	},
+	"featureMultiSize": {
+		"message": "여러 크기로 한 번에 캡처"
+	},
+	"sizeFullHd": {
+		"message": "1920 × 1080 (풀HD)"
+	},
+	"sizeTablet": {
+		"message": "768 × 1024 (태블릿)"
+	},
+	"sizePhone": {
+		"message": "375 × 667 (스마트폰)"
+	},
+	"popupCapturing": {
+		"message": "캡처 중…"
+	},
+	"popupOpenSettings": {
+		"message": "설정 열기"
+	},
+	"popupWaiting": {
+		"message": "이전 캡처가 끝나기를 기다리는 중…"
+	},
+	"errorFailedTitle": {
+		"message": "캡처하지 못했습니다"
+	},
+	"errorRestrictedTitle": {
+		"message": "이 페이지는 캡처할 수 없습니다"
+	},
+	"errorRestrictedNote": {
+		"message": "chrome:// 페이지나 Chrome 웹 스토어처럼 브라우저가 보호하는 페이지입니다."
+	},
+	"errorBusyTitle": {
+		"message": "캡처 중입니다"
+	},
+	"errorBusyNote": {
+		"message": "이전 캡처가 끝날 때까지 잠시 기다려 주세요."
+	},
+	"errorOtherDebuggerNote": {
+		"message": "다른 확장 프로그램이 이 탭을 제어하고 있습니다. 끝난 뒤 다시 시도해 주세요."
+	},
+	"errorDetachedTitle": {
+		"message": "캡처가 중단되었습니다"
+	},
+	"errorDetachedNote": {
+		"message": "캡처 중에 디버깅 표시줄이 닫혔거나 페이지가 이동했습니다. 다시 시도해 주세요."
+	},
+	"errorUnknownNote": {
+		"message": "페이지를 새로고침한 뒤 다시 시도해 주세요."
+	},
+	"noteSeparator": {
+		"message": " "
+	},
+	"noteSavedCount_other": {
+		"message": "이미지 $COUNT$장을 저장했습니다.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"noteCopiedFirst": {
+		"message": "클립보드에는 첫 번째 이미지를 복사했습니다."
+	},
+	"noteScaled": {
+		"message": "페이지가 길어서 축소해 저장했습니다."
+	},
+	"noteCut": {
+		"message": "본문의 보이지 않는 부분은 캡처되지 않았습니다. 설정에서 바꿀 수 있습니다."
+	},
+	"noteSaveFailed": {
+		"message": "파일을 저장하지 못했습니다. 설정에서 저장 위치를 확인해 주세요."
+	},
+	"noteCopyFailed": {
+		"message": "클립보드에 복사하지 못했습니다."
+	},
+	"doneSavedCopied": {
+		"message": "저장하고 복사했습니다"
+	},
+	"doneCanceled": {
+		"message": "저장을 취소했습니다"
+	},
+	"doneCaptured": {
+		"message": "캡처했습니다"
+	},
+	"conditionViewport": {
+		"message": "화면 $WIDTH$×$HEIGHT$",
+		"placeholders": {
+			"width": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"conditionViewportCurrent": {
+		"message": "화면 $WIDTH$×$HEIGHT$ (현재 화면 그대로)",
+		"placeholders": {
+			"width": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"conditionZoom": {
+		"message": "확대/축소 $PERCENT$%",
+		"placeholders": {
+			"percent": {
+				"content": "$1"
+			}
+		}
+	},
+	"conditionScaled": {
+		"message": "축소됨"
+	},
+	"conditionPart": {
+		"message": "분할 $PART$ / $TOTAL$",
+		"placeholders": {
+			"part": {
+				"content": "$1"
+			},
+			"total": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerTitle": {
+		"message": "CaptGrab - 캡처한 이미지"
+	},
+	"viewerPrev": {
+		"message": "이전 이미지"
+	},
+	"viewerNext": {
+		"message": "다음 이미지"
+	},
+	"viewerSave": {
+		"message": "저장"
+	},
+	"viewerSaveAs": {
+		"message": "다른 이름으로 저장"
+	},
+	"viewerCopy": {
+		"message": "복사"
+	},
+	"viewerSaveAll": {
+		"message": "모두 저장"
+	},
+	"viewerApplySplit": {
+		"message": "다음 캡처부터 이 높이로 나누기"
+	},
+	"viewerSplitPaidOnly": {
+		"message": "높이로 나눠 저장하는 기능은 유료입니다. 설정 화면에서 구매할 수 있습니다."
+	},
+	"viewerNoImage": {
+		"message": "이미지를 표시할 수 없습니다. 이 화면을 새로고침하면 이미지가 사라집니다. 다시 캡처해 주세요."
+	},
+	"viewerImageAlt": {
+		"message": "캡처한 페이지 전체 이미지"
+	},
+	"viewerImageAltPart": {
+		"message": "캡처한 페이지 이미지 ($INDEX$ / $TOTAL$)",
+		"placeholders": {
+			"index": {
+				"content": "$1"
+			},
+			"total": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerSplitHint": {
+		"message": "왼쪽 눈금을 드래그하면 높이로 나눌 때 나뉘는 위치를 확인할 수 있습니다."
+	},
+	"viewerSplitResult_other": {
+		"message": "$HEIGHT$px로 나누면 이 이미지는 $COUNT$장이 됩니다.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerConditionsSeparator": {
+		"message": " · "
+	},
+	"viewerSaveFailed": {
+		"message": "저장하지 못했습니다"
+	},
+	"viewerSavedAll_other": {
+		"message": "$COUNT$장을 저장했습니다",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerCopyFailed": {
+		"message": "복사하지 못했습니다"
+	},
+	"viewerSplitApplied": {
+		"message": "다음 캡처부터 $HEIGHT$px로 나눕니다",
+		"placeholders": {
+			"height": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerRulerLabel": {
+		"message": "나눌 높이 (px)"
+	},
+	"optionsTitle": {
+		"message": "CaptGrab - 설정"
+	},
+	"optionsHeading": {
+		"message": "CaptGrab 설정"
+	},
+	"optionsLead": {
+		"message": "변경 사항은 바로 저장되며 다음 캡처부터 적용됩니다."
+	},
+	"actionsHeading": {
+		"message": "캡처 후 동작"
+	},
+	"actionsDescription": {
+		"message": "여러 개를 선택할 수 있습니다."
+	},
+	"actionDownload": {
+		"message": "파일로 저장"
+	},
+	"actionDownloadNote": {
+		"message": "PNG 이미지로 컴퓨터에 저장합니다"
+	},
+	"actionClipboard": {
+		"message": "클립보드에 복사"
+	},
+	"actionClipboardNote": {
+		"message": "채팅이나 문서에 바로 붙여 넣을 수 있습니다"
+	},
+	"actionOpenTab": {
+		"message": "새 탭에서 열기"
+	},
+	"actionOpenTabNote": {
+		"message": "캡처 결과를 바로 확인할 수 있습니다"
+	},
+	"actionsError": {
+		"message": "하나 이상 선택해 주세요."
+	},
+	"saveHeading": {
+		"message": "저장 위치"
+	},
+	"saveDescription": {
+		"message": "Chrome의 제한으로 다운로드 폴더 밖은 고정할 수 없습니다."
+	},
+	"folderLabel": {
+		"message": "다운로드 폴더 안의 폴더 (선택)"
+	},
+	"folderPlaceholder": {
+		"message": "예: CaptGrab"
+	},
+	"folderErrorInvalid": {
+		"message": "이 폴더 이름은 사용할 수 없습니다."
+	},
+	"folderErrorAnd": {
+		"message": "및"
+	},
+	"folderErrorNotAllowed": {
+		"message": "은(는) 사용할 수 없습니다."
+	},
+	"askEveryTime": {
+		"message": "저장할 때마다 위치 선택"
+	},
+	"askEveryTimeNote": {
+		"message": "다운로드 폴더 밖에도 저장할 수 있습니다"
+	},
+	"savePreview": {
+		"message": "저장 위치: $PATH$",
+		"placeholders": {
+			"path": {
+				"content": "$1"
+			}
+		}
+	},
+	"downloadsFolder": {
+		"message": "다운로드"
+	},
+	"viewportHeading": {
+		"message": "캡처할 때의 화면 크기"
+	},
+	"viewportDescription": {
+		"message": "페이지 레이아웃을 결정하는 뷰포트 크기입니다."
+	},
+	"viewportCurrent": {
+		"message": "현재 화면 그대로"
+	},
+	"viewportCurrentNote": {
+		"message": "보이는 레이아웃 그대로 캡처합니다"
+	},
+	"viewportCustom": {
+		"message": "크기 지정"
+	},
+	"viewportCustomNote": {
+		"message": "화면 크기와 관계없이 같은 크기로 캡처합니다"
+	},
+	"presetLabel": {
+		"message": "자주 쓰는 크기"
+	},
+	"presetChoose": {
+		"message": "선택해 주세요"
+	},
+	"widthLabel": {
+		"message": "너비"
+	},
+	"heightLabel": {
+		"message": "높이"
+	},
+	"viewportError": {
+		"message": "너비와 높이는 200~7680 사이의 정수로 지정해 주세요."
+	},
+	"viewportHint": {
+		"message": "너비와 높이만 바뀝니다. 모바일 전용 화면으로 바뀐다는 보장은 없습니다."
+	},
+	"viewportOverridden": {
+		"message": "'여러 크기로 한 번에 캡처'가 켜져 있어 이 설정은 사용되지 않습니다."
+	},
+	"scrollHeading": {
+		"message": "스크롤 영역"
+	},
+	"scrollDescription": {
+		"message": "페이지 전체가 아니라 일부 영역만 스크롤되는 화면의 캡처 방법입니다. 캡처하는 동안만 영역을 넓히고 캡처 후 원래대로 되돌립니다."
+	},
+	"expandContentNote": {
+		"message": "관리 화면이나 웹 앱에서 본문이 중간에 잘리지 않습니다"
+	},
+	"expandMenuNote": {
+		"message": "긴 메뉴도 모두 캡처합니다. 메뉴 모양이 바뀔 수 있습니다"
+	},
+	"scrollHint": {
+		"message": "체크되지 않은 영역은 넓히지 않습니다. 다만 본문을 넓히면 메뉴도 함께 늘어나 전부 캡처되는 화면도 있습니다."
+	},
+	"paidHeading": {
+		"message": "유료 기능"
+	},
+	"price": {
+		"message": "¥500, 1회 구매"
+	},
+	"paidDescription": {
+		"message": "구매 확인을 할 때만 외부 서비스와 통신합니다. 캡처한 이미지는 전송하지 않습니다."
+	},
+	"lazyImagesNote": {
+		"message": "캡처 전에 페이지를 끝까지 스크롤해 아직 불러오지 않은 이미지를 불러옵니다. 긴 페이지는 캡처에 최대 10초 정도 걸립니다"
+	},
+	"featureSplit": {
+		"message": "축소하지 않고 여러 이미지로 나눠 저장"
+	},
+	"featureSplitNote": {
+		"message": "긴 페이지를 축소하는 대신 여러 이미지로 나눠 원래 해상도로 저장합니다"
+	},
+	"splitByHeight": {
+		"message": "높이로 나누기"
+	},
+	"splitByHeightNote": {
+		"message": "한 장의 높이가 이 값을 넘을 때만 나눕니다"
+	},
+	"splitHeightLabel": {
+		"message": "한 장의 최대 높이"
+	},
+	"splitByCount": {
+		"message": "이미지 개수로 나누기"
+	},
+	"splitByCountNote": {
+		"message": "페이지 길이와 관계없이 같은 높이의 이미지로 나눕니다"
+	},
+	"splitCountLabel": {
+		"message": "이미지 수"
+	},
+	"splitCountUnit": {
+		"message": "장"
+	},
+	"splitError": {
+		"message": "높이는 1000~16000, 장 수는 2~20 사이의 정수로 지정해 주세요."
+	},
+	"splitHint": {
+		"message": "저장되는 이미지의 픽셀 수로 셉니다. 캡처한 이미지를 새 탭에서 열면 옆의 눈금으로 나뉘는 위치를 확인하고 높이를 정할 수 있습니다. 고해상도(DPI) 화면에서는 페이지에 보이는 크기의 약 2배가 됩니다. 한 장이 16,000px를 넘으면 장 수를 늘립니다."
+	},
+	"multiSizeNote": {
+		"message": "선택한 화면 크기로 차례로 캡처해 크기별로 저장합니다. 켜져 있는 동안에는 '캡처할 때의 화면 크기' 설정을 사용하지 않습니다"
+	},
+	"multiSizeError": {
+		"message": "크기를 하나 이상 선택해 주세요."
+	},
+	"paymentChecking": {
+		"message": "구매 상태를 확인하는 중…"
+	},
+	"purchasePrompt": {
+		"message": "구매하면 사용할 수 있습니다."
+	},
+	"buy": {
+		"message": "구매하기"
+	},
+	"login": {
+		"message": "이미 구매함"
+	},
+	"paidText": {
+		"message": "구매했습니다. 감사합니다."
+	},
+	"purchaseHint": {
+		"message": "구매 후 확인 메일을 받으면 메일의 링크를 연 다음 이 화면으로 돌아와 주세요."
+	},
+	"loginHint": {
+		"message": "다른 브라우저나 기기에서 구매했다면 '이미 구매함'을 눌러 구매할 때 쓴 이메일 주소로 구매를 복원할 수 있습니다."
+	},
+	"tokushohoLink": {
+		"message": "법적 고지 (일본어)"
+	},
+	"paymentError": {
+		"message": "구매 페이지를 열지 못했습니다. 인터넷 연결을 확인해 주세요."
+	},
+	"nameHeading": {
+		"message": "파일 이름 번호"
+	},
+	"nextNameLabel": {
+		"message": "다음 파일 이름:"
+	},
+	"resetCount": {
+		"message": "1로 되돌리기"
+	},
+	"shortcutHeading": {
+		"message": "단축키"
+	},
+	"shortcutCurrent": {
+		"message": "현재 단축키: $KEY$",
+		"placeholders": {
+			"key": {
+				"content": "$1"
+			}
+		}
+	},
+	"shortcutNone": {
+		"message": "지정되지 않았습니다. '변경'에서 설정할 수 있습니다."
+	},
+	"shortcutChange": {
+		"message": "변경"
+	},
+	"languageHeading": {
+		"message": "언어 / Language"
+	},
+	"languageDescription": {
+		"message": "확장 프로그램 화면에 표시할 언어입니다."
+	},
+	"languageAuto": {
+		"message": "Chrome 설정에 맞추기"
+	},
+	"languageHint": {
+		"message": "도구 모음 버튼의 설명과 단축키 이름은 Chrome의 언어로 표시됩니다."
+	},
+	"resetHeading": {
+		"message": "설정 초기화"
+	},
+	"resetDescription": {
+		"message": "이 화면의 모든 설정을 설치했을 때의 상태로 되돌립니다."
+	},
+	"resetButton": {
+		"message": "초기화"
+	},
+	"resetHint": {
+		"message": "파일 이름 번호도 1로 돌아갑니다. 단축키는 '변경'에서 되돌려 주세요."
+	},
+	"guideLink": {
+		"message": "사용 가이드 (일본어)"
+	},
+	"resetDialogTitle": {
+		"message": "설정을 초기화할까요?"
+	},
+	"resetDialogText": {
+		"message": "이 화면의 설정과 파일 이름 번호를 설치했을 때의 상태로 되돌립니다. 되돌릴 수 없습니다."
+	},
+	"cancel": {
+		"message": "취소"
+	},
+	"resetDone": {
+		"message": "초기화했습니다"
+	}
+}

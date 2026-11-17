@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import fs from "node:fs";
 import { describe, expect, it, vi } from "vitest";
+import { i18nStub } from "./i18n-stub";
 
 const BODY = /<body>([\s\S]*)<\/body>/.exec(
 	fs.readFileSync("src/viewer/index.html", "utf-8")
@@ -29,6 +30,7 @@ async function load(
 	const openOptionsPage = vi.fn();
 	const download = vi.fn(async () => 1);
 	vi.stubGlobal("chrome", {
+		i18n: i18nStub(),
 		runtime: { sendMessage, openOptionsPage },
 		downloads: { download },
 		storage: {

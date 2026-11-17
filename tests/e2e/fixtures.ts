@@ -82,7 +82,10 @@ export const test = base.extend<Fixtures>({
 			channel: "chromium",
 			headless: true,
 			viewport: null,
+			// 画面の文言を日本語で確かめるので、OS の言語によらず日本語で起動する
+			locale: "ja-JP",
 			args: [
+				"--lang=ja",
 				"--window-size=1000,700",
 				`--force-device-scale-factor=${scale}`,
 				`--disable-extensions-except=${EXTENSION}`,

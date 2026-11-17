@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { i18nStub } from "./i18n-stub";
 
 const BLOB = new Blob(["png"], { type: "image/png" });
 
@@ -15,6 +16,8 @@ function setup() {
 		onMessage: { addListener: (fn: typeof listener) => (listener = fn) },
 	};
 	vi.stubGlobal("chrome", {
+		i18n: i18nStub(),
+		storage: { local: { get: vi.fn(async () => ({})) } },
 		runtime: { connect: vi.fn(() => port), openOptionsPage },
 		tabs: { query: vi.fn(async () => [{ id: 42 }]) },
 	});
