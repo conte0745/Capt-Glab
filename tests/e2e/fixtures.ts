@@ -172,7 +172,13 @@ export async function waitForShot(
 	filename = "screen-0001.png"
 ): Promise<Shot> {
 	const target = path.join(downloads, filename);
-	await expect.poll(() => fs.existsSync(target), { timeout: 20_000 }).toBe(true);
+	// Chrome は書き込みの途中でも保存先の名前でファイルを作るので、PNG の終わりまで書かれるのを待つ
+	const PNG_END = Buffer.from("49454e44ae426082", "hex");
+	await expect
+		.poll(() => fs.existsSync(target) && fs.readFileSync(target).subarray(-8).equals(PNG_END), {
+			timeout: 20_000,
+		})
+		.toBe(true);
 	const file = fs.readFileSync(target);
 	const result = await page.evaluate(async (base64) => {
 		const image = new Image();
