@@ -9,13 +9,15 @@ const BODY = /<body>([\s\S]*)<\/body>/.exec(
 async function load(
 	store: Record<string, unknown> = {},
 	shortcut = "Alt+Shift+S",
-	syncStore: Record<string, unknown> = {}
+	syncStore: Record<string, unknown> = {},
+	respond: (url: string) => Promise<Response> = async (url) =>
+		Response.json(url.endsWith("/api/new-key") ? "KEY" : { paid: false })
 ) {
 	document.body.innerHTML = BODY;
+	// jsdom はダイアログを開く機能を持たない
+	(document.getElementById("reset-dialog") as HTMLDialogElement).showModal = () => {};
 	const create = vi.fn();
-	const fetch = vi.fn(async (url: string) =>
-		Response.json(url.endsWith("/api/new-key") ? "KEY" : { paid: false })
-	);
+	const fetch = vi.fn(respond);
 	vi.stubGlobal("fetch", fetch);
 	vi.stubGlobal("chrome", {
 		runtime: { getManifest: () => ({}) },
@@ -31,8 +33,10 @@ async function load(
 				set: vi.fn(async (items: object) => {
 					Object.assign(store, items);
 				}),
-				remove: vi.fn(async (key: string) => {
-					delete store[key];
+				remove: vi.fn(async (keys: string | string[]) => {
+					for (const key of [keys].flat()) {
+						delete store[key];
+					}
 				}),
 			},
 		},
@@ -155,6 +159,22 @@ describe("options", () => {
 		});
 	});
 
+	it("保存したサイズがよく使うサイズなら、開き直してもプルダウンで選ばれている", async () => {
+		await load({ settings: { viewport: { mode: "custom", width: 375, height: 667 } } });
+
+		const preset = document.getElementById("preset") as HTMLSelectElement;
+		expect(preset.value).toBe("375x667");
+
+		input("width").value = "400";
+		input("width").dispatchEvent(new Event("input"));
+		expect(preset.value).toBe("");
+
+		input("width").value = "1920";
+		input("height").value = "1080";
+		input("height").dispatchEvent(new Event("input"));
+		expect(preset.value).toBe("1920x1080");
+	});
+
 	it("現在の表示サイズに戻しても指定サイズを覚えておく", async () => {
 		const { store } = await load({
 			settings: { viewport: { mode: "custom", width: 375, height: 667 } },
@@ -250,6 +270,59 @@ describe("options", () => {
 		expect(create).toHaveBeenCalledWith({ url: "chrome://extensions/shortcuts" });
 	});
 
+	describe("初期値に戻す", () => {
+		/** 画面の中の確認ダイアログで、ボタンを押したことにする */
+		async function answerReset(value: "reset" | "cancel") {
+			const dialog = document.getElementById("reset-dialog") as HTMLDialogElement;
+			dialog.returnValue = value;
+			dialog.dispatchEvent(new Event("close"));
+			await settle();
+		}
+
+		it("押すと確認のダイアログを開く", async () => {
+			await load();
+			const showModal = vi.fn();
+			(document.getElementById("reset-dialog") as HTMLDialogElement).showModal = showModal;
+
+			document.getElementById("reset-settings")!.click();
+
+			expect(showModal).toHaveBeenCalledTimes(1);
+		});
+
+		it("確認してから設定と連番を消し、画面も初期値に戻す。購入は残す", async () => {
+			const { store, syncStore } = await load(
+				{
+					settings: { download: false, clipboard: true, folder: "shots", viewport: { mode: "custom", width: 375, height: 667 } },
+					"payment-paid": true,
+					"image-name-count": 5,
+				},
+				undefined,
+				{ "payment-api-key": "KEY" }
+			);
+			document.getElementById("reset-settings")!.click();
+			await answerReset("reset");
+
+			expect(store.settings).toBeUndefined();
+			expect(store["payment-paid"]).toBe(true);
+			expect(store["image-name-count"]).toBeUndefined();
+			expect(document.getElementById("next-name")!.textContent).toBe("screen-0001.png");
+			expect(syncStore["payment-api-key"]).toBe("KEY");
+			expect(input("download").checked).toBe(true);
+			expect(input("folder").value).toBe("");
+			expect(input("viewport-current").checked).toBe(true);
+			expect(document.getElementById("saved")!.textContent).toBe("初期値に戻しました");
+		});
+
+		it("確認でキャンセルしたら何も変えない", async () => {
+			const { store } = await load({ settings: { download: false, clipboard: true } });
+			document.getElementById("reset-settings")!.click();
+			await answerReset("cancel");
+
+			expect(store.settings).toEqual({ download: false, clipboard: true });
+			expect(input("download").checked).toBe(false);
+		});
+	});
+
 	describe("有料機能", () => {
 		it("未購入なら選べず、購入の案内を出す。通信もしない", async () => {
 			const { fetch } = await load();
@@ -257,6 +330,7 @@ describe("options", () => {
 			expect(input("loadLazyImages").disabled).toBe(true);
 			expect(hidden("purchase")).toBe(false);
 			expect(hidden("paid-text")).toBe(true);
+			expect(hidden("price")).toBe(false);
 			expect(fetch).not.toHaveBeenCalled();
 		});
 
@@ -267,6 +341,7 @@ describe("options", () => {
 			expect(hidden("purchase")).toBe(true);
 			expect(hidden("login-hint")).toBe(true);
 			expect(hidden("paid-text")).toBe(false);
+			expect(hidden("price")).toBe(true);
 
 			await change("loadLazyImages", true);
 			expect(store.settings).toMatchObject({ loadLazyImages: true });
@@ -301,6 +376,46 @@ describe("options", () => {
 			await settle();
 
 			expect(hidden("payment-error")).toBe(false);
+		});
+
+		it("購入状況が分かるまでは押せず、確認中だと表示する", async () => {
+			let reply: (response: Response) => void = () => {};
+			const loading = load({}, undefined, { "payment-api-key": "KEY" }, () =>
+				new Promise((resolve) => (reply = resolve))
+			);
+			await settle();
+
+			expect(input("loadLazyImages").disabled).toBe(true);
+			expect(input("splitCount").disabled).toBe(true);
+			expect(hidden("payment-checking")).toBe(false);
+			expect(hidden("purchase")).toBe(true);
+
+			reply(Response.json({ paid: false }));
+			await loading;
+
+			expect(input("loadLazyImages").disabled).toBe(true);
+			expect(hidden("payment-checking")).toBe(true);
+			expect(hidden("purchase")).toBe(false);
+			expect(hidden("purchase-hint")).toBe(false);
+		});
+
+		it("確認が重なったら、遅れて届いた古い結果を使わない", async () => {
+			const replies: ((response: Response) => void)[] = [];
+			const loading = load({}, undefined, { "payment-api-key": "KEY" }, () =>
+				new Promise((resolve) => replies.push(resolve))
+			);
+			await settle();
+			document.dispatchEvent(new Event("visibilitychange"));
+			await settle();
+
+			// 後から始めた確認が先に返り、購入済みと分かる
+			replies[1](Response.json({ paid: true }));
+			await settle();
+			replies[0](Response.json({ paid: false }));
+			await loading;
+
+			expect(input("loadLazyImages").disabled).toBe(false);
+			expect(hidden("paid-text")).toBe(false);
 		});
 
 		it("購入ページから戻ると、購入が反映される", async () => {

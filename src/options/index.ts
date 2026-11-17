@@ -1,4 +1,5 @@
 import {
+	type Settings,
 	isValidSplitCount,
 	isValidSplitHeight,
 	isValidViewportSize,
@@ -40,8 +41,37 @@ const allFields = [
 
 /** 保存された設定を画面に反映し、変更したらすぐ保存されるようにする */
 async function init() {
-	const settings = await loadSettings();
+	showSettings(await loadSettings());
 
+	input("folder").addEventListener("input", updateSavePreview);
+	input("width").addEventListener("input", showPreset);
+	input("height").addEventListener("input", showPreset);
+	for (const id of allFields) {
+		input(id).addEventListener("change", save);
+	}
+	for (const size of sizeInputs()) {
+		size.addEventListener("change", save);
+	}
+	element<HTMLSelectElement>("preset").addEventListener("change", applyPreset);
+	element("reset-count").addEventListener("click", resetCount);
+	element("reset-settings").addEventListener("click", () => void resetSettings());
+	element("shortcuts").addEventListener("click", () => {
+		void chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
+	});
+	element("buy").addEventListener("click", () => void openPurchasePage(openPaymentPage));
+	element("login").addEventListener("click", () => void openPurchasePage(openLoginPage));
+	// 購入ページのタブから戻ってきたときに、購入が反映されるようにする
+	document.addEventListener("visibilitychange", () => {
+		if (document.visibilityState === "visible") {
+			void showPaymentStatus();
+		}
+	});
+
+	await Promise.all([showNextName(), showShortcut(), showPaymentStatus()]);
+}
+
+/** 設定を入力欄に入れる */
+function showSettings(settings: Settings) {
 	input("download").checked = settings.download;
 	input("clipboard").checked = settings.clipboard;
 	input("openTab").checked = settings.openTab;
@@ -58,42 +88,33 @@ async function init() {
 	input("multiSize").checked = settings.multiSize;
 	for (const size of sizeInputs()) {
 		size.checked = settings.multiSizes.includes(size.value);
-		size.addEventListener("change", save);
 	}
 	input("viewport-current").checked = settings.viewport.mode === "current";
 	input("viewport-custom").checked = settings.viewport.mode === "custom";
 	input("width").value = String(settings.viewport.width);
 	input("height").value = String(settings.viewport.height);
+	showPreset();
 	updateVisibility();
-
-	input("folder").addEventListener("input", updateSavePreview);
-	for (const id of allFields) {
-		input(id).addEventListener("change", save);
-	}
-	element<HTMLSelectElement>("preset").addEventListener("change", applyPreset);
-	element("reset-count").addEventListener("click", resetCount);
-	element("shortcuts").addEventListener("click", () => {
-		void chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
-	});
-	element("buy").addEventListener("click", () => void openPurchasePage(openPaymentPage));
-	element("login").addEventListener("click", () => void openPurchasePage(openLoginPage));
-	// 購入ページのタブから戻ってきたときに、購入が反映されるようにする
-	document.addEventListener("visibilitychange", () => {
-		if (document.visibilityState === "visible") {
-			void showPaymentStatus();
-		}
-	});
-
-	await Promise.all([showNextName(), showShortcut(), showPaymentStatus()]);
 }
+
+let paymentCheck = 0;
 
 /** 購入済みなら有料機能を使えるようにし、未購入なら購入の案内を出す */
 async function showPaymentStatus() {
+	// 確認が重なったときに、遅れて届いた古い結果で上書きしない
+	const check = ++paymentCheck;
 	const paid = await isPaid();
+	if (check !== paymentCheck) {
+		return;
+	}
 	for (const field of element("paid-section").querySelectorAll("input")) {
 		field.disabled = !paid;
 	}
+	element("payment-checking").hidden = true;
+	// 購入済みの人には値段を見せる必要がない
+	element("price").hidden = paid;
 	element("purchase").hidden = paid;
+	element("purchase-hint").hidden = paid;
 	element("login-hint").hidden = paid;
 	element("paid-text").hidden = !paid;
 	updateVisibility();
@@ -118,6 +139,14 @@ async function showShortcut() {
 	element("shortcut-text").textContent = shortcut
 		? `現在のキー: ${shortcut}`
 		: "割り当てられていません。「変更する」から設定できます。";
+}
+
+/** 幅と高さがよく使うサイズのどれかと同じなら、プルダウンでそれを選んだ状態にする */
+function showPreset() {
+	const preset = element<HTMLSelectElement>("preset");
+	const size = `${input("width").value}x${input("height").value}`;
+	const matched = [...preset.options].some((option) => option.value === size);
+	preset.value = matched ? size : "";
 }
 
 /** 選んだ画面サイズを入力欄に入れ、指定したサイズで撮る設定にする */
@@ -236,10 +265,10 @@ async function save() {
 
 let savedTimer: ReturnType<typeof setTimeout>;
 
-/** 「保存しました」を少しのあいだ表示する */
-function showSaved() {
+/** 「保存しました」などを少しのあいだ表示する */
+function showSaved(text = "保存しました") {
 	const saved = element("saved");
-	saved.textContent = "保存しました";
+	saved.textContent = text;
 	clearTimeout(savedTimer);
 	savedTimer = setTimeout(() => (saved.textContent = ""), SAVED_TOAST_MS);
 }
@@ -253,6 +282,33 @@ async function showNextName() {
 	nextName = `screen-${next.toString().padStart(4, "0")}.png`;
 	element("next-name").textContent = nextName;
 	updateSavePreview();
+}
+
+/** 設定とファイル名の連番を初期値に戻す。購入の記録は別に保存しているので残る */
+async function resetSettings() {
+	if (!(await askReset())) {
+		return;
+	}
+	await chrome.storage.local.remove(["settings", COUNT_KEY]);
+	showSettings(await loadSettings());
+	await showNextName();
+	// 前の入力で出ていたエラーを消す
+	for (const error of document.querySelectorAll<HTMLElement>(".error")) {
+		error.hidden = true;
+	}
+	showSaved("初期値に戻しました");
+}
+
+/** 初期値に戻してよいかを、画面の中のダイアログで確かめる */
+function askReset(): Promise<boolean> {
+	const dialog = element<HTMLDialogElement>("reset-dialog");
+	dialog.returnValue = "";
+	dialog.showModal();
+	return new Promise((resolve) =>
+		dialog.addEventListener("close", () => resolve(dialog.returnValue === "reset"), {
+			once: true,
+		})
+	);
 }
 
 /** 連番を最初に戻す */
