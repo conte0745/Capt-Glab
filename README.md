@@ -22,7 +22,7 @@
 
 ### ソースコードからビルドする場合
 
-Node.js(20.19 以上または 22.12 以上)、pnpm、Git が必要です。
+Node.js 26 系(`.nvmrc` 参照)、pnpm、Git が必要です。
 
 ```sh
 git clone https://github.com/conte0745/Capt-Glab.git
