@@ -17,6 +17,8 @@
 			header {
 				position: sticky;
 				top: 0;
+				/* 目盛りを付けた画像より手前に出す */
+				z-index: 1;
 				display: flex;
 				flex-wrap: wrap;
 				align-items: center;
@@ -43,17 +45,29 @@
 				font-size: 11px;
 				opacity: 0.7;
 			}
+			/* 画像の上に重なっても見落とさないよう、押したボタンに近い上部に大きく出す */
 			#toast {
 				position: fixed;
+				z-index: 2;
 				left: 50%;
-				bottom: 20px;
+				top: 14px;
 				margin: 0;
-				padding: 7px 16px;
+				padding: 10px 22px;
+				border: 2px solid light-dark(#fffdf5, #111a3a);
 				border-radius: 999px;
 				background: light-dark(#111a3a, #fffdf5);
 				color: light-dark(#fffdf5, #111a3a);
-				font-size: 13px;
+				font-size: 15px;
+				font-weight: 600;
+				box-shadow: 0 4px 18px rgb(0 0 0 / 35%);
 				transform: translateX(-50%);
+				animation: toast-in 0.15s ease-out;
+			}
+			@keyframes toast-in {
+				from {
+					opacity: 0;
+					transform: translate(-50%, -6px);
+				}
 			}
 			#toast:empty {
 				display: none;
@@ -67,9 +81,151 @@
 				font: inherit;
 				cursor: pointer;
 			}
+			#conditions {
+				flex-basis: 100%;
+				margin: 0;
+				font-size: 12px;
+				opacity: 0.75;
+			}
+			#conditions[hidden] {
+				display: none;
+			}
+			#split-tool {
+				display: flex;
+				flex-basis: 100%;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 4px 12px;
+				font-size: 12px;
+			}
+			#split-tool[hidden],
+			#apply-split[hidden],
+			#split-paid-only[hidden] {
+				display: none;
+			}
+			#apply-split {
+				padding: 3px 10px;
+			}
+			#split-paid-only {
+				opacity: 0.75;
+			}
+			/* 画像の左に目盛りを置く。位置は画像の高さに対する割合で決める */
+			.frame {
+				position: relative;
+				display: inline-block;
+				max-width: 100%;
+				padding-left: 56px;
+				box-sizing: border-box;
+				vertical-align: top;
+			}
+			.frame img {
+				display: block;
+			}
+			.ruler {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				width: 48px;
+				border-right: 1px solid light-dark(#999, #777);
+				color: light-dark(#555, #aaa);
+				font-size: 10px;
+				font-variant-numeric: tabular-nums;
+				cursor: ns-resize;
+				touch-action: none;
+				user-select: none;
+			}
+			.tick {
+				position: absolute;
+				right: 0;
+				width: 8px;
+				border-top: 1px solid currentColor;
+			}
+			.tick.minor {
+				width: 4px;
+			}
+			.tick span {
+				position: absolute;
+				right: 11px;
+				transform: translateY(-50%);
+				white-space: nowrap;
+			}
+			.cuts {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 56px;
+				pointer-events: none;
+			}
+			.cut {
+				position: absolute;
+				left: -56px;
+				right: 0;
+				border-top: 2px dashed #e5484d;
+			}
+			.cut span {
+				position: absolute;
+				top: 2px;
+				right: 8px;
+				padding: 1px 6px;
+				border-radius: 3px;
+				background: #e5484d;
+				color: #fff;
+				font-size: 11px;
+			}
 			main {
-				padding: 16px;
+				/* 右端の線の数値が、画面の縦スクロールバーに隠れないようにする */
+				padding: 16px 28px 16px 16px;
 				text-align: center;
+			}
+			.title {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				min-width: 0;
+			}
+			#name {
+				overflow-wrap: anywhere;
+			}
+			.pager {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+			.pager[hidden],
+			#save-all[hidden] {
+				display: none;
+			}
+			.pager button {
+				padding: 4px 10px;
+			}
+			button:disabled {
+				cursor: default;
+				opacity: 0.4;
+			}
+			#position {
+				min-width: 3.5em;
+				font-variant-numeric: tabular-nums;
+			}
+			/* 複数の画像は横に並べ、1枚ずつ止まるように横スクロールする */
+			#images {
+				/* 横スクロールの枠で切れないよう、目盛りの両端の数値の分だけ上下を空ける */
+				padding: 10px 0;
+				display: flex;
+				align-items: flex-start;
+				overflow-x: auto;
+				/* 高さは表示中の画像に合わせるので、ほかの長い画像ははみ出た分を見せない */
+				overflow-y: hidden;
+				scroll-snap-type: x mandatory;
+			}
+			#images[hidden] {
+				display: none;
+			}
+			figure {
+				flex: 0 0 100%;
+				margin: 0;
+				scroll-snap-align: start;
 			}
 			img {
 				max-width: 100%;
@@ -80,21 +236,35 @@
 	</head>
 	<body>
 		<header>
-			<span id="name">撮影した画像</span>
+			<span class="title">
+				<span class="pager" id="pager" hidden>
+					<button type="button" id="prev" aria-label="前の画像">‹</button>
+					<span id="position"></span>
+					<button type="button" id="next" aria-label="次の画像">›</button>
+				</span>
+				<span id="name">撮影した画像</span>
+			</span>
 			<span class="actions">
 				<span class="actions" id="actions" hidden>
 					<button type="button" id="save">保存 <kbd>Ctrl+S</kbd></button>
 					<button type="button" id="save-as">別名で保存 <kbd>Ctrl+Shift+S</kbd></button>
 					<button type="button" id="copy">コピー <kbd>Ctrl+C</kbd></button>
+					<button type="button" id="save-all" hidden>すべて保存</button>
 				</span>
 				<button type="button" id="settings">設定</button>
 			</span>
+			<p id="conditions" hidden></p>
+			<div id="split-tool" hidden>
+				<span id="split-text"></span>
+				<button type="button" id="apply-split" hidden>次の撮影からこの高さで分ける</button>
+				<span id="split-paid-only" hidden>高さで分けて保存するのは有料機能です。設定画面から購入できます。</span>
+			</div>
 		</header>
 		<main>
 			<p id="message" hidden>
 				画像を表示できません。この画面は再読み込みすると画像が消えます。もう一度撮影してください。
 			</p>
-			<img id="image" alt="撮影したページ全体の画像" hidden />
+			<div id="images" hidden></div>
 		</main>
 		<p id="toast" role="status"></p>
 		<script type="module" src="./index.ts"></script>

@@ -551,7 +551,7 @@ test.describe("設定", () => {
 		await clickAction(extension, page);
 
 		const viewer = await opened;
-		await expect(viewer.locator("#image")).toBeVisible();
+		await expect(viewer.locator("#images img")).toBeVisible();
 		expect(fs.readdirSync(extension.downloads)).toEqual([]);
 	});
 
@@ -600,16 +600,44 @@ test.describe("設定", () => {
 		await clickAction(extension, page);
 		const viewer = await opened;
 
-		await expect(viewer.locator("#image")).toBeVisible();
+		await expect(viewer.locator("#images img")).toBeVisible();
 		await expect
 			.poll(() =>
 				viewer
-					.locator("#image")
+					.locator("#images img")
 					.evaluate((image: HTMLImageElement) => image.naturalWidth)
 			)
 			.toBeGreaterThan(0);
 		await expect(viewer.locator("#actions")).toBeVisible();
 		expect(fs.readdirSync(extension.downloads)).toEqual([]);
+	});
+
+	test("複数枚は1つのタブに並べ、矢印キーで横に切り替える", async ({ extension, page, url }) => {
+		await extension.worker.evaluate(() => chrome.storage.local.set({ "payment-paid": true }));
+		await setSettings(extension, {
+			...settings,
+			download: false,
+			openTab: true,
+			multiSize: true,
+			multiSizes: ["1280x800", "375x667"],
+		});
+		await page.goto(url);
+		const pages = () => extension.context.pages().filter((p) => p.url().includes("src/viewer/"));
+
+		const opened = extension.context.waitForEvent("page");
+		await clickAction(extension, page);
+		const viewer = await opened;
+
+		await expect(viewer.locator("#images img")).toHaveCount(2);
+		await expect(viewer.locator("#position")).toHaveText("1 / 2");
+		await viewer.keyboard.press("ArrowRight");
+		await expect(viewer.locator("#position")).toHaveText("2 / 2");
+		// 2枚目が見える位置まで、実際に横へスクロールしている
+		await expect
+			.poll(() => viewer.locator("#images").evaluate((images) => images.scrollLeft))
+			.toBeGreaterThan(0);
+		await page.waitForTimeout(1000);
+		expect(pages()).toHaveLength(1);
 	});
 
 	test.describe("別タブのショートカット", () => {
@@ -671,7 +699,7 @@ test.describe("設定", () => {
 		const opened = extension.context.waitForEvent("page");
 		await clickAction(extension, page);
 		const viewer = await opened;
-		await expect(viewer.locator("#image")).toBeVisible();
+		await expect(viewer.locator("#images img")).toBeVisible();
 
 		await page.bringToFront();
 		const types = await page.evaluate(async () => {

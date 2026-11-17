@@ -32,7 +32,15 @@ const SCROLL_AREA_RESTORE_MS = 30000;
 
 const detachedAt = new Map<number, number>();
 const capturingTabs = new Set<number>();
-const viewerImages = new Map<string, { data: string; filename: string | null }>();
+/** 別タブに渡す画像。filename は撮影時に保存したときのファイル名 */
+type ViewerImage = {
+	data: string;
+	filename: string | null;
+	suffix: string;
+	conditions: string[];
+	scale: number;
+};
+const viewerImages = new Map<string, ViewerImage[]>();
 
 chrome.runtime.onInstalled.addListener(function ({ reason }) {
 	// 設定の入口を知ってもらうため、最初の1回だけ開く
@@ -65,9 +73,15 @@ chrome.runtime.onMessage.addListener(function (
 	sendResponse
 ) {
 	if (message.request === "viewer-image") {
-		// 画像をメモリに残さないよう、渡したら手放す
-		sendResponse(viewerImages.get(message.id) ?? null);
-		viewerImages.delete(message.id);
+		// まとめて渡すとメッセージの大きさの上限を超えることがあるので、1枚ずつ渡す
+		const images = viewerImages.get(message.id);
+		const index: number = message.index ?? 0;
+		const image = images?.[index];
+		sendResponse(image ? { image, count: images.length } : null);
+		// 画像をメモリに残さないよう、最後の1枚を渡したら手放す
+		if (!images || index >= images.length - 1) {
+			viewerImages.delete(message.id);
+		}
 	}
 });
 
@@ -120,9 +134,16 @@ async function handleCapture(port: chrome.runtime.Port, tabId: number) {
 				);
 				await Promise.race([copied, gone]);
 			}
-			for (const [index, shot] of shots.entries()) {
-				await openViewer(shot.data, filenames[index] ?? null);
-			}
+			// 複数枚でも1つのタブにまとめ、横に並べて見せる
+			await openViewer(
+				shots.map((shot, index) => ({
+					data: shot.data,
+					filename: filenames[index] ?? null,
+					suffix: shot.suffix,
+					conditions: shot.conditions,
+					scale: shot.scale,
+				}))
+			);
 		}
 	} catch (error) {
 		console.error(error);
@@ -152,6 +173,10 @@ type Shot = {
 	data: string;
 	/** ファイル名の連番のあとに付ける、サイズや分割の番号。1枚だけなら空 */
 	suffix: string;
+	/** 別タブに出す、撮影したときの条件 */
+	conditions: string[];
+	/** 縮小した倍率。縮小していなければ 1 */
+	scale: number;
 };
 
 type Viewport = { width: number; height: number; label: string | null };
@@ -274,6 +299,16 @@ async function captureTab(
 				areas.bottom,
 				paid && settings.splitLongPages ? splitOption(settings) : null
 			);
+			const conditions = [
+				`画面 ${Math.round(viewport.width / zoom)}×${Math.round(viewport.height / zoom)}${
+					custom ? "" : "（今の画面のまま）"
+				}`,
+				zoom !== 1 ? `ズーム ${Math.round(zoom * 100)}%` : null,
+				page.scale < 1 ? "縮小あり" : null,
+				paid && settings.loadLazyImages ? "遅延読み込みの画像も写す" : null,
+				settings.expandContent ? "本文を最後まで撮る" : null,
+				settings.expandMenu ? "サイドメニューを最後まで撮る" : null,
+			].filter((condition) => condition !== null);
 			for (const [part, data] of page.images.entries()) {
 				const labels = [
 					viewport.label,
@@ -282,9 +317,14 @@ async function captureTab(
 				shots.push({
 					data,
 					suffix: labels.filter((label) => label !== null).map((label) => `-${label}`).join(""),
+					conditions:
+						page.images.length > 1
+							? [conditions[0], `分割 ${part + 1} / ${page.images.length}`, ...conditions.slice(1)]
+							: conditions,
+					scale: page.scale,
 				});
 			}
-			scaled ||= page.scaled;
+			scaled ||= page.scale < 1;
 			cut ||= areas.contentCut;
 		}
 
@@ -332,7 +372,7 @@ async function screenshotPage(
 	zoom: number,
 	expandedBottom: number,
 	split: Split | null
-): Promise<{ images: string[]; scaled: boolean }> {
+): Promise<{ images: string[]; scale: number }> {
 	const metrics = (await chrome.debugger.sendCommand(
 		target,
 		"Page.getLayoutMetrics"
@@ -382,7 +422,7 @@ async function screenshotPage(
 		)) as { data: string };
 		images.push(screenshot.data);
 	}
-	return { images, scaled: scale < 1 };
+	return { images, scale };
 }
 
 /** ページのスクリプトに結果を偽装されないよう、隔離された実行環境を作る */
@@ -450,9 +490,9 @@ async function downloadImages(
 }
 
 /** 画像を別タブで開く。URL に入れると長すぎるので、画像はタブから取りに来させる */
-async function openViewer(data: string, filename: string | null) {
+async function openViewer(images: ViewerImage[]) {
 	const id = crypto.randomUUID();
-	viewerImages.set(id, { data, filename });
+	viewerImages.set(id, images);
 	await chrome.tabs.create({
 		url: chrome.runtime.getURL(`src/viewer/index.html?id=${id}`),
 	});
