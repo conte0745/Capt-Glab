@@ -764,6 +764,30 @@ test.describe("設定", () => {
 		expect(shot.firstScreenEnd).toBe(667);
 	});
 
+	test("設定画面で選んだ言語で、設定画面と撮影した画像の画面を表示する", async ({
+		extension,
+		page,
+		url,
+	}) => {
+		const extensionId = new URL(extension.worker.url()).host;
+		const options = await extension.context.newPage();
+		await options.goto(`chrome-extension://${extensionId}/src/options/index.html`);
+		await expect(options.locator("h1")).toHaveText("CaptGrab の設定");
+		await options.selectOption("#language", "en");
+		await expect(options.locator("h1")).toHaveText("CaptGrab settings");
+		await expect(options.locator("html")).toHaveAttribute("lang", "en");
+		await expect(options.locator("#language")).toHaveValue("en");
+		await options.locator("#openTab").check();
+		await options.close();
+
+		await page.goto(url);
+		const opened = extension.context.waitForEvent("page");
+		await clickAction(extension, page);
+		const viewer = await opened;
+		await expect(viewer.locator("#copy")).toContainText("Copy");
+		await expect(viewer.locator("#conditions")).toContainText("Viewport");
+	});
+
 	test("設定画面に割り当て済みのショートカットを表示する", async ({ extension, page }) => {
 		const extensionId = new URL(extension.worker.url()).host;
 		await page.goto(`chrome-extension://${extensionId}/src/options/index.html`);

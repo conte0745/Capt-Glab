@@ -8,6 +8,7 @@ import {
 	peekImageName,
 	type Settings,
 } from "../settings";
+import { initI18n, t } from "../i18n";
 import { isPaid } from "../payment";
 import { loadLazyImages } from "./lazy-images";
 import {
@@ -102,6 +103,8 @@ async function handleCapture(port: chrome.runtime.Port, tabId: number) {
 
 	try {
 		const settings = await loadSettings();
+		// 撮影した条件の文言を、設定で選んだ言語で書く
+		await initI18n();
 		const { shots, scaled, cut } = await captureTab(tabId, settings, () =>
 			post({ type: "waiting" })
 		);
@@ -300,14 +303,16 @@ async function captureTab(
 				paid && settings.splitLongPages ? splitOption(settings) : null
 			);
 			const conditions = [
-				`画面 ${Math.round(viewport.width / zoom)}×${Math.round(viewport.height / zoom)}${
-					custom ? "" : "（今の画面のまま）"
-				}`,
-				zoom !== 1 ? `ズーム ${Math.round(zoom * 100)}%` : null,
-				page.scale < 1 ? "縮小あり" : null,
-				paid && settings.loadLazyImages ? "遅延読み込みの画像も写す" : null,
-				settings.expandContent ? "本文を最後まで撮る" : null,
-				settings.expandMenu ? "サイドメニューを最後まで撮る" : null,
+				t(
+					custom ? "conditionViewport" : "conditionViewportCurrent",
+					Math.round(viewport.width / zoom),
+					Math.round(viewport.height / zoom)
+				),
+				zoom !== 1 ? t("conditionZoom", Math.round(zoom * 100)) : null,
+				page.scale < 1 ? t("conditionScaled") : null,
+				paid && settings.loadLazyImages ? t("featureLazyImages") : null,
+				settings.expandContent ? t("featureExpandContent") : null,
+				settings.expandMenu ? t("featureExpandMenu") : null,
 			].filter((condition) => condition !== null);
 			for (const [part, data] of page.images.entries()) {
 				const labels = [
@@ -319,7 +324,7 @@ async function captureTab(
 					suffix: labels.filter((label) => label !== null).map((label) => `-${label}`).join(""),
 					conditions:
 						page.images.length > 1
-							? [conditions[0], `分割 ${part + 1} / ${page.images.length}`, ...conditions.slice(1)]
+							? [conditions[0], t("conditionPart", part + 1, page.images.length), ...conditions.slice(1)]
 							: conditions,
 					scale: page.scale,
 				});

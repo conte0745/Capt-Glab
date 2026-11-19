@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import fs from "node:fs";
 import { describe, expect, it, vi } from "vitest";
+import { i18nStub } from "./i18n-stub";
 
 const BODY = /<body>([\s\S]*)<\/body>/.exec(
 	fs.readFileSync("src/options/index.html", "utf-8")
@@ -20,7 +21,11 @@ async function load(
 	const fetch = vi.fn(respond);
 	vi.stubGlobal("fetch", fetch);
 	vi.stubGlobal("chrome", {
-		runtime: { getManifest: () => ({}) },
+		i18n: i18nStub(),
+		runtime: {
+			getManifest: () => ({}),
+			getURL: (path: string) => `chrome-extension://id/${path}`,
+		},
 		storage: {
 			sync: {
 				get: vi.fn(async (key: string) => ({ [key]: syncStore[key] })),
@@ -548,6 +553,50 @@ describe("options", () => {
 				expect(hidden("multi-size-error")).toBe(false);
 				expect((store.settings as { multiSizes: string[] }).multiSizes).toHaveLength(1);
 			});
+		});
+	});
+
+	describe("言語", () => {
+		const select = () => document.getElementById("language") as HTMLSelectElement;
+
+		it("Chrome に合わせる設定と、用意している言語をその言語の名前で並べる", async () => {
+			await load();
+
+			expect([...select().options].map((option) => [option.value, option.text])).toEqual([
+				["auto", "Chrome の設定に合わせる"],
+				["ja", "日本語"],
+				["en", "English"],
+				["zh_TW", "中文（台灣）"],
+				["es", "español"],
+				["fr", "français"],
+				["pt_BR", "português (Brasil)"],
+				["de", "Deutsch"],
+				["ko", "한국어"],
+			]);
+			expect(select().value).toBe("auto");
+		});
+
+		it("選んだ言語を保存する。ほかの設定は変えない", async () => {
+			const { store } = await load({ settings: { folder: "shots" } });
+			await change("language", "en");
+
+			expect(store.settings).toMatchObject({ language: "en", folder: "shots" });
+		});
+
+		it("ほかの設定を保存しても、選んだ言語は残る", async () => {
+			const english = JSON.parse(
+				fs.readFileSync("public/_locales/en/messages.json", "utf-8")
+			);
+			const { store } = await load(
+				{ settings: { language: "en" } },
+				undefined,
+				undefined,
+				async (url) => Response.json(url.endsWith("/messages.json") ? english : { paid: false })
+			);
+			expect(select().value).toBe("en");
+			await change("openTab", true);
+
+			expect(store.settings).toMatchObject({ language: "en", openTab: true });
 		});
 	});
 });

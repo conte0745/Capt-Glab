@@ -1,4 +1,5 @@
 import {
+	DEFAULT_SETTINGS,
 	type Settings,
 	isValidSplitCount,
 	isValidSplitHeight,
@@ -7,6 +8,7 @@ import {
 	normalizeFolder,
 	saveSettings,
 } from "../settings";
+import { LOCALES, initI18n, localeName, localizePage, t } from "../i18n";
 import { isPaid, openLoginPage, openPaymentPage } from "../payment";
 
 const COUNT_KEY = "image-name-count";
@@ -41,6 +43,9 @@ const allFields = [
 
 /** 保存された設定を画面に反映し、変更したらすぐ保存されるようにする */
 async function init() {
+	await initI18n();
+	localizePage();
+	addLanguageOptions();
 	showSettings(await loadSettings());
 
 	input("folder").addEventListener("input", updateSavePreview);
@@ -53,6 +58,7 @@ async function init() {
 		size.addEventListener("change", save);
 	}
 	element<HTMLSelectElement>("preset").addEventListener("change", applyPreset);
+	element<HTMLSelectElement>("language").addEventListener("change", () => void changeLanguage());
 	element("reset-count").addEventListener("click", resetCount);
 	element("reset-settings").addEventListener("click", () => void resetSettings());
 	element("shortcuts").addEventListener("click", () => {
@@ -93,6 +99,7 @@ function showSettings(settings: Settings) {
 	input("viewport-custom").checked = settings.viewport.mode === "custom";
 	input("width").value = String(settings.viewport.width);
 	input("height").value = String(settings.viewport.height);
+	element<HTMLSelectElement>("language").value = settings.language;
 	showPreset();
 	updateVisibility();
 }
@@ -137,8 +144,23 @@ async function showShortcut() {
 	const { shortcut } =
 		commands.find((command) => command.name === "_execute_action") ?? {};
 	element("shortcut-text").textContent = shortcut
-		? `現在のキー: ${shortcut}`
-		: "割り当てられていません。「変更する」から設定できます。";
+		? t("shortcutCurrent", shortcut)
+		: t("shortcutNone");
+}
+
+/** 言語のプルダウンに、用意している言語を、その言語自身の名前で並べる */
+function addLanguageOptions() {
+	const select = element<HTMLSelectElement>("language");
+	for (const locale of LOCALES) {
+		select.append(new Option(localeName(locale), locale));
+	}
+}
+
+/** 言語を保存し、画面の文言を選んだ言語で表示し直す */
+async function changeLanguage() {
+	const language = element<HTMLSelectElement>("language").value;
+	await saveSettings({ ...(await loadSettings()), language });
+	location.reload();
 }
 
 /** 幅と高さがよく使うサイズのどれかと同じなら、プルダウンでそれを選んだ状態にする */
@@ -189,9 +211,10 @@ function updateSavePreview() {
 	const folder = normalizeFolder(input("folder").value);
 	const preview = element("save-preview");
 	preview.hidden = folder === null || input("askEveryTime").checked;
-	preview.textContent = `保存先: ${["ダウンロード", folder, nextName]
-		.filter(Boolean)
-		.join(" / ")}`;
+	preview.textContent = t(
+		"savePreview",
+		[t("downloadsFolder"), folder, nextName].filter(Boolean).join(" / ")
+	);
 }
 
 /** 入力が正しいときだけ保存する。正しくないあいだは前の設定で撮影される */
@@ -258,6 +281,7 @@ async function save() {
 		viewport: custom
 			? { mode: "custom", width, height }
 			: { ...current.viewport, mode: "current" },
+		language: current.language,
 	});
 	input("folder").value = folder;
 	showSaved();
@@ -266,7 +290,7 @@ async function save() {
 let savedTimer: ReturnType<typeof setTimeout>;
 
 /** 「保存しました」などを少しのあいだ表示する */
-function showSaved(text = "保存しました") {
+function showSaved(text = t("saved")) {
 	const saved = element("saved");
 	saved.textContent = text;
 	clearTimeout(savedTimer);
@@ -289,14 +313,20 @@ async function resetSettings() {
 	if (!(await askReset())) {
 		return;
 	}
+	const { language } = await loadSettings();
 	await chrome.storage.local.remove(["settings", COUNT_KEY]);
+	// 言語も初期値に戻るので、文言を Chrome の言語で表示し直す
+	if (language !== DEFAULT_SETTINGS.language) {
+		location.reload();
+		return;
+	}
 	showSettings(await loadSettings());
 	await showNextName();
 	// 前の入力で出ていたエラーを消す
 	for (const error of document.querySelectorAll<HTMLElement>(".error")) {
 		error.hidden = true;
 	}
-	showSaved("初期値に戻しました");
+	showSaved(t("resetDone"));
 }
 
 /** 初期値に戻してよいかを、画面の中のダイアログで確かめる */

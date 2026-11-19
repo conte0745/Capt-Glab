@@ -1,0 +1,543 @@
+{
+	"lang": {
+		"message": "pt-BR"
+	},
+	"extDescription": {
+		"message": "Capture uma página da web inteira em PNG com um clique e tamanho de janela fixo. Escolha salvar, copiar ou ambos."
+	},
+	"commandCapture": {
+		"message": "Capturar a página inteira"
+	},
+	"settings": {
+		"message": "Configurações"
+	},
+	"saved": {
+		"message": "Salvo"
+	},
+	"copied": {
+		"message": "Copiado"
+	},
+	"capturedImage": {
+		"message": "Imagem capturada"
+	},
+	"featureLazyImages": {
+		"message": "Incluir imagens de carregamento lento"
+	},
+	"featureExpandContent": {
+		"message": "Capturar todo o conteúdo principal"
+	},
+	"featureExpandMenu": {
+		"message": "Capturar todo o menu lateral"
+	},
+	"featureMultiSize": {
+		"message": "Capturar vários tamanhos de uma vez"
+	},
+	"sizeFullHd": {
+		"message": "1920 × 1080 (Full HD)"
+	},
+	"sizeTablet": {
+		"message": "768 × 1024 (tablet)"
+	},
+	"sizePhone": {
+		"message": "375 × 667 (smartphone)"
+	},
+	"popupCapturing": {
+		"message": "Capturando…"
+	},
+	"popupOpenSettings": {
+		"message": "Abrir as configurações"
+	},
+	"popupWaiting": {
+		"message": "Aguardando a captura anterior terminar…"
+	},
+	"errorFailedTitle": {
+		"message": "Não foi possível capturar a página"
+	},
+	"errorRestrictedTitle": {
+		"message": "Esta página não pode ser capturada"
+	},
+	"errorRestrictedNote": {
+		"message": "O navegador protege páginas como chrome:// e a Chrome Web Store."
+	},
+	"errorBusyTitle": {
+		"message": "Já está capturando"
+	},
+	"errorBusyNote": {
+		"message": "Aguarde a captura anterior terminar."
+	},
+	"errorOtherDebuggerNote": {
+		"message": "Outra extensão está controlando esta guia. Tente novamente quando ela terminar."
+	},
+	"errorDetachedTitle": {
+		"message": "A captura foi interrompida"
+	},
+	"errorDetachedNote": {
+		"message": "A barra de depuração foi fechada ou a página mudou durante a captura. Tente novamente."
+	},
+	"errorUnknownNote": {
+		"message": "Recarregue a página e tente novamente."
+	},
+	"noteSeparator": {
+		"message": " "
+	},
+	"noteSavedCount_one": {
+		"message": "$COUNT$ imagem salva.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"noteSavedCount_other": {
+		"message": "$COUNT$ imagens salvas.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"noteCopiedFirst": {
+		"message": "A primeira imagem foi copiada para a área de transferência."
+	},
+	"noteScaled": {
+		"message": "A página era longa, então a imagem foi reduzida."
+	},
+	"noteCut": {
+		"message": "Partes ocultas do conteúdo principal não foram capturadas. Você pode mudar isso nas configurações."
+	},
+	"noteSaveFailed": {
+		"message": "Não foi possível salvar o arquivo. Verifique o local de salvamento nas configurações."
+	},
+	"noteCopyFailed": {
+		"message": "Não foi possível copiar para a área de transferência."
+	},
+	"doneSavedCopied": {
+		"message": "Salvo e copiado"
+	},
+	"doneCanceled": {
+		"message": "Salvamento cancelado"
+	},
+	"doneCaptured": {
+		"message": "Capturado"
+	},
+	"conditionViewport": {
+		"message": "Janela $WIDTH$×$HEIGHT$",
+		"placeholders": {
+			"width": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"conditionViewportCurrent": {
+		"message": "Janela $WIDTH$×$HEIGHT$ (tamanho atual)",
+		"placeholders": {
+			"width": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"conditionZoom": {
+		"message": "Zoom $PERCENT$%",
+		"placeholders": {
+			"percent": {
+				"content": "$1"
+			}
+		}
+	},
+	"conditionScaled": {
+		"message": "Reduzida"
+	},
+	"conditionPart": {
+		"message": "Parte $PART$ / $TOTAL$",
+		"placeholders": {
+			"part": {
+				"content": "$1"
+			},
+			"total": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerTitle": {
+		"message": "CaptGrab - Imagem capturada"
+	},
+	"viewerPrev": {
+		"message": "Imagem anterior"
+	},
+	"viewerNext": {
+		"message": "Próxima imagem"
+	},
+	"viewerSave": {
+		"message": "Salvar"
+	},
+	"viewerSaveAs": {
+		"message": "Salvar como"
+	},
+	"viewerCopy": {
+		"message": "Copiar"
+	},
+	"viewerSaveAll": {
+		"message": "Salvar todas"
+	},
+	"viewerApplySplit": {
+		"message": "Dividir nesta altura a partir da próxima captura"
+	},
+	"viewerSplitPaidOnly": {
+		"message": "Dividir por altura é um recurso pago. Você pode comprá-lo nas configurações."
+	},
+	"viewerNoImage": {
+		"message": "Não é possível mostrar a imagem. As imagens são apagadas quando esta página é recarregada. Capture novamente."
+	},
+	"viewerImageAlt": {
+		"message": "Imagem da página inteira capturada"
+	},
+	"viewerImageAltPart": {
+		"message": "Imagem da página capturada ($INDEX$ / $TOTAL$)",
+		"placeholders": {
+			"index": {
+				"content": "$1"
+			},
+			"total": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerSplitHint": {
+		"message": "Arraste a régua à esquerda para ver onde a imagem seria dividida por altura."
+	},
+	"viewerSplitResult_one": {
+		"message": "Com $HEIGHT$ px, esta imagem não será dividida.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerSplitResult_other": {
+		"message": "Com $HEIGHT$ px, esta imagem será dividida em $COUNT$ imagens.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerConditionsSeparator": {
+		"message": " · "
+	},
+	"viewerSaveFailed": {
+		"message": "Não foi possível salvar"
+	},
+	"viewerSavedAll_one": {
+		"message": "$COUNT$ imagem salva",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerSavedAll_other": {
+		"message": "$COUNT$ imagens salvas",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerCopyFailed": {
+		"message": "Não foi possível copiar"
+	},
+	"viewerSplitApplied": {
+		"message": "A partir da próxima captura, as imagens serão divididas em $HEIGHT$ px",
+		"placeholders": {
+			"height": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerRulerLabel": {
+		"message": "Altura da divisão (px)"
+	},
+	"optionsTitle": {
+		"message": "CaptGrab - Configurações"
+	},
+	"optionsHeading": {
+		"message": "Configurações do CaptGrab"
+	},
+	"optionsLead": {
+		"message": "As alterações são salvas na hora e valem a partir da próxima captura."
+	},
+	"actionsHeading": {
+		"message": "Depois de capturar"
+	},
+	"actionsDescription": {
+		"message": "Você pode escolher mais de uma opção."
+	},
+	"actionDownload": {
+		"message": "Salvar em um arquivo"
+	},
+	"actionDownloadNote": {
+		"message": "Salva uma imagem PNG no seu computador"
+	},
+	"actionClipboard": {
+		"message": "Copiar para a área de transferência"
+	},
+	"actionClipboardNote": {
+		"message": "Cole direto em chats e documentos"
+	},
+	"actionOpenTab": {
+		"message": "Abrir em uma nova guia"
+	},
+	"actionOpenTabNote": {
+		"message": "Confira o resultado na hora"
+	},
+	"actionsError": {
+		"message": "Escolha pelo menos uma opção."
+	},
+	"saveHeading": {
+		"message": "Local de salvamento"
+	},
+	"saveDescription": {
+		"message": "Por restrições do Chrome, um local fixo precisa estar dentro da pasta Downloads."
+	},
+	"folderLabel": {
+		"message": "Pasta dentro de Downloads (opcional)"
+	},
+	"folderPlaceholder": {
+		"message": "ex.: CaptGrab"
+	},
+	"folderErrorInvalid": {
+		"message": "Este nome de pasta não pode ser usado."
+	},
+	"folderErrorAnd": {
+		"message": "e"
+	},
+	"folderErrorNotAllowed": {
+		"message": "não são permitidos."
+	},
+	"askEveryTime": {
+		"message": "Escolher o local toda vez"
+	},
+	"askEveryTimeNote": {
+		"message": "Também permite salvar fora de Downloads"
+	},
+	"savePreview": {
+		"message": "Salva em: $PATH$",
+		"placeholders": {
+			"path": {
+				"content": "$1"
+			}
+		}
+	},
+	"downloadsFolder": {
+		"message": "Downloads"
+	},
+	"viewportHeading": {
+		"message": "Tamanho da janela na captura"
+	},
+	"viewportDescription": {
+		"message": "O tamanho da janela que define o layout da página."
+	},
+	"viewportCurrent": {
+		"message": "Tamanho atual da janela"
+	},
+	"viewportCurrentNote": {
+		"message": "Captura o layout no tamanho atual da sua janela"
+	},
+	"viewportCustom": {
+		"message": "Tamanho personalizado"
+	},
+	"viewportCustomNote": {
+		"message": "Sempre captura no mesmo tamanho, seja qual for a sua tela"
+	},
+	"presetLabel": {
+		"message": "Tamanhos comuns"
+	},
+	"presetChoose": {
+		"message": "Escolha um tamanho"
+	},
+	"widthLabel": {
+		"message": "Largura"
+	},
+	"heightLabel": {
+		"message": "Altura"
+	},
+	"viewportError": {
+		"message": "A largura e a altura devem ser números inteiros de 200 a 7680."
+	},
+	"viewportHint": {
+		"message": "Só a largura e a altura mudam. Os sites podem não mudar para o layout de celular."
+	},
+	"viewportOverridden": {
+		"message": "Não é usado porque “Capturar vários tamanhos de uma vez” está ativado."
+	},
+	"scrollHeading": {
+		"message": "Áreas com rolagem"
+	},
+	"scrollDescription": {
+		"message": "Como capturar páginas em que só parte da tela rola. As áreas são expandidas apenas durante a captura e restauradas depois."
+	},
+	"expandContentNote": {
+		"message": "Evita que o conteúdo principal seja cortado em painéis administrativos e apps da web"
+	},
+	"expandMenuNote": {
+		"message": "Captura menus longos por inteiro. A aparência do menu pode mudar"
+	},
+	"scrollHint": {
+		"message": "Áreas desativadas não são expandidas. Mas, em algumas páginas, expandir o conteúdo principal também estica o menu, e ele é capturado inteiro."
+	},
+	"paidHeading": {
+		"message": "Recursos pagos"
+	},
+	"price": {
+		"message": "¥500, compra única"
+	},
+	"paidDescription": {
+		"message": "Conecta-se a um serviço externo apenas para verificar a sua compra. As imagens capturadas nunca são enviadas."
+	},
+	"lazyImagesNote": {
+		"message": "Rola a página até o fim antes de capturar para carregar as imagens que ainda não foram carregadas. Páginas longas podem levar até cerca de 10 segundos"
+	},
+	"featureSplit": {
+		"message": "Dividir em várias imagens em vez de reduzir"
+	},
+	"featureSplitNote": {
+		"message": "Salva páginas longas como várias imagens em resolução total em vez de reduzi-las"
+	},
+	"splitByHeight": {
+		"message": "Dividir por altura"
+	},
+	"splitByHeightNote": {
+		"message": "Só divide quando uma imagem ficaria mais alta que isso"
+	},
+	"splitHeightLabel": {
+		"message": "Altura máxima por imagem"
+	},
+	"splitByCount": {
+		"message": "Dividir por número de imagens"
+	},
+	"splitByCountNote": {
+		"message": "Divide em imagens de mesma altura, seja qual for o comprimento da página"
+	},
+	"splitCountLabel": {
+		"message": "Dividir em"
+	},
+	"splitCountUnit": {
+		"message": "imagens"
+	},
+	"splitError": {
+		"message": "A altura deve ser um número inteiro de 1000 a 16000, e a quantidade, de 2 a 20."
+	},
+	"splitHint": {
+		"message": "Contado em pixels da imagem salva. Abra uma captura em uma nova guia para ver os pontos de divisão na régua ao lado e escolher uma altura. Em telas de alta densidade, isso é cerca do dobro do tamanho visível da página. Se uma imagem passar de 16.000 px, mais imagens são usadas."
+	},
+	"multiSizeNote": {
+		"message": "Captura em cada tamanho selecionado, um após o outro, e salva uma imagem por tamanho. Enquanto estiver ativado, “Tamanho da janela na captura” não é usado"
+	},
+	"multiSizeError": {
+		"message": "Escolha pelo menos um tamanho."
+	},
+	"paymentChecking": {
+		"message": "Verificando a sua compra…"
+	},
+	"purchasePrompt": {
+		"message": "Disponível após a compra."
+	},
+	"buy": {
+		"message": "Comprar"
+	},
+	"login": {
+		"message": "Já comprei"
+	},
+	"paidText": {
+		"message": "Comprado. Obrigado!"
+	},
+	"purchaseHint": {
+		"message": "Se você receber um e-mail de confirmação após a compra, abra o link nele e depois volte para esta página."
+	},
+	"loginHint": {
+		"message": "Se você comprou em outro navegador ou dispositivo, clique em “Já comprei” e informe o e-mail que usou."
+	},
+	"tokushohoLink": {
+		"message": "Aviso legal (em japonês)"
+	},
+	"paymentError": {
+		"message": "Não foi possível abrir a página de compra. Verifique a sua conexão com a internet."
+	},
+	"nameHeading": {
+		"message": "Numeração dos arquivos"
+	},
+	"nextNameLabel": {
+		"message": "Próximo nome de arquivo:"
+	},
+	"resetCount": {
+		"message": "Voltar para 1"
+	},
+	"shortcutHeading": {
+		"message": "Atalho de teclado"
+	},
+	"shortcutCurrent": {
+		"message": "Atalho atual: $KEY$",
+		"placeholders": {
+			"key": {
+				"content": "$1"
+			}
+		}
+	},
+	"shortcutNone": {
+		"message": "Não definido. Defina um em “Alterar”."
+	},
+	"shortcutChange": {
+		"message": "Alterar"
+	},
+	"languageHeading": {
+		"message": "Idioma / Language"
+	},
+	"languageDescription": {
+		"message": "O idioma das telas da extensão."
+	},
+	"languageAuto": {
+		"message": "Igual ao Chrome"
+	},
+	"languageHint": {
+		"message": "A descrição do botão da barra de ferramentas e o nome do atalho seguem o idioma do Chrome."
+	},
+	"resetHeading": {
+		"message": "Restaurar as configurações"
+	},
+	"resetDescription": {
+		"message": "Volta todas as configurações desta página ao estado de quando a extensão foi instalada."
+	},
+	"resetButton": {
+		"message": "Restaurar"
+	},
+	"resetHint": {
+		"message": "A numeração dos arquivos também volta para 1. Para restaurar o atalho de teclado, use “Alterar”."
+	},
+	"guideLink": {
+		"message": "Guia de uso (em japonês)"
+	},
+	"resetDialogTitle": {
+		"message": "Restaurar as configurações?"
+	},
+	"resetDialogText": {
+		"message": "As configurações desta página e a numeração dos arquivos voltam ao estado de quando a extensão foi instalada. Não é possível desfazer."
+	},
+	"cancel": {
+		"message": "Cancelar"
+	},
+	"resetDone": {
+		"message": "Configurações restauradas"
+	}
+}

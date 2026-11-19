@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RESTORE_SCROLL_AREAS } from "../../src/background/scroll-areas";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/settings";
+import { i18nStub } from "./i18n-stub";
 
 const TAB = { width: 1000, height: 613 };
 const METRICS = {
@@ -48,6 +49,7 @@ function setup(settings: Partial<Settings> = {}) {
 		return {};
 	});
 	const chromeStub = {
+		i18n: i18nStub(),
 		runtime: {
 			onInstalled: { addListener: (fn: typeof onInstalled) => (onInstalled = fn) },
 			openOptionsPage: vi.fn(),

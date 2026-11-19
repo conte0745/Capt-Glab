@@ -1,0 +1,543 @@
+{
+	"lang": {
+		"message": "en"
+	},
+	"extDescription": {
+		"message": "Capture a full web page as a PNG at a fixed viewport size in one click. Choose to save it, copy it to the clipboard, or both."
+	},
+	"commandCapture": {
+		"message": "Capture the full page"
+	},
+	"settings": {
+		"message": "Settings"
+	},
+	"saved": {
+		"message": "Saved"
+	},
+	"copied": {
+		"message": "Copied"
+	},
+	"capturedImage": {
+		"message": "Captured image"
+	},
+	"featureLazyImages": {
+		"message": "Include lazy-loaded images"
+	},
+	"featureExpandContent": {
+		"message": "Capture the full main content"
+	},
+	"featureExpandMenu": {
+		"message": "Capture the full side menu"
+	},
+	"featureMultiSize": {
+		"message": "Capture multiple sizes at once"
+	},
+	"sizeFullHd": {
+		"message": "1920 × 1080 (Full HD)"
+	},
+	"sizeTablet": {
+		"message": "768 × 1024 (tablet)"
+	},
+	"sizePhone": {
+		"message": "375 × 667 (smartphone)"
+	},
+	"popupCapturing": {
+		"message": "Capturing…"
+	},
+	"popupOpenSettings": {
+		"message": "Open settings"
+	},
+	"popupWaiting": {
+		"message": "Waiting for the previous capture to finish…"
+	},
+	"errorFailedTitle": {
+		"message": "Couldn't capture the page"
+	},
+	"errorRestrictedTitle": {
+		"message": "This page can't be captured"
+	},
+	"errorRestrictedNote": {
+		"message": "The browser protects pages such as chrome:// and the Web Store."
+	},
+	"errorBusyTitle": {
+		"message": "Already capturing"
+	},
+	"errorBusyNote": {
+		"message": "Please wait until the previous capture finishes."
+	},
+	"errorOtherDebuggerNote": {
+		"message": "Another extension is controlling this tab. Try again once it's done."
+	},
+	"errorDetachedTitle": {
+		"message": "The capture was interrupted"
+	},
+	"errorDetachedNote": {
+		"message": "The debugging bar was closed or the page navigated away during the capture. Please try again."
+	},
+	"errorUnknownNote": {
+		"message": "Reload the page and try again."
+	},
+	"noteSeparator": {
+		"message": " "
+	},
+	"noteSavedCount_other": {
+		"message": "Saved $COUNT$ images.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"noteCopiedFirst": {
+		"message": "Copied the first image to the clipboard."
+	},
+	"noteScaled": {
+		"message": "The page was long, so the image was scaled down."
+	},
+	"noteCut": {
+		"message": "Hidden parts of the main content weren't captured. You can change this in Settings."
+	},
+	"noteSaveFailed": {
+		"message": "Couldn't save the file. Check the save location in Settings."
+	},
+	"noteCopyFailed": {
+		"message": "Couldn't copy to the clipboard."
+	},
+	"doneSavedCopied": {
+		"message": "Saved and copied"
+	},
+	"doneCanceled": {
+		"message": "Save canceled"
+	},
+	"doneCaptured": {
+		"message": "Captured"
+	},
+	"conditionViewport": {
+		"message": "Viewport $WIDTH$×$HEIGHT$",
+		"placeholders": {
+			"width": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"conditionViewportCurrent": {
+		"message": "Viewport $WIDTH$×$HEIGHT$ (current window size)",
+		"placeholders": {
+			"width": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"conditionZoom": {
+		"message": "Zoom $PERCENT$%",
+		"placeholders": {
+			"percent": {
+				"content": "$1"
+			}
+		}
+	},
+	"conditionScaled": {
+		"message": "Scaled down"
+	},
+	"conditionPart": {
+		"message": "Part $PART$ / $TOTAL$",
+		"placeholders": {
+			"part": {
+				"content": "$1"
+			},
+			"total": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerTitle": {
+		"message": "CaptGrab - Captured image"
+	},
+	"viewerPrev": {
+		"message": "Previous image"
+	},
+	"viewerNext": {
+		"message": "Next image"
+	},
+	"viewerSave": {
+		"message": "Save"
+	},
+	"viewerSaveAs": {
+		"message": "Save as"
+	},
+	"viewerCopy": {
+		"message": "Copy"
+	},
+	"viewerSaveAll": {
+		"message": "Save all"
+	},
+	"viewerApplySplit": {
+		"message": "Split at this height from the next capture"
+	},
+	"viewerSplitPaidOnly": {
+		"message": "Splitting by height is a paid feature. You can buy it in Settings."
+	},
+	"viewerNoImage": {
+		"message": "The image can't be shown. Images are cleared when this page is reloaded. Please capture again."
+	},
+	"viewerImageAlt": {
+		"message": "Captured full-page image"
+	},
+	"viewerImageAltPart": {
+		"message": "Captured page image ($INDEX$ / $TOTAL$)",
+		"placeholders": {
+			"index": {
+				"content": "$1"
+			},
+			"total": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerSplitHint": {
+		"message": "Drag the ruler on the left to see where the image would be split by height."
+	},
+	"viewerSplitResult_other": {
+		"message": "At $HEIGHT$px, this image will be split into $COUNT$ images.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerConditionsSeparator": {
+		"message": " · "
+	},
+	"viewerSaveFailed": {
+		"message": "Couldn't save"
+	},
+	"viewerSavedAll_other": {
+		"message": "Saved $COUNT$ images",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerCopyFailed": {
+		"message": "Couldn't copy"
+	},
+	"viewerSplitApplied": {
+		"message": "Future captures will be split at $HEIGHT$px",
+		"placeholders": {
+			"height": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerRulerLabel": {
+		"message": "Split height (px)"
+	},
+	"optionsTitle": {
+		"message": "CaptGrab - Settings"
+	},
+	"optionsHeading": {
+		"message": "CaptGrab settings"
+	},
+	"optionsLead": {
+		"message": "Changes are saved right away and apply from the next capture."
+	},
+	"actionsHeading": {
+		"message": "After capturing"
+	},
+	"actionsDescription": {
+		"message": "You can choose more than one."
+	},
+	"actionDownload": {
+		"message": "Save to a file"
+	},
+	"actionDownloadNote": {
+		"message": "Saves a PNG image to your computer"
+	},
+	"actionClipboard": {
+		"message": "Copy to the clipboard"
+	},
+	"actionClipboardNote": {
+		"message": "Paste it straight into chats and documents"
+	},
+	"actionOpenTab": {
+		"message": "Open in a new tab"
+	},
+	"actionOpenTabNote": {
+		"message": "Check the result right away"
+	},
+	"actionsError": {
+		"message": "Choose at least one."
+	},
+	"saveHeading": {
+		"message": "Save location"
+	},
+	"saveDescription": {
+		"message": "Due to Chrome's restrictions, a fixed location must be inside your Downloads folder."
+	},
+	"folderLabel": {
+		"message": "Folder inside Downloads (optional)"
+	},
+	"folderPlaceholder": {
+		"message": "e.g. CaptGrab"
+	},
+	"folderErrorInvalid": {
+		"message": "This folder name can't be used."
+	},
+	"folderErrorAnd": {
+		"message": "and"
+	},
+	"folderErrorNotAllowed": {
+		"message": "aren't allowed."
+	},
+	"askEveryTime": {
+		"message": "Choose a location every time"
+	},
+	"askEveryTimeNote": {
+		"message": "Lets you save outside Downloads too"
+	},
+	"savePreview": {
+		"message": "Saves to: $PATH$",
+		"placeholders": {
+			"path": {
+				"content": "$1"
+			}
+		}
+	},
+	"downloadsFolder": {
+		"message": "Downloads"
+	},
+	"viewportHeading": {
+		"message": "Viewport size for capturing"
+	},
+	"viewportDescription": {
+		"message": "The viewport size that determines the page layout."
+	},
+	"viewportCurrent": {
+		"message": "Current window size"
+	},
+	"viewportCurrentNote": {
+		"message": "Captures the layout at your current window size"
+	},
+	"viewportCustom": {
+		"message": "Custom size"
+	},
+	"viewportCustomNote": {
+		"message": "Always captures at the same size, whatever your screen size"
+	},
+	"presetLabel": {
+		"message": "Preset sizes"
+	},
+	"presetChoose": {
+		"message": "Choose a size"
+	},
+	"widthLabel": {
+		"message": "Width"
+	},
+	"heightLabel": {
+		"message": "Height"
+	},
+	"viewportError": {
+		"message": "Width and height must be whole numbers from 200 to 7680."
+	},
+	"viewportHint": {
+		"message": "Only the width and height change. Sites may not switch to their mobile layout."
+	},
+	"viewportOverridden": {
+		"message": "Not used because \"Capture multiple sizes at once\" is on."
+	},
+	"scrollHeading": {
+		"message": "Scrollable areas"
+	},
+	"scrollDescription": {
+		"message": "How to capture pages where only part of the screen scrolls. The areas are expanded only while capturing and restored afterward."
+	},
+	"expandContentNote": {
+		"message": "Keeps the main content from being cut off in dashboards and web apps"
+	},
+	"expandMenuNote": {
+		"message": "Captures long menus in full. The menu may look different"
+	},
+	"scrollHint": {
+		"message": "Unchecked areas aren't expanded. On some pages, though, expanding the main content also stretches the menu, so it's captured in full."
+	},
+	"paidHeading": {
+		"message": "Paid features"
+	},
+	"price": {
+		"message": "¥500, one-time purchase"
+	},
+	"paidDescription": {
+		"message": "Connects to an external service only to check your purchase. Captured images are never sent."
+	},
+	"lazyImagesNote": {
+		"message": "Scrolls to the bottom before capturing so images that haven't loaded yet get loaded. Long pages can take up to about 10 seconds"
+	},
+	"featureSplit": {
+		"message": "Split into multiple images instead of scaling down"
+	},
+	"featureSplitNote": {
+		"message": "Saves long pages as multiple images at full resolution instead of scaling them down"
+	},
+	"splitByHeight": {
+		"message": "Split by height"
+	},
+	"splitByHeightNote": {
+		"message": "Splits only when an image would be taller than this"
+	},
+	"splitHeightLabel": {
+		"message": "Max height per image"
+	},
+	"splitByCount": {
+		"message": "Split by number of images"
+	},
+	"splitByCountNote": {
+		"message": "Splits into images of equal height, whatever the page length"
+	},
+	"splitCountLabel": {
+		"message": "Split into"
+	},
+	"splitCountUnit": {
+		"message": "images"
+	},
+	"splitError": {
+		"message": "Height must be a whole number from 1000 to 16000, and the count from 2 to 20."
+	},
+	"splitHint": {
+		"message": "Counted in pixels of the saved image. Open a capture in a new tab to check the split positions on the ruler beside it and choose a height from there. On high-DPI screens this is about twice the page's visible size. If an image would exceed 16,000px, more images are used."
+	},
+	"multiSizeNote": {
+		"message": "Captures at each selected size in turn and saves one image per size. While this is on, \"Viewport size for capturing\" isn't used"
+	},
+	"multiSizeError": {
+		"message": "Choose at least one size."
+	},
+	"paymentChecking": {
+		"message": "Checking your purchase…"
+	},
+	"purchasePrompt": {
+		"message": "Available after purchase."
+	},
+	"buy": {
+		"message": "Buy"
+	},
+	"login": {
+		"message": "Already purchased"
+	},
+	"paidText": {
+		"message": "Purchased. Thank you!"
+	},
+	"purchaseHint": {
+		"message": "If you get a confirmation email after purchasing, open the link in it, then come back to this page."
+	},
+	"loginHint": {
+		"message": "If you made the purchase on another browser or device, click \"Already purchased\" and enter the email address you used."
+	},
+	"tokushohoLink": {
+		"message": "Legal notice (in Japanese)"
+	},
+	"paymentError": {
+		"message": "Couldn't open the purchase page. Check your internet connection."
+	},
+	"nameHeading": {
+		"message": "File numbering"
+	},
+	"nextNameLabel": {
+		"message": "Next file name:"
+	},
+	"resetCount": {
+		"message": "Reset to 1"
+	},
+	"shortcutHeading": {
+		"message": "Keyboard shortcut"
+	},
+	"shortcutCurrent": {
+		"message": "Current shortcut: $KEY$",
+		"placeholders": {
+			"key": {
+				"content": "$1"
+			}
+		}
+	},
+	"shortcutNone": {
+		"message": "Not assigned. Set one with \"Change\"."
+	},
+	"shortcutChange": {
+		"message": "Change"
+	},
+	"languageHeading": {
+		"message": "Language"
+	},
+	"languageDescription": {
+		"message": "The language used on the extension's screens."
+	},
+	"languageAuto": {
+		"message": "Same as Chrome"
+	},
+	"languageHint": {
+		"message": "The toolbar button description and the shortcut name follow Chrome's language."
+	},
+	"resetHeading": {
+		"message": "Reset settings"
+	},
+	"resetDescription": {
+		"message": "Restores every setting on this page to how it was when you installed the extension."
+	},
+	"resetButton": {
+		"message": "Reset"
+	},
+	"resetHint": {
+		"message": "File numbering also goes back to 1. To reset the keyboard shortcut, use \"Change\"."
+	},
+	"guideLink": {
+		"message": "User guide (in Japanese)"
+	},
+	"resetDialogTitle": {
+		"message": "Reset settings?"
+	},
+	"resetDialogText": {
+		"message": "The settings on this page and the file numbering go back to how they were when you installed the extension. This can't be undone."
+	},
+	"cancel": {
+		"message": "Cancel"
+	},
+	"resetDone": {
+		"message": "Settings reset"
+	},
+	"noteSavedCount_one": {
+		"message": "Saved $COUNT$ image.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	},
+	"viewerSplitResult_one": {
+		"message": "At $HEIGHT$px, this image won't be split.",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			},
+			"height": {
+				"content": "$2"
+			}
+		}
+	},
+	"viewerSavedAll_one": {
+		"message": "Saved $COUNT$ image",
+		"placeholders": {
+			"count": {
+				"content": "$1"
+			}
+		}
+	}
+}

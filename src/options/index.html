@@ -4,7 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="color-scheme" content="light dark" />
-		<title>CaptGrab - 設定</title>
+		<title data-i18n="optionsTitle">CaptGrab - 設定</title>
 		<link rel="icon" href="../icons/icon-48.png" />
 		<style>
 			:root {
@@ -308,188 +308,197 @@
 		<div class="page">
 			<header>
 				<img src="../icons/icon-128.png" alt="" />
-				<h1>CaptGrab の設定</h1>
+				<h1 data-i18n="optionsHeading">CaptGrab の設定</h1>
 			</header>
-			<p class="lead">変更はすぐに保存され、次の撮影から反映されます。</p>
+			<p class="lead" data-i18n="optionsLead">変更はすぐに保存され、次の撮影から反映されます。</p>
 
 			<section class="card">
-				<h2>撮影後の動作</h2>
-				<p class="description">複数選べます。</p>
+				<h2 data-i18n="actionsHeading">撮影後の動作</h2>
+				<p class="description" data-i18n="actionsDescription">複数選べます。</p>
 				<label class="choice">
 					<input type="checkbox" id="download" />
-					<span><strong>ファイルに保存</strong><small>PNG 画像としてパソコンに保存します</small></span>
+					<span><strong data-i18n="actionDownload">ファイルに保存</strong><small data-i18n="actionDownloadNote">PNG 画像としてパソコンに保存します</small></span>
 				</label>
 				<label class="choice">
 					<input type="checkbox" id="clipboard" />
-					<span><strong>クリップボードにコピー</strong><small>チャットや資料にすぐ貼り付けられます</small></span>
+					<span><strong data-i18n="actionClipboard">クリップボードにコピー</strong><small data-i18n="actionClipboardNote">チャットや資料にすぐ貼り付けられます</small></span>
 				</label>
 				<label class="choice">
 					<input type="checkbox" id="openTab" />
-					<span><strong>別のタブで開く</strong><small>撮影結果をその場で確認できます</small></span>
+					<span><strong data-i18n="actionOpenTab">別のタブで開く</strong><small data-i18n="actionOpenTabNote">撮影結果をその場で確認できます</small></span>
 				</label>
-				<p class="error" id="actions-error" role="alert" hidden>少なくとも1つ選んでください。</p>
+				<p class="error" id="actions-error" role="alert" hidden data-i18n="actionsError">少なくとも1つ選んでください。</p>
 			</section>
 
 			<section class="card" id="save-section">
-				<h2>保存先</h2>
-				<p class="description">Chrome の制限で、ダウンロードフォルダの外は固定できません。</p>
-				<label class="field-label" for="folder">ダウンロードフォルダ内のフォルダ（任意）</label>
-				<input type="text" id="folder" placeholder="例: CaptGrab" />
+				<h2 data-i18n="saveHeading">保存先</h2>
+				<p class="description" data-i18n="saveDescription">Chrome の制限で、ダウンロードフォルダの外は固定できません。</p>
+				<label class="field-label" for="folder" data-i18n="folderLabel">ダウンロードフォルダ内のフォルダ（任意）</label>
+				<input type="text" id="folder" placeholder="例: CaptGrab" data-i18n-placeholder="folderPlaceholder" />
 				<p class="preview" id="save-preview"></p>
 				<p class="error" id="folder-error" role="alert" hidden>
-					このフォルダ名は使えません。<code>..</code> や <code>&lt; &gt; : " | ? *</code> は使えません。
+					<span data-i18n="folderErrorInvalid">このフォルダ名は使えません。</span><code>..</code> <span data-i18n="folderErrorAnd">や</span> <code>&lt; &gt; : " | ? *</code> <span data-i18n="folderErrorNotAllowed">は使えません。</span>
 				</p>
 				<label class="choice">
 					<input type="checkbox" id="askEveryTime" />
-					<span><strong>保存のたびに場所を選ぶ</strong><small>ダウンロードフォルダの外にも保存できます</small></span>
+					<span><strong data-i18n="askEveryTime">保存のたびに場所を選ぶ</strong><small data-i18n="askEveryTimeNote">ダウンロードフォルダの外にも保存できます</small></span>
 				</label>
 			</section>
 
 			<section class="card">
-				<h2>撮影するときの画面サイズ</h2>
-				<p class="description">ページのレイアウトを決める、ビューポートのサイズです。</p>
+				<h2 data-i18n="viewportHeading">撮影するときの画面サイズ</h2>
+				<p class="description" data-i18n="viewportDescription">ページのレイアウトを決める、ビューポートのサイズです。</p>
 				<label class="choice">
 					<input type="radio" name="viewport" id="viewport-current" />
-					<span><strong>今の画面のまま</strong><small>見えているレイアウトで撮影します</small></span>
+					<span><strong data-i18n="viewportCurrent">今の画面のまま</strong><small data-i18n="viewportCurrentNote">見えているレイアウトで撮影します</small></span>
 				</label>
 				<label class="choice">
 					<input type="radio" name="viewport" id="viewport-custom" />
-					<span><strong>サイズを指定</strong><small>画面の大きさに関係なく、同じサイズで撮影します</small></span>
+					<span><strong data-i18n="viewportCustom">サイズを指定</strong><small data-i18n="viewportCustomNote">画面の大きさに関係なく、同じサイズで撮影します</small></span>
 				</label>
 				<div class="nested" id="viewport-fields">
-					<label class="field-label" for="preset">よく使うサイズ</label>
+					<label class="field-label" for="preset" data-i18n="presetLabel">よく使うサイズ</label>
 					<select id="preset">
-						<option value="">選んでください</option>
-						<option value="1920x1080">1920 × 1080（フルHD）</option>
+						<option value="" data-i18n="presetChoose">選んでください</option>
+						<option value="1920x1080" data-i18n="sizeFullHd">1920 × 1080（フルHD）</option>
 						<option value="1440x900">1440 × 900</option>
 						<option value="1280x800">1280 × 800</option>
-						<option value="768x1024">768 × 1024（タブレット）</option>
-						<option value="375x667">375 × 667（スマートフォン）</option>
+						<option value="768x1024" data-i18n="sizeTablet">768 × 1024（タブレット）</option>
+						<option value="375x667" data-i18n="sizePhone">375 × 667（スマートフォン）</option>
 					</select>
 					<div class="size">
-						<label>幅 <input type="number" id="width" min="200" max="7680" /></label>
-						<label>高さ <input type="number" id="height" min="200" max="7680" /></label>
+						<label><span data-i18n="widthLabel">幅</span> <input type="number" id="width" min="200" max="7680" /></label>
+						<label><span data-i18n="heightLabel">高さ</span> <input type="number" id="height" min="200" max="7680" /></label>
 						<span>px</span>
 					</div>
-					<p class="error" id="viewport-error" role="alert" hidden>幅と高さは 200〜7680 の整数で指定してください。</p>
-					<p class="hint">幅と高さだけを変えます。スマートフォン専用の表示になるとは限りません。</p>
+					<p class="error" id="viewport-error" role="alert" hidden data-i18n="viewportError">幅と高さは 200〜7680 の整数で指定してください。</p>
+					<p class="hint" data-i18n="viewportHint">幅と高さだけを変えます。スマートフォン専用の表示になるとは限りません。</p>
 				</div>
-				<p class="hint" id="viewport-overridden" hidden>「複数のサイズで一度に撮る」がオンのため、この設定は使われません。</p>
+				<p class="hint" id="viewport-overridden" hidden data-i18n="viewportOverridden">「複数のサイズで一度に撮る」がオンのため、この設定は使われません。</p>
 			</section>
 
 			<section class="card">
-				<h2>スクロールする領域</h2>
-				<p class="description">ページ全体ではなく、一部の領域だけがスクロールする画面の撮り方です。撮影中だけ領域を広げ、撮影後に元に戻します。</p>
+				<h2 data-i18n="scrollHeading">スクロールする領域</h2>
+				<p class="description" data-i18n="scrollDescription">ページ全体ではなく、一部の領域だけがスクロールする画面の撮り方です。撮影中だけ領域を広げ、撮影後に元に戻します。</p>
 				<label class="choice">
 					<input type="checkbox" id="expandContent" />
-					<span><strong>本文を最後まで撮る</strong><small>管理画面や Web アプリで、本文が途中で切れなくなります</small></span>
+					<span><strong data-i18n="featureExpandContent">本文を最後まで撮る</strong><small data-i18n="expandContentNote">管理画面や Web アプリで、本文が途中で切れなくなります</small></span>
 				</label>
 				<label class="choice">
 					<input type="checkbox" id="expandMenu" />
-					<span><strong>サイドメニューを最後まで撮る</strong><small>長いメニューも全部写します。メニューの見た目が変わることがあります</small></span>
+					<span><strong data-i18n="featureExpandMenu">サイドメニューを最後まで撮る</strong><small data-i18n="expandMenuNote">長いメニューも全部写します。メニューの見た目が変わることがあります</small></span>
 				</label>
-				<p class="hint">オフの領域は広げません。ただし、本文を広げるとメニューが一緒に伸びて、全部写る画面もあります。</p>
+				<p class="hint" data-i18n="scrollHint">チェックしていない領域は広げません。ただし、本文を広げるとメニューが一緒に伸びて、全部写る画面もあります。</p>
 			</section>
 
 			<section class="card" id="paid-section">
-				<h2>有料機能<span class="price" id="price">買い切り 500 円</span></h2>
-				<p class="description">購入の確認のときだけ外部サービスと通信します。撮影した画像は送信しません。</p>
+				<h2><span data-i18n="paidHeading">有料機能</span><span class="price" id="price" data-i18n="price">買い切り 500 円</span></h2>
+				<p class="description" data-i18n="paidDescription">購入の確認のときだけ外部サービスと通信します。撮影した画像は送信しません。</p>
 				<label class="choice">
 					<input type="checkbox" id="loadLazyImages" disabled />
-					<span><strong>遅延読み込みの画像も写す</strong><small>撮影前にページを下までスクロールして、まだ読み込まれていない画像を読み込ませます。長いページでは撮影に最大 10 秒ほどかかります</small></span>
+					<span><strong data-i18n="featureLazyImages">遅延読み込みの画像も写す</strong><small data-i18n="lazyImagesNote">撮影前にページを下までスクロールして、まだ読み込まれていない画像を読み込ませます。長いページでは撮影に最大 10 秒ほどかかります</small></span>
 				</label>
 				<label class="choice">
 					<input type="checkbox" id="splitLongPages" disabled />
-					<span><strong>縮小せずに画像を分けて保存</strong><small>長いページを縮小する代わりに、複数の画像に分けて元の解像度のまま保存します</small></span>
+					<span><strong data-i18n="featureSplit">縮小せずに画像を分けて保存</strong><small data-i18n="featureSplitNote">長いページを縮小する代わりに、複数の画像に分けて元の解像度のまま保存します</small></span>
 				</label>
 				<div class="nested" id="split-fields">
 					<label class="choice">
 						<input type="radio" name="splitMode" id="split-height" disabled />
-						<span><strong>高さで分ける</strong><small>1枚の高さがこの値を超えるときだけ分けます</small></span>
+						<span><strong data-i18n="splitByHeight">高さで分ける</strong><small data-i18n="splitByHeightNote">1枚の高さがこの値を超えるときだけ分けます</small></span>
 					</label>
 					<div class="size">
-						<label>1枚の高さの上限 <input type="number" id="splitHeight" min="1000" max="16000" step="1000" disabled /></label>
+						<label><span data-i18n="splitHeightLabel">1枚の高さの上限</span> <input type="number" id="splitHeight" min="1000" max="16000" step="1000" disabled /></label>
 						<span>px</span>
 					</div>
 					<label class="choice">
 						<input type="radio" name="splitMode" id="split-count" disabled />
-						<span><strong>枚数で分ける</strong><small>ページの長さに関係なく、同じ高さの画像に分けます</small></span>
+						<span><strong data-i18n="splitByCount">枚数で分ける</strong><small data-i18n="splitByCountNote">ページの長さに関係なく、同じ高さの画像に分けます</small></span>
 					</label>
 					<div class="size">
-						<label>枚数 <input type="number" id="splitCount" min="2" max="20" disabled /></label>
-						<span>枚</span>
+						<label><span data-i18n="splitCountLabel">枚数</span> <input type="number" id="splitCount" min="2" max="20" disabled /></label>
+						<span data-i18n="splitCountUnit">枚</span>
 					</div>
-					<p class="error" id="split-error" role="alert" hidden>高さは 1000〜16000、枚数は 2〜20 の整数で指定してください。</p>
-					<p class="hint">保存される画像のピクセル数で数えます。撮影した画像を別タブで開くと、横の目盛りで分かれる位置を確かめて、そこから高さを決められます。高 DPI の画面では、ページの見た目の 2 倍ほどになります。1枚が 16,000px を超えるときは、枚数を増やします。</p>
+					<p class="error" id="split-error" role="alert" hidden data-i18n="splitError">高さは 1000〜16000、枚数は 2〜20 の整数で指定してください。</p>
+					<p class="hint" data-i18n="splitHint">保存される画像のピクセル数で数えます。撮影した画像を別タブで開くと、横の目盛りで分かれる位置を確かめて、そこから高さを決められます。高 DPI の画面では、ページの見た目の 2 倍ほどになります。1枚が 16,000px を超えるときは、枚数を増やします。</p>
 				</div>
 				<label class="choice">
 					<input type="checkbox" id="multiSize" disabled />
-					<span><strong>複数のサイズで一度に撮る</strong><small>選んだ画面サイズで続けて撮影し、サイズごとに保存します。オンのあいだは「撮影するときの画面サイズ」の設定を使いません</small></span>
+					<span><strong data-i18n="featureMultiSize">複数のサイズで一度に撮る</strong><small data-i18n="multiSizeNote">選んだ画面サイズで続けて撮影し、サイズごとに保存します。オンのあいだは「撮影するときの画面サイズ」の設定を使いません</small></span>
 				</label>
 				<div class="nested" id="multi-size-fields">
 					<div class="size-options">
-						<label><input type="checkbox" name="multiSizes" value="1920x1080" disabled />1920 × 1080（フルHD）</label>
+						<label><input type="checkbox" name="multiSizes" value="1920x1080" disabled /><span data-i18n="sizeFullHd">1920 × 1080（フルHD）</span></label>
 						<label><input type="checkbox" name="multiSizes" value="1440x900" disabled />1440 × 900</label>
 						<label><input type="checkbox" name="multiSizes" value="1280x800" disabled />1280 × 800</label>
-						<label><input type="checkbox" name="multiSizes" value="768x1024" disabled />768 × 1024（タブレット）</label>
-						<label><input type="checkbox" name="multiSizes" value="375x667" disabled />375 × 667（スマートフォン）</label>
+						<label><input type="checkbox" name="multiSizes" value="768x1024" disabled /><span data-i18n="sizeTablet">768 × 1024（タブレット）</span></label>
+						<label><input type="checkbox" name="multiSizes" value="375x667" disabled /><span data-i18n="sizePhone">375 × 667（スマートフォン）</span></label>
 					</div>
-					<p class="error" id="multi-size-error" role="alert" hidden>サイズを1つ以上選んでください。</p>
+					<p class="error" id="multi-size-error" role="alert" hidden data-i18n="multiSizeError">サイズを1つ以上選んでください。</p>
 				</div>
-				<p class="hint" id="payment-checking">購入状況を確認しています…</p>
+				<p class="hint" id="payment-checking" data-i18n="paymentChecking">購入状況を確認しています…</p>
 				<div class="row" id="purchase" hidden>
-					<span>購入すると使えるようになります。</span>
+					<span data-i18n="purchasePrompt">購入すると使えるようになります。</span>
 					<span class="buttons">
-						<button type="button" class="primary" id="buy">購入する</button>
-						<button type="button" id="login">購入済みの方</button>
+						<button type="button" class="primary" id="buy" data-i18n="buy">購入する</button>
+						<button type="button" id="login" data-i18n="login">購入済みの方</button>
 					</span>
 				</div>
-				<p class="hint" id="paid-text" hidden>購入済みです。ありがとうございます。</p>
-				<p class="hint" id="purchase-hint" hidden>購入後に確認のメールが届いた場合は、メールのリンクを開いてから、この画面に戻ってください。</p>
-				<p class="hint" id="login-hint">別の Chrome で購入した場合は「購入済みの方」から、購入時のメールアドレスで引き継げます。</p>
+				<p class="hint" id="paid-text" hidden data-i18n="paidText">購入済みです。ありがとうございます。</p>
+				<p class="hint" id="purchase-hint" hidden data-i18n="purchaseHint">購入後に確認のメールが届いた場合は、メールのリンクを開いてから、この画面に戻ってください。</p>
+				<p class="hint" id="login-hint" data-i18n="loginHint">別の Chrome で購入した場合は「購入済みの方」から、購入時のメールアドレスで引き継げます。</p>
 				<p class="hint">
-					<a href="https://captgrab.shiftonton.net/tokushoho.html" target="_blank" rel="noopener noreferrer">特定商取引法に基づく表記</a>
+					<a href="https://captgrab.shiftonton.net/tokushoho.html" target="_blank" rel="noopener noreferrer" data-i18n="tokushohoLink">特定商取引法に基づく表記</a>
 				</p>
-				<p class="error" id="payment-error" role="alert" hidden>購入ページを開けませんでした。インターネットの接続を確認してください。</p>
+				<p class="error" id="payment-error" role="alert" hidden data-i18n="paymentError">購入ページを開けませんでした。インターネットの接続を確認してください。</p>
 			</section>
 
 			<section class="card" id="name-section">
-				<h2>ファイル名の連番</h2>
+				<h2 data-i18n="nameHeading">ファイル名の連番</h2>
 				<div class="row">
-					<span>次のファイル名: <code id="next-name"></code></span>
-					<button type="button" id="reset-count">1 に戻す</button>
+					<span><span data-i18n="nextNameLabel">次のファイル名:</span> <code id="next-name"></code></span>
+					<button type="button" id="reset-count" data-i18n="resetCount">1 に戻す</button>
 				</div>
 			</section>
 
 			<section class="card">
-				<h2>ショートカットキー</h2>
+				<h2 data-i18n="shortcutHeading">ショートカットキー</h2>
 				<div class="row">
 					<span id="shortcut-text"></span>
-					<button type="button" id="shortcuts">変更する</button>
+					<button type="button" id="shortcuts" data-i18n="shortcutChange">変更する</button>
 				</div>
 			</section>
 
 			<section class="card">
-				<h2>設定を初期値に戻す</h2>
+				<h2 id="language-heading" data-i18n="languageHeading">言語 / Language</h2>
+				<p class="description" data-i18n="languageDescription">拡張機能の画面に表示する言語です。</p>
+				<select id="language" aria-labelledby="language-heading">
+					<option value="auto" data-i18n="languageAuto">Chrome の設定に合わせる</option>
+				</select>
+				<p class="hint" data-i18n="languageHint">ツールバーのボタンの説明とショートカットの名前は、Chrome の言語で表示されます。</p>
+			</section>
+
+			<section class="card">
+				<h2 data-i18n="resetHeading">設定を初期値に戻す</h2>
 				<div class="row">
-					<span>この画面の設定をすべて、インストールしたときの状態に戻します。</span>
-					<button type="button" id="reset-settings">初期値に戻す</button>
+					<span data-i18n="resetDescription">この画面の設定をすべて、インストールしたときの状態に戻します。</span>
+					<button type="button" id="reset-settings" data-i18n="resetButton">初期値に戻す</button>
 				</div>
-				<p class="hint">ファイル名の連番も 1 に戻ります。ショートカットキーは「変更する」から戻してください。</p>
+				<p class="hint" data-i18n="resetHint">ファイル名の連番も 1 に戻ります。ショートカットキーは「変更する」から戻してください。</p>
 			</section>
 
 			<footer>
-				<a href="https://captgrab.shiftonton.net/guide.html" target="_blank" rel="noopener noreferrer">使い方ガイド</a>
+				<a href="https://captgrab.shiftonton.net/guide.html" target="_blank" rel="noopener noreferrer" data-i18n="guideLink">使い方ガイド</a>
 			</footer>
 		</div>
 
 		<dialog id="reset-dialog" aria-labelledby="reset-dialog-title">
 			<form method="dialog">
-				<h3 id="reset-dialog-title">設定を初期値に戻しますか？</h3>
-				<p>この画面の設定とファイル名の連番を、インストールしたときの状態に戻します。元には戻せません。</p>
+				<h3 id="reset-dialog-title" data-i18n="resetDialogTitle">設定を初期値に戻しますか？</h3>
+				<p data-i18n="resetDialogText">この画面の設定とファイル名の連番を、インストールしたときの状態に戻します。元には戻せません。</p>
 				<div class="buttons">
-					<button value="cancel" autofocus>キャンセル</button>
-					<button value="reset" class="danger">初期値に戻す</button>
+					<button value="cancel" autofocus data-i18n="cancel">キャンセル</button>
+					<button value="reset" class="danger" data-i18n="resetButton">初期値に戻す</button>
 				</div>
 			</form>
 		</dialog>

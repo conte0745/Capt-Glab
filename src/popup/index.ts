@@ -1,28 +1,19 @@
-export {};
+import { initI18n, localizePage, t, tPlural, type MessageKey } from "../i18n";
 
 const AUTO_CLOSE_MS = 2000;
 // 読み切れるよう、補足があるときは長めに表示する
 const AUTO_CLOSE_WITH_NOTE_MS = 5000;
 
-const ERROR_MESSAGES: Record<string, [string, string]> = {
-	restricted: [
-		"このページは撮影できません",
-		"chrome:// やウェブストアなど、ブラウザが保護しているページです。",
-	],
-	busy: ["撮影中です", "前の撮影が終わるまで、少しお待ちください。"],
-	"other-debugger": [
-		"撮影できませんでした",
-		"他の拡張機能がこのタブを操作しています。終わってからお試しください。",
-	],
-	detached: [
-		"撮影が中断されました",
-		"撮影中にデバッグのバーが閉じられたか、ページが移動しました。もう一度お試しください。",
-	],
-	unknown: [
-		"撮影できませんでした",
-		"ページを読み込み直してから、もう一度お試しください。",
-	],
+const ERROR_MESSAGES: Record<string, [MessageKey, MessageKey]> = {
+	restricted: ["errorRestrictedTitle", "errorRestrictedNote"],
+	busy: ["errorBusyTitle", "errorBusyNote"],
+	"other-debugger": ["errorFailedTitle", "errorOtherDebuggerNote"],
+	detached: ["errorDetachedTitle", "errorDetachedNote"],
+	unknown: ["errorFailedTitle", "errorUnknownNote"],
 };
+
+await initI18n();
+localizePage();
 
 const statusText = document.getElementById("status")!;
 const noteText = document.getElementById("note")!;
@@ -52,11 +43,11 @@ async function start() {
 
 	port.onMessage.addListener(async (message) => {
 		if (message.type === "waiting") {
-			statusText.textContent = "前回の撮影の後処理を待っています…";
+			statusText.textContent = t("popupWaiting");
 		} else if (message.type === "error") {
 			const [status, note] =
 				ERROR_MESSAGES[message.reason] ?? ERROR_MESSAGES.unknown;
-			show(status, note);
+			show(t(status), t(note));
 		} else if (message.type === "done") {
 			await finish(port, message);
 		}
@@ -85,24 +76,24 @@ async function finish(port: chrome.runtime.Port, message: DoneMessage) {
 	const notes = [];
 	const count = message.count ?? 1;
 	if (count > 1 && message.saved === "saved") {
-		notes.push(`${count} 枚の画像を保存しました。`);
+		notes.push(tPlural("noteSavedCount", count));
 	}
 	if (count > 1 && copied) {
-		notes.push("クリップボードには1枚目をコピーしました。");
+		notes.push(t("noteCopiedFirst"));
 	}
 	if (message.scaled) {
-		notes.push("長いページのため、縮小して保存しました。");
+		notes.push(t("noteScaled"));
 	}
 	if (message.cut) {
-		notes.push("本文の見えていない部分は写っていません。設定で変更できます。");
+		notes.push(t("noteCut"));
 	}
 	if (message.saved === "failed") {
-		notes.push("ファイルを保存できませんでした。設定の保存先をご確認ください。");
+		notes.push(t("noteSaveFailed"));
 	}
 	if (copied === false) {
-		notes.push("クリップボードにコピーできませんでした。");
+		notes.push(t("noteCopyFailed"));
 	}
-	show(completedText(message.saved, copied), notes.join(""));
+	show(completedText(message.saved, copied), notes.join(t("noteSeparator")));
 
 	await sleep(notes.length ? AUTO_CLOSE_WITH_NOTE_MS : AUTO_CLOSE_MS);
 	closeRequested = true;
@@ -113,11 +104,11 @@ async function finish(port: chrome.runtime.Port, message: DoneMessage) {
 
 /** 保存とコピーの結果から、表示する見出しを選ぶ */
 function completedText(saved: DoneMessage["saved"], copied: boolean | null) {
-	if (saved === "saved" && copied) return "保存してコピーしました";
-	if (saved === "saved") return "保存しました";
-	if (copied) return "コピーしました";
-	if (saved === "canceled") return "保存をキャンセルしました";
-	return "撮影しました";
+	if (saved === "saved" && copied) return t("doneSavedCopied");
+	if (saved === "saved") return t("saved");
+	if (copied) return t("copied");
+	if (saved === "canceled") return t("doneCanceled");
+	return t("doneCaptured");
 }
 
 /** 画像をクリップボードにコピーし、成功したかを返す */
