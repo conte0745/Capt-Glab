@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"description": "__MSG_extDescription__",
-	"default_locale": "en",
+	"default_locale": "ja",
 	"name": "CaptGrab",
 	"icons": {
 		"16": "src/icons/icon-16.png",
